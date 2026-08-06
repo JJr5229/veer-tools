@@ -1,0 +1,2049 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veer · NFC Studio</title>
+<style>
+:root{
+  /* Veer palette — mark colours #ef4037 / #bd222f / #f69322 */
+  --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
+  --tx:#f2efe9; --tx2:#9b9a96; --acc:#f69322; --acc2:#a8541a;
+  --red:#ef4037; --red2:#bd222f; --warn:#f69322; --bad:#ef4037;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:13px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;
+  overflow:hidden;display:flex;flex-direction:column;height:100vh}
+#app{display:flex;flex:1;min-height:0}
+.powered{
+  background:#131519;                /* panel is #17191d — a shade darker, no more */
+  flex:none;padding:8px 0 9px;
+  font-size:.72rem;letter-spacing:.05em;color:#6f6e6a;text-align:center;line-height:1.3;
+}
+.powered a{color:#9b9a96;font-weight:600;text-decoration:none}
+.powered a:hover{color:#fff}
+
+/* ---------- sidebar ---------- */
+#side{width:360px;min-width:360px;background:var(--panel);border-right:1px solid var(--line);
+      display:flex;flex-direction:column}
+#brand{padding:14px 16px;border-bottom:1px solid var(--line)}
+#brand h1{margin:0;font-size:15px;letter-spacing:.3px}
+#brand p{margin:2px 0 0;font-size:11px;color:var(--tx2)}
+#ctrls{flex:1;overflow-y:auto;padding:6px 14px 24px}
+#ctrls::-webkit-scrollbar{width:10px}
+#ctrls::-webkit-scrollbar-thumb{background:#2a323d;border-radius:5px}
+
+details.sec{border-bottom:1px solid var(--line);padding:4px 0}
+details.sec>summary{cursor:pointer;padding:9px 2px;font-weight:600;font-size:12px;
+  letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);list-style:none;user-select:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary:before{content:"▸";display:inline-block;width:14px;color:var(--acc);
+  transition:transform .15s}
+details.sec[open]>summary:before{transform:rotate(90deg)}
+details.sec>summary:hover{color:var(--tx)}
+.body{padding:4px 2px 12px}
+
+.row{display:flex;align-items:center;gap:8px;margin:7px 0}
+.row label{flex:1;color:var(--tx2);font-size:12px}
+.row .hint{font-size:10.5px;color:#6b7embed}
+input[type=number],input[type=text],select{
+  background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:6px;
+  padding:5px 7px;font:inherit;width:86px}
+input[type=text].wide{width:100%}
+select{width:auto;min-width:110px}
+input[type=range]{flex:1;accent-color:var(--acc)}
+input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);
+  border-radius:6px;background:var(--panel2);cursor:pointer}
+input:focus,select:focus{outline:1px solid var(--acc)}
+.val{width:46px;text-align:right;color:var(--tx);font-variant-numeric:tabular-nums;font-size:11.5px}
+.chk{display:flex;align-items:center;gap:7px;margin:8px 0;color:var(--tx2);cursor:pointer;font-size:12px}
+.chk input{accent-color:var(--acc);width:15px;height:15px}
+button{background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:7px;
+  padding:7px 11px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--acc);color:#fff}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.primary{background:var(--acc2);border-color:var(--acc);color:#eafffb;font-weight:600}
+button.primary:hover{background:var(--acc);color:#05201d}
+.note{font-size:11px;color:var(--tx2);margin:6px 0 0;line-height:1.5}
+.warnbox{background:#2a1f0a;border:1px solid #6b4f10;color:#f3d089;border-radius:6px;
+  padding:7px 9px;font-size:11px;margin:8px 0}
+
+#drop{border:1.5px dashed #37414e;border-radius:10px;padding:20px 12px;text-align:center;
+  color:var(--tx2);cursor:pointer;transition:.15s;margin:8px 0}
+#drop:hover,#drop.over{border-color:var(--acc);color:var(--tx);background:#12201f}
+#drop b{color:var(--tx)}
+
+.swatch{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);
+  border-radius:7px;padding:6px 8px;margin:6px 0}
+.swatch .slot{font-size:10px;color:var(--tx2);width:52px;line-height:1.25}
+.swatch .slot b{display:block;color:var(--tx);font-size:11px}
+.swatch .name{flex:1;font-size:11.5px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swatch .pct{font-size:10.5px;color:var(--tx2);font-variant-numeric:tabular-nums}
+.pickbtn{padding:3px 6px;font-size:10.5px}
+.pickbtn.on{background:var(--acc);color:#05201d;border-color:var(--acc)}
+
+/* ---------- main ---------- */
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+#tabs{display:flex;gap:2px;padding:8px 14px 0;border-bottom:1px solid var(--line);background:var(--panel)}
+.tab{padding:7px 15px;border-radius:7px 7px 0 0;border:1px solid transparent;border-bottom:none;
+  cursor:pointer;color:var(--tx2);font-size:12px}
+.tab.on{background:var(--bg);border-color:var(--line);color:var(--tx);margin-bottom:-1px}
+#stage{flex:1;position:relative;overflow:hidden;background:
+  radial-gradient(circle at 50% 40%,#161d26 0%,#0b0e13 75%)}
+#face2d,#gl{position:absolute;inset:0;width:100%;height:100%}
+#face2d{display:block}
+#gl{display:none}
+#overlay{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--tx2);
+  background:#0b0e13cc;border:1px solid var(--line);border-radius:7px;padding:6px 10px;
+  pointer-events:none;max-width:70%}
+#bar{border-top:1px solid var(--line);background:var(--panel);padding:10px 14px;
+  display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+#stat{flex:1;font-size:11.5px;color:var(--tx2);min-width:180px}
+#stat.err{color:var(--bad)}
+#stat.ok{color:var(--acc)}
+.kbd{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 4px;font-size:10.5px}
+#partlist{padding:0 14px 10px;background:var(--panel);border-top:1px solid var(--line);
+  display:none;max-height:150px;overflow:auto}
+#partlist table{width:100%;border-collapse:collapse;font-size:11.5px}
+#partlist th{text-align:left;color:var(--tx2);font-weight:600;padding:6px 6px;position:sticky;top:0;background:var(--panel)}
+#partlist td{padding:4px 6px;border-top:1px solid var(--line);color:var(--tx2)}
+#partlist td.n{color:var(--tx)}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid #0006;vertical-align:-1px}
+</style>
+</head>
+<body>
+<div id="app">
+
+<!-- ============ SIDEBAR ============ -->
+<div id="side">
+  <div id="brand">
+    <div style="display:flex;align-items:center;gap:9px">
+      <svg viewBox="0 0 79.9 66.6" width="26" height="22" aria-label="Veer">
+        <g transform="translate(-100.447,-44.954)">
+        <path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/>
+        <path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/>
+        <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
+        </g>
+      </svg>
+      <h1 style="flex:1">NFC Studio <span id="build" style="font-size:10px;font-weight:400;color:var(--acc);
+        border:1px solid var(--acc2);border-radius:4px;padding:1px 5px;vertical-align:2px"></span></h1>
+    </div>
+    <p>Veer &middot; logo &rarr; multi-colour STL for Bambu Studio</p>
+  </div>
+  <div id="ctrls">
+
+    <details class="sec" open><summary>1 · Artwork</summary><div class="body">
+      <div id="drop">
+        <b>Drop a logo here</b><br>PNG · JPG · SVG · WEBP<br>
+        <span style="font-size:10.5px">transparent PNG or SVG gives the best trace</span>
+      </div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <div class="row"><label>Fit width</label>
+        <input type="range" id="artScale" min="10" max="100" value="60"><span class="val" id="artScaleV">60%</span></div>
+      <div class="row"><label>Move X / Y (mm)</label>
+        <input type="number" id="artX" value="0" step="0.5" style="width:62px">
+        <input type="number" id="artY" value="0" step="0.5" style="width:62px"></div>
+      <div class="row"><label>Keep clear of edge (mm)</label>
+        <input type="number" id="margin" value="3" step="0.5" min="0"></div>
+      <div class="chk"><input type="checkbox" id="rmBg" checked><span>Drop background colour (auto)</span></div>
+      <div class="row"><label>Background tolerance</label>
+        <input type="range" id="bgTol" min="1" max="40" value="12"><span class="val" id="bgTolV">12</span></div>
+    </div></details>
+
+    <details class="sec" open><summary>2 · Colours <span id="colCount" style="text-transform:none;color:var(--acc)"></span></summary><div class="body">
+      <div class="row"><label>Logo colours</label>
+        <select id="k"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></div>
+      <div class="chk"><input type="checkbox" id="lockPal"><span>Lock palette (match my colours, don't auto-detect)</span></div>
+      <div class="chk"><input type="checkbox" id="despeckle" checked><span>Clean up JPEG noise / dithering</span></div>
+      <div id="swatches"></div>
+      <div class="note">Slot 1 is the card itself. Use the <b>pick</b> button then click the preview to sample a colour straight off your logo.</div>
+      <div id="colWarn"></div>
+    </div></details>
+
+    <details class="sec"><summary>3 · Text (optional)</summary><div class="body">
+      <div class="chk"><input type="checkbox" id="txOn"><span>Add company info</span></div>
+      <input type="text" class="wide" id="tx1" placeholder="Line 1 — e.g. Camden Shapeworks" style="margin:4px 0">
+      <input type="text" class="wide" id="tx2" placeholder="Line 2 — e.g. 3D Printing &amp; Design" style="margin:4px 0">
+      <input type="text" class="wide" id="tx3" placeholder="Line 3 — e.g. 555-0142" style="margin:4px 0">
+      <div class="row"><label>Font</label>
+        <select id="txFont">
+          <option value="Arial Black">Arial Black (best for print)</option>
+          <option value="Impact">Impact</option>
+          <option value="Arial" selected>Arial</option>
+          <option value="Georgia">Georgia</option>
+          <option value="Courier New">Courier New</option>
+          <option value="Verdana">Verdana</option>
+        </select></div>
+      <div class="row"><label>Cap height (mm)</label>
+        <input type="number" id="txSize" value="3.5" step="0.25" min="1.5"></div>
+      <div class="row"><label>Line spacing</label>
+        <input type="range" id="txLead" min="100" max="220" value="145"><span class="val" id="txLeadV">1.45</span></div>
+      <div class="row"><label>Align</label>
+        <select id="txAlign"><option value="center" selected>Centre</option><option value="left">Left</option><option value="right">Right</option></select></div>
+      <div class="row"><label>Position X / Y (mm)</label>
+        <input type="number" id="txX" value="0" step="0.5" style="width:62px">
+        <input type="number" id="txY" value="-18" step="0.5" style="width:62px"></div>
+      <div class="row"><label>Print in colour slot</label>
+        <select id="txSlot"></select></div>
+      <div class="row"><label>Bold weight</label>
+        <input type="range" id="txBold" min="0" max="60" value="0"><span class="val" id="txBoldV">0.00</span></div>
+      <div class="note">Cap height under 2.5&nbsp;mm gets mushy on a 0.4&nbsp;mm nozzle. 3.5&nbsp;mm is a safe minimum for phone-readable text.</div>
+    </div></details>
+
+    <details class="sec" open><summary>4 · Card</summary><div class="body">
+      <div class="row"><label>Preset</label>
+        <select id="preset">
+          <optgroup label="Cards">
+          <option value="cr80">Credit card — 85.6 × 54</option>
+          <option value="us">US business card — 88.9 × 50.8</option>
+          <option value="eu">EU business card — 85 × 55</option>
+          </optgroup>
+          <optgroup label="Keychains">
+          <option value="kcRect">Keychain — 45 × 28</option>
+          <option value="kcPill">Pill keychain — 50 × 25</option>
+          <option value="kcDisc">Round keychain — 35 mm</option>
+          <option value="kcSq">Square keytag — 38 × 38</option>
+          </optgroup>
+          <option value="custom">Custom…</option>
+        </select></div>
+      <div class="row"><label>Shape</label>
+        <select id="shape">
+          <option value="rect" selected>Rounded rectangle</option>
+          <option value="pill">Pill / stadium</option>
+          <option value="circle">Circle / disc</option>
+        </select></div>
+      <div class="row"><label>Width × Height (mm)</label>
+        <input type="number" id="cw" value="85.6" step="0.1" style="width:62px">
+        <input type="number" id="ch" value="54" step="0.1" style="width:62px"></div>
+      <div class="row"><label>Thickness (mm)</label>
+        <input type="number" id="ct" value="2" step="0.1" min="0.8"></div>
+      <div class="row"><label>Corner radius (mm)</label>
+        <input type="number" id="cr" value="3.5" step="0.5" min="0"></div>
+      <div class="row"><label>Colour layer depth (mm)</label>
+        <input type="number" id="ah" value="0.6" step="0.2" min="0.2"></div>
+      <div class="row"><label>Layer height (mm)</label>
+        <input type="number" id="layerH" value="0.2" step="0.04" min="0.04"></div>
+      <div class="row"><label>First layer height (mm)</label>
+        <input type="number" id="layer1" value="0.2" step="0.04" min="0.04"></div>
+      <div class="note">Match these to your slicer profile exactly. The tag cavity's floor and
+        ceiling are snapped onto real layer boundaries — if they land mid-layer the slicer has to
+        print a layer that's half solid and half bridging over the void, which shows up as ridges
+        on the back of the card.</div>
+      <div class="note">Colour depth should be a multiple of your layer height. 0.6&nbsp;mm = 3 layers at 0.2&nbsp;mm — enough to fully hide the colour underneath.</div>
+
+      <div class="chk" style="margin-top:12px"><input type="checkbox" id="hangOn"><span>Keyring hole</span></div>
+      <div class="row"><label>Hole diameter (mm)</label>
+        <input type="number" id="hangD" value="4" step="0.5" min="1.5"></div>
+      <div class="row"><label>Position</label>
+        <select id="hangPos">
+          <option value="tl">Top left</option>
+          <option value="tr" selected>Top right</option>
+          <option value="bl">Bottom left</option>
+          <option value="br">Bottom right</option>
+          <option value="tc">Top centre</option>
+          <option value="lc">Left centre</option>
+          <option value="custom">Custom…</option>
+        </select></div>
+      <div class="row"><label>Hole X / Y (mm)</label>
+        <input type="number" id="hangX" value="0" step="0.5" style="width:62px">
+        <input type="number" id="hangY" value="0" step="0.5" style="width:62px"></div>
+      <div class="note">The hole goes right through. Artwork and the tag cavity are both held clear of
+        it automatically. 4&nbsp;mm suits a split ring; 5&nbsp;mm if you want a lanyard clip.</div>
+    </div></details>
+
+    <details class="sec" open><summary>5 · NFC pocket</summary><div class="body">
+      <div class="chk"><input type="checkbox" id="pkOn" checked><span>Recess a tag pocket in the back</span></div>
+      <div class="row"><label>Tag</label>
+        <select id="pkPreset">
+          <option value="25">NTAG215 round sticker — 25 mm</option>
+          <option value="30">NTAG215 round sticker — 30 mm</option>
+          <option value="22">NTAG213 round sticker — 22 mm</option>
+          <option value="rect45">Rectangular wet inlay — 45 × 25</option>
+          <option value="custom">Custom…</option>
+        </select></div>
+      <div class="row"><label>Shape</label>
+        <select id="pkShape"><option value="circle" selected>Circle</option><option value="rect">Rectangle</option></select></div>
+      <div class="row"><label id="pkDimL">Diameter (mm)</label>
+        <input type="number" id="pkW" value="25" step="0.5" style="width:62px">
+        <input type="number" id="pkH" value="25" step="0.5" style="width:62px" disabled></div>
+      <div class="row"><label>Clearance (mm)</label>
+        <input type="number" id="pkGap" value="0.6" step="0.1" min="0"></div>
+      <div class="row"><label>Tag thickness (mm)</label>
+        <input type="number" id="pkD" value="0.5" step="0.1" min="0.2"></div>
+      <div class="chk"><input type="checkbox" id="pkSeal" checked><span>Seal the tag inside the card</span></div>
+      <div class="row"><label>Cover thickness (mm)</label>
+        <input type="number" id="pkLid" value="0.6" step="0.2" min="0.4"></div>
+      <div class="note">Sealed cards need a <b>pause</b> mid-print to drop the tag in — the tool tells
+        you the exact height and layer. Set <b>Tag thickness</b> to your tag's real thickness: if the
+        cavity is deeper than the tag, the cover has to bridge over air instead of printing straight
+        onto the tag. A paper-thin NTAG215 sticker is ~0.3–0.4&nbsp;mm; a foam-backed disc ~0.8&nbsp;mm.</div>
+      <div class="row"><label>Offset X / Y (mm)</label>
+        <input type="number" id="pkX" value="0" step="0.5" style="width:62px">
+        <input type="number" id="pkY" value="0" step="0.5" style="width:62px"></div>
+      <div id="pkWarn"></div>
+    </div></details>
+
+    <details class="sec"><summary>6 · Trace quality</summary><div class="body">
+      <div class="row"><label>Resolution</label>
+        <select id="res">
+          <option value="8">Draft — 8 px/mm (fast)</option>
+          <option value="12" selected>Normal — 12 px/mm</option>
+          <option value="18">Fine — 18 px/mm</option>
+          <option value="26">Ultra — 26 px/mm (slow)</option>
+        </select></div>
+      <div class="row"><label>Edge smoothing</label>
+        <input type="range" id="smooth" min="0" max="4" value="1"><span class="val" id="smoothV">1</span></div>
+      <div class="row"><label>Simplify (mm)</label>
+        <input type="range" id="simp" min="0" max="30" value="6"><span class="val" id="simpV">0.06</span></div>
+      <div class="row"><label>Drop specks under (mm²)</label>
+        <input type="number" id="minA" value="0.15" step="0.05" min="0"></div>
+      <div class="note">Higher resolution + low simplify keeps fine detail but makes bigger files. If the slicer complains about the mesh, raise simplify slightly.</div>
+    </div></details>
+
+    <details class="sec"><summary>7 · Print notes</summary><div class="body">
+      <div class="note" style="line-height:1.65">
+        <b style="color:var(--tx)">Orientation:</b> the model is already built face-down — the logo sits on
+        the build plate as the first layers, and the NFC pocket opens upward. Don't rotate it.<br><br>
+        <b style="color:var(--tx)">Plate:</b> a smooth PEI or textured plate becomes the card's front finish.
+        Textured hides layer lines best.<br><br>
+        <b style="color:var(--tx)">Settings:</b> 0.2&nbsp;mm layers, 100% infill (the card is thin — solid is
+        faster than sparse + top layers), 0 elephant-foot if you can.<br><br>
+        <b style="color:var(--tx)">Colours:</b> in Bambu Studio, right-click the object &rarr;
+        <span class="kbd">Change filament</span> per part, or click each part in the object list and set its
+        filament. Colour changes only happen in the first few layers, so purge waste stays small.<br><br>
+        <b style="color:var(--tx)">Tag:</b> drop the NFC sticker into the pocket after printing and cover
+        with a printed lid, vinyl sticker, or a smear of glue. Keep the card away from metal surfaces —
+        metal detunes the antenna and kills the read.
+      </div>
+    </div></details>
+
+  </div>
+</div>
+
+<!-- ============ MAIN ============ -->
+<div id="main">
+  <div id="tabs">
+    <div class="tab on" data-v="2d">Card face</div>
+    <div class="tab" data-v="3d">3D preview</div>
+  </div>
+  <div id="stage">
+    <canvas id="face2d"></canvas>
+    <canvas id="gl"></canvas>
+    <div id="overlay">Drop a logo in the panel on the left to begin.</div>
+  </div>
+  <div id="partlist"></div>
+  <div id="bar">
+    <div id="stat">Ready.</div>
+    <button id="btnBuild">Build mesh</button>
+    <button id="btnStl" class="primary" disabled>Download STL set (.zip)</button>
+    <button id="btn3mf" disabled title="Bambu Studio discards part and filament data from any 3MF it didn't write itself — it will import as one solid colour. Use the STL set.">3MF (single colour only)</button>
+    <button id="btnReset">Reset</button>
+  </div>
+</div>
+</div>
+<div class="powered">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
+
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════════════════
+   NFC Card Studio — Camden Shapeworks
+   Single-file, offline. Raster logo -> colour separation -> contour trace ->
+   extruded watertight solids -> one STL per filament, shared origin.
+   Coordinate system: X right, Y up, Z up. Z=0 is the CARD FACE (build plate).
+   Art occupies z 0..h, card body h..T, NFC pocket recessed from z=T downward.
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* Bump this on every change. It shows in the header, in the STL header bytes
+   and in the 3MF metadata, so there's never any doubt which build produced a
+   file — browsers cache file:// pages aggressively. */
+const BUILD = "b10 · 2026-08-06";
+
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+
+/* ───────────────────────── state ───────────────────────── */
+const S = {
+  img:null, imgName:"logo",
+  palette:[],          // [{hex,count}] detected logo colours (slots 2..n)
+  cardColor:"#1b1b1f", // slot 1
+  labelPx:null,        // Uint8Array in canvas pixel space: 0=none, 1..K=logo colour i
+  gw:0, gh:0, ox:0, oy:0, res:12,
+  parts:[], picking:-1
+};
+
+/* ───────────────────────── geometry helpers ───────────────────────── */
+
+function roundRectLoop(w,h,r,seg){
+  // CCW, centred on origin
+  const hw=w/2, hh=h/2;
+  r = clamp(r, 0, Math.min(hw,hh)-0.001);
+  if(r<=0.001) return [{x:-hw,y:-hh},{x:hw,y:-hh},{x:hw,y:hh},{x:-hw,y:hh}];
+  const pts=[], n=Math.max(4, seg||Math.ceil(r*6));
+  const corners=[[ hw-r,-hh+r,-Math.PI/2],[ hw-r, hh-r,0],[-hw+r, hh-r,Math.PI/2],[-hw+r,-hh+r,Math.PI]];
+  for(const [cx,cy,a0] of corners)
+    for(let i=0;i<=n;i++){ const a=a0+(Math.PI/2)*(i/n); pts.push({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)}); }
+  return dedupeLoop(pts);
+}
+function circleLoop(cx,cy,r,seg){
+  const n=Math.max(24, seg||Math.ceil(r*8)), pts=[];
+  for(let i=0;i<n;i++){ const a=2*Math.PI*i/n; pts.push({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)}); }
+  return pts; // CCW
+}
+function rectLoop(cx,cy,w,h,r){
+  const L=roundRectLoop(w,h,r||0);
+  return L.map(p=>({x:p.x+cx, y:p.y+cy}));
+}
+function dedupeLoop(p){
+  const out=[];
+  for(const q of p){ const l=out[out.length-1]; if(!l || Math.hypot(l.x-q.x,l.y-q.y)>1e-6) out.push(q); }
+  if(out.length>1){ const a=out[0], b=out[out.length-1]; if(Math.hypot(a.x-b.x,a.y-b.y)<1e-6) out.pop(); }
+  return out;
+}
+function loopArea(L){ let s=0; for(let i=0;i<L.length;i++){ const p=L[i], q=L[(i+1)%L.length]; s+=p.x*q.y-q.x*p.y; } return s/2; }
+const revLoop = L => L.slice().reverse();
+
+/* Triangle sink -------------------------------------------------------- */
+function tri(t,ax,ay,az,bx,by,bz,cx,cy,cz){ t.push(ax,ay,az,bx,by,bz,cx,cy,cz); }
+
+/* ── Ear-clipping triangulator with hole support ──────────────────────────
+   Algorithm after Mapbox's earcut (ISC licence), reimplemented here so this
+   file stays dependency-free. Crucially, the cap triangles use only the
+   polygon's OWN vertices, so every cap boundary edge matches a wall edge
+   exactly — no T-junctions, and the solids come out watertight. */
+function ecNode(i,x,y){ return {i,x,y,prev:null,next:null,z:0,prevZ:null,nextZ:null,steiner:false}; }
+function ecIns(i,x,y,last){
+  const p=ecNode(i,x,y);
+  if(!last){ p.prev=p; p.next=p; }
+  else { p.next=last.next; p.prev=last; last.next.prev=p; last.next=p; }
+  return p;
+}
+function ecRem(p){
+  p.next.prev=p.prev; p.prev.next=p.next;
+  if(p.prevZ) p.prevZ.nextZ=p.nextZ;
+  if(p.nextZ) p.nextZ.prevZ=p.prevZ;
+}
+function ecArea(p,q,r){ return (q.y-p.y)*(r.x-q.x)-(q.x-p.x)*(r.y-q.y); }
+function ecEq(a,b){ return a.x===b.x && a.y===b.y; }
+function ecSignedArea(d,s,e){ let sum=0; for(let i=s,j=e-2;i<e;i+=2){ sum+=(d[j]-d[i])*(d[i+1]+d[j+1]); j=i; } return sum; }
+function ecList(d,s,e,cw){
+  let last=null;
+  if(cw === (ecSignedArea(d,s,e)>0)){ for(let i=s;i<e;i+=2) last=ecIns(i,d[i],d[i+1],last); }
+  else { for(let i=e-2;i>=s;i-=2) last=ecIns(i,d[i],d[i+1],last); }
+  if(last && ecEq(last,last.next)){ ecRem(last); last=last.next; }
+  return last;
+}
+function ecFilter(start,end){
+  if(!start) return start;
+  if(!end) end=start;
+  let p=start, again;
+  do{
+    again=false;
+    if(!p.steiner && (ecEq(p,p.next) || ecArea(p.prev,p,p.next)===0)){
+      ecRem(p); p=end=p.prev;
+      if(p===p.next) break;
+      again=true;
+    } else p=p.next;
+  } while(again || p!==end);
+  return end;
+}
+function ecInTri(ax,ay,bx,by,cx,cy,px,py){
+  return (cx-px)*(ay-py)>=(ax-px)*(cy-py) &&
+         (ax-px)*(by-py)>=(bx-px)*(ay-py) &&
+         (bx-px)*(cy-py)>=(cx-px)*(by-py);
+}
+function ecIsEar(ear){
+  const a=ear.prev,b=ear,c=ear.next;
+  if(ecArea(a,b,c)>=0) return false;
+  const ax=a.x,ay=a.y,bx=b.x,by=b.y,cx=c.x,cy=c.y;
+  const x0=Math.min(ax,bx,cx), y0=Math.min(ay,by,cy), x1=Math.max(ax,bx,cx), y1=Math.max(ay,by,cy);
+  let p=c.next;
+  while(p!==a){
+    if(p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1 &&
+       ecInTri(ax,ay,bx,by,cx,cy,p.x,p.y) && ecArea(p.prev,p,p.next)>=0) return false;
+    p=p.next;
+  }
+  return true;
+}
+function ecZ(x,y){
+  x=(x|0)&0xFFFF; y=(y|0)&0xFFFF;
+  x=(x|(x<<8))&0x00FF00FF; x=(x|(x<<4))&0x0F0F0F0F; x=(x|(x<<2))&0x33333333; x=(x|(x<<1))&0x55555555;
+  y=(y|(y<<8))&0x00FF00FF; y=(y|(y<<4))&0x0F0F0F0F; y=(y|(y<<2))&0x33333333; y=(y|(y<<1))&0x55555555;
+  return x|(y<<1);
+}
+function ecSortLinked(list){
+  let numMerges, inSize=1, p,q,e,tail,pSize,qSize;
+  do{
+    p=list; list=null; tail=null; numMerges=0;
+    while(p){
+      numMerges++; q=p; pSize=0;
+      for(let i=0;i<inSize;i++){ pSize++; q=q.nextZ; if(!q) break; }
+      qSize=inSize;
+      while(pSize>0 || (qSize>0 && q)){
+        if(pSize!==0 && (qSize===0 || !q || p.z<=q.z)){ e=p; p=p.nextZ; pSize--; }
+        else { e=q; q=q.nextZ; qSize--; }
+        if(tail) tail.nextZ=e; else list=e;
+        e.prevZ=tail; tail=e;
+      }
+      p=q;
+    }
+    tail.nextZ=null; inSize*=2;
+  } while(numMerges>1);
+  return list;
+}
+function ecIndexCurve(start,minX,minY,invSize){
+  let p=start;
+  do{
+    if(p.z===0) p.z=ecZ((p.x-minX)*invSize,(p.y-minY)*invSize);
+    p.prevZ=p.prev; p.nextZ=p.next; p=p.next;
+  } while(p!==start);
+  p.prevZ.nextZ=null; p.prevZ=null;
+  ecSortLinked(p);
+}
+function ecIsEarHashed(ear,minX,minY,invSize){
+  const a=ear.prev,b=ear,c=ear.next;
+  if(ecArea(a,b,c)>=0) return false;
+  const ax=a.x,ay=a.y,bx=b.x,by=b.y,cx=c.x,cy=c.y;
+  const x0=Math.min(ax,bx,cx), y0=Math.min(ay,by,cy), x1=Math.max(ax,bx,cx), y1=Math.max(ay,by,cy);
+  const minZ=ecZ((x0-minX)*invSize,(y0-minY)*invSize), maxZ=ecZ((x1-minX)*invSize,(y1-minY)*invSize);
+  let p=ear.prevZ, n=ear.nextZ;
+  while(p && p.z>=minZ && n && n.z<=maxZ){
+    if(p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1&&p!==a&&p!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,p.x,p.y)&&ecArea(p.prev,p,p.next)>=0) return false;
+    p=p.prevZ;
+    if(n.x>=x0&&n.x<=x1&&n.y>=y0&&n.y<=y1&&n!==a&&n!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,n.x,n.y)&&ecArea(n.prev,n,n.next)>=0) return false;
+    n=n.nextZ;
+  }
+  while(p && p.z>=minZ){
+    if(p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1&&p!==a&&p!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,p.x,p.y)&&ecArea(p.prev,p,p.next)>=0) return false;
+    p=p.prevZ;
+  }
+  while(n && n.z<=maxZ){
+    if(n.x>=x0&&n.x<=x1&&n.y>=y0&&n.y<=y1&&n!==a&&n!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,n.x,n.y)&&ecArea(n.prev,n,n.next)>=0) return false;
+    n=n.nextZ;
+  }
+  return true;
+}
+const ecSign = n => n>0?1:n<0?-1:0;
+function ecOnSeg(p,q,r){
+  return q.x<=Math.max(p.x,r.x)&&q.x>=Math.min(p.x,r.x)&&q.y<=Math.max(p.y,r.y)&&q.y>=Math.min(p.y,r.y);
+}
+function ecIntersects(p1,q1,p2,q2){
+  const o1=ecSign(ecArea(p1,q1,p2)), o2=ecSign(ecArea(p1,q1,q2));
+  const o3=ecSign(ecArea(p2,q2,p1)), o4=ecSign(ecArea(p2,q2,q1));
+  if(o1!==o2 && o3!==o4) return true;
+  if(o1===0 && ecOnSeg(p1,p2,q1)) return true;
+  if(o2===0 && ecOnSeg(p1,q2,q1)) return true;
+  if(o3===0 && ecOnSeg(p2,p1,q2)) return true;
+  if(o4===0 && ecOnSeg(p2,q1,q2)) return true;
+  return false;
+}
+function ecIntersectsPoly(a,b){
+  let p=a;
+  do{
+    if(p.i!==a.i && p.next.i!==a.i && p.i!==b.i && p.next.i!==b.i && ecIntersects(p,p.next,a,b)) return true;
+    p=p.next;
+  } while(p!==a);
+  return false;
+}
+function ecLocallyInside(a,b){
+  return ecArea(a.prev,a,a.next)<0
+    ? ecArea(a,b,a.next)>=0 && ecArea(a,a.prev,b)>=0
+    : ecArea(a,b,a.prev)<0 || ecArea(a,a.next,b)<0;
+}
+function ecMiddleInside(a,b){
+  let p=a, inside=false;
+  const px=(a.x+b.x)/2, py=(a.y+b.y)/2;
+  do{
+    if(((p.y>py)!==(p.next.y>py)) && p.next.y!==p.y &&
+       (px < (p.next.x-p.x)*(py-p.y)/(p.next.y-p.y)+p.x)) inside=!inside;
+    p=p.next;
+  } while(p!==a);
+  return inside;
+}
+function ecValidDiagonal(a,b){
+  return a.next.i!==b.i && a.prev.i!==b.i && !ecIntersectsPoly(a,b) &&
+    (ecLocallyInside(a,b) && ecLocallyInside(b,a) && ecMiddleInside(a,b) &&
+     (ecArea(a.prev,a,b.prev)||ecArea(a,b.prev,b)) ||
+     ecEq(a,b) && ecArea(a.prev,a,a.next)>0 && ecArea(b.prev,b,b.next)>0);
+}
+function ecSplitPoly(a,b){
+  const a2=ecNode(a.i,a.x,a.y), b2=ecNode(b.i,b.x,b.y), an=a.next, bp=b.prev;
+  a.next=b; b.prev=a;
+  a2.next=an; an.prev=a2;
+  b2.next=a2; a2.prev=b2;
+  bp.next=b2; b2.prev=bp;
+  return b2;
+}
+function ecCure(start,tris){
+  let p=start;
+  do{
+    const a=p.prev, b=p.next.next;
+    if(!ecEq(a,b) && ecIntersects(a,p,p.next,b) && ecLocallyInside(a,b) && ecLocallyInside(b,a)){
+      tris.push(a.i/2, p.i/2, b.i/2);
+      ecRem(p); ecRem(p.next);
+      p=start=b;
+    }
+    p=p.next;
+  } while(p!==start);
+  return ecFilter(p);
+}
+function ecSplitEarcut(start,tris,minX,minY,invSize){
+  let a=start;
+  do{
+    let b=a.next.next;
+    while(b!==a.prev){
+      if(a.i!==b.i && ecValidDiagonal(a,b)){
+        let c=ecSplitPoly(a,b);
+        a=ecFilter(a,a.next); c=ecFilter(c,c.next);
+        ecLinked(a,tris,minX,minY,invSize,0);
+        ecLinked(c,tris,minX,minY,invSize,0);
+        return;
+      }
+      b=b.next;
+    }
+    a=a.next;
+  } while(a!==start);
+}
+function ecGetLeftmost(start){
+  let p=start, leftmost=start;
+  do{
+    if(p.x<leftmost.x || (p.x===leftmost.x && p.y<leftmost.y)) leftmost=p;
+    p=p.next;
+  } while(p!==start);
+  return leftmost;
+}
+function ecSectorContains(m,p){ return ecArea(m.prev,m,p.prev)<0 && ecArea(p.next,m,m.next)<0; }
+function ecFindBridge(hole,outerNode){
+  let p=outerNode, qx=-Infinity, m=null;
+  const hx=hole.x, hy=hole.y;
+  do{
+    if(hy<=p.y && hy>=p.next.y && p.next.y!==p.y){
+      const x=p.x+(hy-p.y)/(p.next.y-p.y)*(p.next.x-p.x);
+      if(x<=hx && x>qx){ qx=x; m = p.x<p.next.x ? p : p.next; if(x===hx) return m; }
+    }
+    p=p.next;
+  } while(p!==outerNode);
+  if(!m) return null;
+  const stop=m, mx=m.x, my=m.y;
+  let tanMin=Infinity;
+  p=m;
+  do{
+    if(hx>=p.x && p.x>=mx && hx!==p.x &&
+       ecInTri(hy<my?hx:qx, hy, mx, my, hy<my?qx:hx, hy, p.x, p.y)){
+      const tan=Math.abs(hy-p.y)/(hx-p.x);
+      if(ecLocallyInside(p,hole) &&
+         (tan<tanMin || (tan===tanMin && (p.x>m.x || (p.x===m.x && ecSectorContains(m,p)))))){
+        m=p; tanMin=tan;
+      }
+    }
+    p=p.next;
+  } while(p!==stop);
+  return m;
+}
+function ecEliminateHoles(d,holeIdx,outerNode){
+  const queue=[];
+  for(let i=0,len=holeIdx.length;i<len;i++){
+    const s=holeIdx[i]*2, e = i<len-1 ? holeIdx[i+1]*2 : d.length;
+    const list=ecList(d,s,e,false);
+    if(list===list.next) list.steiner=true;
+    queue.push(ecGetLeftmost(list));
+  }
+  queue.sort((a,b)=>a.x-b.x);
+  for(const q of queue){
+    const bridge=ecFindBridge(q,outerNode);
+    if(!bridge) continue;
+    const br=ecSplitPoly(bridge,q);
+    ecFilter(br,br.next);
+    outerNode=ecFilter(bridge,bridge.next);
+  }
+  return outerNode;
+}
+function ecLinked(ear,tris,minX,minY,invSize,pass){
+  if(!ear) return;
+  if(!pass && invSize) ecIndexCurve(ear,minX,minY,invSize);
+  let stop=ear, prev, next, guard=0;
+  while(ear.prev!==ear.next){
+    if(guard++ > 3e6) break;
+    prev=ear.prev; next=ear.next;
+    if(invSize ? ecIsEarHashed(ear,minX,minY,invSize) : ecIsEar(ear)){
+      tris.push(prev.i/2, ear.i/2, next.i/2);
+      ecRem(ear);
+      ear=next.next; stop=next.next;
+      continue;
+    }
+    ear=next;
+    if(ear===stop){
+      if(!pass) ecLinked(ecFilter(ear),tris,minX,minY,invSize,1);
+      else if(pass===1){ ear=ecCure(ecFilter(ear),tris); ecLinked(ear,tris,minX,minY,invSize,2); }
+      else if(pass===2) ecSplitEarcut(ear,tris,minX,minY,invSize);
+      break;
+    }
+  }
+}
+function earcut(d, holeIdx){
+  const hasHoles = holeIdx && holeIdx.length;
+  const outerLen = hasHoles ? holeIdx[0]*2 : d.length;
+  let outerNode = ecList(d,0,outerLen,true);
+  const tris=[];
+  if(!outerNode || outerNode.next===outerNode.prev) return tris;
+  let minX,minY,maxX,maxY,invSize;
+  if(hasHoles) outerNode = ecEliminateHoles(d,holeIdx,outerNode);
+  if(d.length>160){
+    minX=maxX=d[0]; minY=maxY=d[1];
+    for(let i=2;i<outerLen;i+=2){
+      const x=d[i], y=d[i+1];
+      if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y;
+    }
+    invSize=Math.max(maxX-minX,maxY-minY);
+    invSize = invSize!==0 ? 32767/invSize : 0;
+  }
+  ecLinked(outerNode,tris,minX,minY,invSize,0);
+  return tris;
+}
+
+/* Caps. `loops` must be correctly oriented: CCW for solid boundaries, CW for
+   holes. Holes are matched to the innermost outer loop that contains them, so
+   nested art (a dot inside the counter of an "O") comes out right. */
+function pointInLoop(px,py,L){
+  let inside=false;
+  for(let i=0,j=L.length-1;i<L.length;j=i++){
+    if(((L[i].y>py)!==(L[j].y>py)) &&
+       (px < (L[j].x-L[i].x)*(py-L[i].y)/(L[j].y-L[i].y)+L[i].x)) inside=!inside;
+  }
+  return inside;
+}
+function addCaps(out, loops, z, faceUp){
+  const outers=[], holes=[];
+  for(const L of loops){
+    if(!L || L.length<3) continue;
+    const a=loopArea(L);
+    if(Math.abs(a)<1e-12) continue;
+    (a>0 ? outers : holes).push({L, a:Math.abs(a)});
+  }
+  if(!outers.length) return;
+  // assign each hole to the smallest outer that contains it
+  for(const h of holes){
+    let best=null;
+    for(const o of outers)
+      if(o.a>h.a && pointInLoop(h.L[0].x,h.L[0].y,o.L) && (!best || o.a<best.a)) best=o;
+    if(best) (best.holes || (best.holes=[])).push(h.L);
+  }
+  for(const o of outers){
+    const coords=[], holeIdx=[];
+    for(const p of o.L) coords.push(p.x,p.y);
+    if(o.holes) for(const H of o.holes){
+      holeIdx.push(coords.length/2);
+      for(const p of H) coords.push(p.x,p.y);
+    }
+    const idx = earcut(coords, holeIdx.length?holeIdx:null);
+    for(let i=0;i<idx.length;i+=3){
+      const a=idx[i]*2, b=idx[i+1]*2, c=idx[i+2]*2;
+      const ax=coords[a],ay=coords[a+1], bx=coords[b],by=coords[b+1], cx=coords[c],cy=coords[c+1];
+      // force winding to match the requested facing, whatever earcut handed back
+      const cross=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax);
+      if((cross>=0)===faceUp) tri(out, ax,ay,z, bx,by,z, cx,cy,z);
+      else                    tri(out, ax,ay,z, cx,cy,z, bx,by,z);
+    }
+  }
+}
+
+/* Walls: loops wound CCW for outer boundaries, CW for holes → normals face out */
+function addWalls(out, loops, zb, zt){
+  for(const L of loops){
+    if(!L || L.length<3) continue;
+    for(let i=0;i<L.length;i++){
+      const p=L[i], q=L[(i+1)%L.length];
+      if(Math.hypot(p.x-q.x,p.y-q.y)<1e-9) continue;
+      tri(out, p.x,p.y,zb, q.x,q.y,zb, q.x,q.y,zt);
+      tri(out, p.x,p.y,zb, q.x,q.y,zt, p.x,p.y,zt);
+    }
+  }
+}
+function extrude(out, loops, zb, zt){
+  addCaps(out, loops, zb, false);
+  addCaps(out, loops, zt, true);
+  addWalls(out, loops, zb, zt);
+}
+
+/* ─────────────── marching squares: binary mask → closed loops ───────────────
+   Segment orientation keeps material on the LEFT, so outer loops come out CCW
+   and holes CW — exactly what addWalls() needs. */
+const MS_CASES = [
+  [],[[0,3]],[[1,0]],[[1,3]],[[2,1]],[[0,3],[2,1]],[[2,0]],[[2,3]],
+  [[3,2]],[[0,2]],[[3,2],[1,0]],[[1,2]],[[3,1]],[[0,1]],[[3,0]],[]
+];
+function traceMask(mask, gw, gh, ox, oy, res){
+  const STR = 2*gh+4;
+  const next = new Map();
+  const ekey=(gx,gy,e)=>{ // doubled-integer coords of edge midpoints
+    switch(e){
+      case 0: return (2*gx+1)*STR + (2*gy);
+      case 1: return (2*gx+2)*STR + (2*gy+1);
+      case 2: return (2*gx+1)*STR + (2*gy+2);
+      default:return (2*gx  )*STR + (2*gy+1);
+    }
+  };
+  for(let gy=0; gy<gh-1; gy++){
+    const r0=gy*gw, r1=r0+gw;
+    for(let gx=0; gx<gw-1; gx++){
+      const idx = (mask[r0+gx]?1:0) | (mask[r0+gx+1]?2:0) | (mask[r1+gx+1]?4:0) | (mask[r1+gx]?8:0);
+      const segs = MS_CASES[idx];
+      for(let s=0;s<segs.length;s++) next.set(ekey(gx,gy,segs[s][0]), ekey(gx,gy,segs[s][1]));
+    }
+  }
+  const loops=[];
+  const toMM = k => { const dx=Math.floor(k/STR), dy=k-dx*STR; return {x:ox+(dx/2)/res, y:oy+(dy/2)/res}; };
+  while(next.size){
+    const start = next.keys().next().value;
+    const L=[]; let k=start, guard=0;
+    while(k!==undefined && guard++ < 4e6){
+      const nk = next.get(k);
+      if(nk===undefined) break;
+      next.delete(k);
+      L.push(toMM(k));
+      k = nk;
+      if(k===start) break;
+    }
+    if(L.length>=3) loops.push(L);
+  }
+  return loops;
+}
+
+/* loop clean-up: corner-preserving smoothing, then Douglas-Peucker */
+function smoothLoop(L, passes){
+  let P=L;
+  for(let p=0;p<passes;p++){
+    const n=P.length, Q=new Array(n);
+    for(let i=0;i<n;i++){
+      const a=P[(i-1+n)%n], b=P[i], c=P[(i+1)%n];
+      Q[i]={x:0.25*a.x+0.5*b.x+0.25*c.x, y:0.25*a.y+0.5*b.y+0.25*c.y};
+    }
+    P=Q;
+  }
+  return P;
+}
+function dp(pts, i, j, tol, keep){
+  if(j<=i+1) return;
+  const a=pts[i], b=pts[j];
+  const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy);
+  let best=-1, bi=-1;
+  for(let k=i+1;k<j;k++){
+    const p=pts[k];
+    const d = len<1e-12 ? Math.hypot(p.x-a.x,p.y-a.y)
+                        : Math.abs(dy*(p.x-a.x)-dx*(p.y-a.y))/len;
+    if(d>best){ best=d; bi=k; }
+  }
+  if(best>tol){ keep[bi]=1; dp(pts,i,bi,tol,keep); dp(pts,bi,j,tol,keep); }
+}
+function simplifyLoop(L, tol){
+  if(tol<=0 || L.length<8) return L;
+  const n=L.length;
+  // split the closed loop at two far-apart anchors so DP behaves
+  let far=0, fd=-1;
+  for(let i=1;i<n;i++){ const d=Math.hypot(L[i].x-L[0].x, L[i].y-L[0].y); if(d>fd){fd=d;far=i;} }
+  const keep=new Uint8Array(n); keep[0]=1; keep[far]=1;
+  dp(L,0,far,tol,keep); dp(L,far,n-1,tol,keep); keep[n-1]=1;
+  const out=[]; for(let i=0;i<n;i++) if(keep[i]) out.push(L[i]);
+  return out.length>=3 ? out : L;
+}
+function maskToLoops(mask, gw, gh, ox, oy, res, smoothPasses, tol, minArea){
+  let loops = traceMask(mask, gw, gh, ox, oy, res);
+  const out=[];
+  for(let L of loops){
+    if(smoothPasses>0) L = smoothLoop(L, smoothPasses);
+    L = simplifyLoop(L, tol);
+    L = dedupeLoop(L);
+    if(L.length<3) continue;
+    if(Math.abs(loopArea(L)) < minArea) continue;
+    out.push(L);
+  }
+  return out;
+}
+
+/* ───────────────────────── colour quantisation ───────────────────────── */
+const hex2rgb = h => [parseInt(h.slice(1,3),16), parseInt(h.slice(3,5),16), parseInt(h.slice(5,7),16)];
+const rgb2hex = (r,g,b) => "#"+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,"0")).join("");
+
+function kmeans(samples, k, iters){
+  // k-means++ seeding
+  const n = samples.length/3;
+  if(n===0) return [];
+  const C=[]; let s0=(Math.random()*n)|0;
+  C.push([samples[s0*3],samples[s0*3+1],samples[s0*3+2]]);
+  const d2=new Float64Array(n);
+  while(C.length<k){
+    let tot=0;
+    for(let i=0;i<n;i++){
+      let best=Infinity;
+      for(const c of C){
+        const dr=samples[i*3]-c[0], dg=samples[i*3+1]-c[1], db=samples[i*3+2]-c[2];
+        const d=dr*dr+dg*dg+db*db; if(d<best) best=d;
+      }
+      d2[i]=best; tot+=best;
+    }
+    if(tot<=0){ C.push(C[0].slice()); continue; }
+    let r=Math.random()*tot, pick=0;
+    for(let i=0;i<n;i++){ r-=d2[i]; if(r<=0){ pick=i; break; } }
+    C.push([samples[pick*3],samples[pick*3+1],samples[pick*3+2]]);
+  }
+  const sum=new Float64Array(k*3), cnt=new Float64Array(k);
+  for(let it=0; it<iters; it++){
+    sum.fill(0); cnt.fill(0);
+    for(let i=0;i<n;i++){
+      const r=samples[i*3],g=samples[i*3+1],b=samples[i*3+2];
+      let bi=0,bd=Infinity;
+      for(let c=0;c<k;c++){
+        const dr=r-C[c][0], dg=g-C[c][1], db=b-C[c][2];
+        const d=dr*dr+dg*dg+db*db; if(d<bd){bd=d;bi=c;}
+      }
+      sum[bi*3]+=r; sum[bi*3+1]+=g; sum[bi*3+2]+=b; cnt[bi]++;
+    }
+    for(let c=0;c<k;c++) if(cnt[c]>0) C[c]=[sum[c*3]/cnt[c], sum[c*3+1]/cnt[c], sum[c*3+2]/cnt[c]];
+  }
+  return C;
+}
+
+/* ───────────────────────── rasterise artwork ───────────────────────── */
+function readSettings(){
+  const g = id => parseFloat($(id).value)||0;
+  const s = {
+    W:g("cw"), H:g("ch"), T:g("ct"), R:g("cr"), h:g("ah"), shape:$("shape").value,
+    hangOn:$("hangOn").checked, hangD:Math.max(1,g("hangD")), hangPos:$("hangPos").value,
+    hangX:g("hangX"), hangY:g("hangY"),
+    margin:g("margin"), artScale:g("artScale")/100, artX:g("artX"), artY:g("artY"),
+    k:parseInt($("k").value,10), rmBg:$("rmBg").checked, bgTol:g("bgTol"),
+    despeckle:$("despeckle").checked, lockPal:$("lockPal").checked,
+    res:parseFloat($("res").value), smooth:parseInt($("smooth").value,10),
+    simp:g("simp")/100, minA:g("minA"),
+    pkOn:$("pkOn").checked, pkShape:$("pkShape").value, pkW:g("pkW"), pkH:g("pkH"),
+    pkGap:g("pkGap"), pkD:g("pkD"), pkX:g("pkX"), pkY:g("pkY"),
+    pkSeal:$("pkSeal").checked, pkLid:Math.max(0.2,g("pkLid")),
+    layerH:Math.max(0.04,g("layerH")), layer1:Math.max(0.04,g("layer1")),
+    txOn:$("txOn").checked, txLines:[$("tx1").value,$("tx2").value,$("tx3").value].filter(v=>v.trim()),
+    txFont:$("txFont").value, txSize:g("txSize"), txLead:g("txLead")/100, txAlign:$("txAlign").value,
+    txX:g("txX"), txY:g("txY"), txSlot:parseInt($("txSlot").value||"1",10), txBold:g("txBold")/100
+  };
+  s.h = Math.min(s.h, s.T-0.2);
+  // never let art run right to the card edge — the traced art boundary would
+  // touch the analytic card outline and make the face polygon degenerate
+  s.margin = Math.max(0.25, s.margin);
+  if(s.shape==="circle") s.H = s.W;                 // a disc: width is the diameter
+  const hc = s.hangPos==="custom" ? {x:s.hangX, y:s.hangY} : hangCenter(s);
+  s.hcx = hc.x; s.hcy = hc.y;
+  return s;
+}
+
+/* Build the pixel-space label map + preview. Canvas pixel space is y-DOWN;
+   grid/mask space is y-UP. Conversion happens in buildMasks(). */
+const work = document.createElement("canvas");
+const wctx = work.getContext("2d", {willReadFrequently:true});
+
+function rasterise(st){
+  const res = st.res;
+  const gw = Math.ceil(st.W*res)+5, gh = Math.ceil(st.H*res)+5;
+  const ox = -st.W/2 - 2/res, oy = -st.H/2 - 2/res;
+  S.gw=gw; S.gh=gh; S.ox=ox; S.oy=oy; S.res=res;
+
+  work.width=gw; work.height=gh;
+  wctx.setTransform(1,0,0,1,0,0);
+  wctx.clearRect(0,0,gw,gh);
+
+  const mm2px = (x,y) => [ (x-ox)*res, (gh-1)-(y-oy)*res ];
+
+  /* 1. draw the logo, fitted */
+  if(S.img){
+    const availW = Math.max(1, st.W - 2*st.margin), availH = Math.max(1, st.H - 2*st.margin);
+    const iw=S.img.naturalWidth||S.img.width, ih=S.img.naturalHeight||S.img.height;
+    const fit = Math.min(availW/iw, availH/ih) * st.artScale;
+    const dw = iw*fit, dh = ih*fit;
+    const [px,py] = mm2px(st.artX - dw/2, st.artY + dh/2);   // top-left in canvas space
+    wctx.imageSmoothingEnabled = true;
+    wctx.imageSmoothingQuality = "high";
+    try{ wctx.drawImage(S.img, px, py, dw*res, dh*res); }catch(e){}
+  }
+
+  const id = wctx.getImageData(0,0,gw,gh);
+  const d = id.data, N = gw*gh;
+
+  /* 2. background rejection */
+  const keep = new Uint8Array(N);
+  let bgR=255,bgG=255,bgB=255, hasAlpha=false;
+  for(let i=0;i<N;i++) if(d[i*4+3]<250){ hasAlpha=true; break; }
+  if(st.rmBg && !hasAlpha){
+    // most common colour among the four corners of the drawn art
+    const cands=[[0,0],[gw-1,0],[0,gh-1],[gw-1,gh-1]].map(([x,y])=>{
+      const o=(y*gw+x)*4; return [d[o],d[o+1],d[o+2]];
+    });
+    bgR=cands[0][0]; bgG=cands[0][1]; bgB=cands[0][2];
+  }
+  const tol2 = (st.bgTol*2.55)*(st.bgTol*2.55)*3;
+  for(let i=0;i<N;i++){
+    const a=d[i*4+3];
+    if(a<128){ keep[i]=0; continue; }
+    if(st.rmBg && !hasAlpha){
+      const dr=d[i*4]-bgR, dg=d[i*4+1]-bgG, db=d[i*4+2]-bgB;
+      if(dr*dr+dg*dg+db*db < tol2){ keep[i]=0; continue; }
+    }
+    keep[i]=1;
+  }
+
+  /* 3. palette */
+  let centroids;
+  if(st.lockPal && S.palette.length===st.k){
+    centroids = S.palette.map(p=>hex2rgb(p.hex));
+  }else{
+    const samples=[]; let taken=0;
+    const step = Math.max(1, Math.floor(N/20000));
+    for(let i=0;i<N;i+=step){
+      if(!keep[i]) continue;
+      samples.push(d[i*4],d[i*4+1],d[i*4+2]); taken++;
+    }
+    centroids = taken>0 ? kmeans(new Float64Array(samples), st.k, 14) : [];
+    while(centroids.length<st.k) centroids.push([128,128,128]);
+  }
+
+  /* 4. assign labels */
+  const label = new Uint8Array(N);
+  const counts = new Array(st.k).fill(0);
+  for(let i=0;i<N;i++){
+    if(!keep[i]) continue;
+    const r=d[i*4], g=d[i*4+1], b=d[i*4+2];
+    let bi=0,bd=Infinity;
+    for(let c=0;c<centroids.length;c++){
+      const dr=r-centroids[c][0], dg=g-centroids[c][1], db=b-centroids[c][2];
+      const dd=dr*dr+dg*dg+db*db; if(dd<bd){bd=dd;bi=c;}
+    }
+    label[i]=bi+1; counts[bi]++;
+  }
+
+  /* 5. despeckle: 3x3 majority filter */
+  if(st.despeckle){
+    const src = label.slice();
+    const hist = new Uint8Array(st.k+1);
+    for(let y=1;y<gh-1;y++) for(let x=1;x<gw-1;x++){
+      hist.fill(0);
+      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++) hist[src[(y+dy)*gw+(x+dx)]]++;
+      let bi=0,bc=-1;
+      for(let v=0;v<=st.k;v++) if(hist[v]>bc){bc=hist[v];bi=v;}
+      if(bc>=6) label[y*gw+x]=bi;
+    }
+  }
+
+  /* 6. text overlay, burned into its chosen slot */
+  if(st.txOn && st.txLines.length && st.txSlot>=1){
+    const t=document.createElement("canvas"); t.width=gw; t.height=gh;
+    const tc=t.getContext("2d",{willReadFrequently:true});
+    const fpx = st.txSize*res/0.716;                 // cap height → font px
+    tc.font = `${fpx}px "${st.txFont}", sans-serif`;
+    tc.textAlign = st.txAlign; tc.textBaseline="alphabetic";
+    tc.fillStyle="#fff"; tc.strokeStyle="#fff";
+    tc.lineJoin="round"; tc.lineWidth = st.txBold*res;
+    const lead = st.txSize*st.txLead;
+    const total = (st.txLines.length-1)*lead;
+    st.txLines.forEach((ln,i)=>{
+      const yMM = st.txY + total/2 - i*lead;
+      const [px,py] = mm2px(st.txX, yMM);
+      if(st.txBold>0) tc.strokeText(ln, px, py);
+      tc.fillText(ln, px, py);
+    });
+    const td = tc.getImageData(0,0,gw,gh).data;
+    for(let i=0;i<N;i++) if(td[i*4+3]>128) label[i]=st.txSlot;
+  }
+
+  /* 7. clip to the card (inset by the margin) and keep clear of the keyring hole */
+  const holeR = st.hangOn ? st.hangD/2 + 1.0 : -1;
+  for(let y=0;y<gh;y++) for(let x=0;x<gw;x++){
+    const i=y*gw+x; if(!label[i]) continue;
+    const mx = ox + x/res, my = oy + ((gh-1)-y)/res;
+    if(!insideCard(mx,my,st,st.margin)){ label[i]=0; continue; }
+    if(holeR>0 && Math.hypot(mx-st.hcx, my-st.hcy) < holeR) label[i]=0;
+  }
+
+  S.labelPx = label;
+  S.centroids = centroids;
+  S.pxCounts = counts;
+  if(!st.lockPal){
+    const tot = counts.reduce((a,b)=>a+b,0)||1;
+    S.palette = centroids.map((c,i)=>({
+      hex: rgb2hex(c[0],c[1],c[2]),
+      pct: Math.round(100*counts[i]/tot)
+    }));
+  }else{
+    const tot = counts.reduce((a,b)=>a+b,0)||1;
+    S.palette.forEach((p,i)=> p.pct = Math.round(100*(counts[i]||0)/tot));
+  }
+}
+/* Card / keychain outline. A pill is a rounded rect with the corner radius
+   maxed out, and a disc is a pill with equal sides — so one generator and one
+   inside-test cover all three shapes. */
+function effR(st){ return st.shape==="rect" ? st.R : Math.min(st.W,st.H)/2; }
+function cardOutline(st){
+  const r=effR(st);
+  return roundRectLoop(st.W, st.H, r, Math.max(10, Math.ceil(r*8)));
+}
+function insideCard(x,y,st,ins){
+  ins = ins||0;
+  return insideRoundRect(x, y, st.W/2-ins, st.H/2-ins, Math.max(0, effR(st)-ins));
+}
+/* Aim from the centre at the requested corner/edge, then binary-search the
+   furthest point along that line where the whole hole still clears the
+   outline. Works for any of the three shapes without special-casing. */
+function hangCenter(st){
+  const need = st.hangD/2 + 1.4;
+  const d = {tl:[-1,1],tr:[1,1],bl:[-1,-1],br:[1,-1],tc:[0,1],lc:[-1,0]}[st.hangPos] || [1,1];
+  const tx = d[0]*st.W/2, ty = d[1]*st.H/2;
+  const fits = (x,y)=>{
+    for(let k=0;k<24;k++){ const a=2*Math.PI*k/24;
+      if(!insideCard(x+need*Math.cos(a), y+need*Math.sin(a), st)) return false; }
+    return true;
+  };
+  if(!fits(0,0)) return {x:0,y:0};
+  let lo=0, hi=1;
+  for(let i=0;i<40;i++){ const mid=(lo+hi)/2; if(fits(tx*mid,ty*mid)) lo=mid; else hi=mid; }
+  return {x:+(tx*lo).toFixed(3), y:+(ty*lo).toFixed(3)};
+}
+
+function insideRoundRect(x,y,hw,hh,r){
+  if(hw<=0||hh<=0) return false;
+  r=clamp(r,0,Math.min(hw,hh));
+  const ax=Math.abs(x), ay=Math.abs(y);
+  if(ax>hw||ay>hh) return false;
+  if(ax<=hw-r||ay<=hh-r) return true;
+  return Math.hypot(ax-(hw-r), ay-(hh-r)) <= r;
+}
+
+/* label map (pixel space, y-down) → mask (grid space, y-up) */
+function labelMask(label, gw, gh, slot){
+  const m=new Uint8Array(gw*gh);
+  for(let y=0;y<gh;y++){
+    const src=y*gw, dst=(gh-1-y)*gw;
+    for(let x=0;x<gw;x++) if(label[src+x]===slot) m[dst+x]=1;
+  }
+  return m;
+}
+
+/* A pocket bigger than the card would cut straight through and leave the back
+   open — a broken solid, not a recess. Pull it inside a rounded rect inset by
+   POCKET_WALL from the card outline, shrinking about its own centre if needed.
+   Returns null if it can't fit at all. */
+const POCKET_WALL = 1.2;
+function fitPocket(loop, st){
+  const hw=st.W/2-POCKET_WALL, hh=st.H/2-POCKET_WALL;
+  if(hw<=0.5 || hh<=0.5) return null;
+  const holeR = st.hangOn ? st.hangD/2 + POCKET_WALL : -1;
+  const clear = (x,y)=> insideCard(x,y,st,POCKET_WALL) &&
+                        (holeR<0 || Math.hypot(x-st.hcx, y-st.hcy) > holeR);
+  // must clear the outline AND the keyring hole, and must not swallow the hole
+  const ok = L => L.every(p=>clear(p.x,p.y)) &&
+                  (holeR<0 || !pointInLoop(st.hcx, st.hcy, L));
+  if(ok(loop)) return loop;
+  let cx=0, cy=0;
+  for(const p of loop){ cx+=p.x; cy+=p.y; }
+  cx/=loop.length; cy/=loop.length;
+  // pull the centre inside first, then shrink until every point clears the edge
+  cx=clamp(cx,-hw,hw); cy=clamp(cy,-hh,hh);
+  if(!clear(cx,cy)){ cx*=0.8; cy*=0.8; }
+  if(!clear(cx,cy)) return null;
+  const c0x=loop.reduce((a,p)=>a+p.x,0)/loop.length, c0y=loop.reduce((a,p)=>a+p.y,0)/loop.length;
+  let s=1;
+  for(let i=0;i<300;i++){
+    const L=loop.map(p=>({x:cx+(p.x-c0x)*s, y:cy+(p.y-c0y)*s}));
+    if(ok(L)) return L;
+    s*=0.98;
+  }
+  return null;
+}
+
+/* The card prints face-down: the artwork surface is the z=0 plane, sitting on
+   the build plate. You only ever see that face by peeling the card off and
+   turning it over — i.e. viewing the plane from the far side, which reverses
+   left and right. So the solids get mirrored in X here; without this every
+   printed card comes out backwards, text and all.
+   Negating x flips each triangle's winding, so swap two vertices to keep the
+   normals pointing out. */
+function mirrorX(parts){
+  for(const p of parts){
+    const t=p.tris;
+    for(let i=0;i<t.length;i+=9){
+      t[i]=-t[i]; t[i+3]=-t[i+3]; t[i+6]=-t[i+6];
+      const x=t[i+3], y=t[i+4], z=t[i+5];
+      t[i+3]=t[i+6]; t[i+4]=t[i+7]; t[i+5]=t[i+8];
+      t[i+6]=x;      t[i+7]=y;      t[i+8]=z;
+    }
+  }
+}
+
+/* Where the tag cavity actually lands, once layer snapping and the minimum
+   floor over the logo are applied. Shared by the mesh builder and the
+   validator so the warnings can never disagree with the geometry. */
+const MIN_FLOOR = 0.3;
+function cavityPlan(st){
+  const h = st.h;
+  const lid = (st.pkOn && st.pkSeal) ? st.pkLid : 0;
+  const snapDn = z => st.layer1 + Math.max(0, Math.floor((z-st.layer1)/st.layerH + 1e-6))*st.layerH;
+  const snapUp = z => st.layer1 + Math.max(0, Math.ceil ((z-st.layer1)/st.layerH - 1e-6))*st.layerH;
+  let zTop, zBot;
+  if(lid>0){
+    zTop = snapDn(st.T - lid);
+    zBot = zTop - Math.ceil(st.pkD/st.layerH - 1e-6)*st.layerH;
+    if(zBot < h+MIN_FLOOR) zBot = snapUp(h+MIN_FLOOR);   // don't break into the logo
+  }else{
+    zTop = st.T;
+    zBot = Math.max(h+MIN_FLOOR, st.T - st.pkD);
+  }
+  const depth = zTop - zBot;
+  // thickness that would give a full-depth cavity, allowing for snap losses
+  const want = h + MIN_FLOOR + Math.ceil(st.pkD/st.layerH - 1e-6)*st.layerH + lid + st.layerH;
+  return { lid, zTop, zBot, depth,
+           valid: depth > 0.15 && (lid>0 ? (st.T-zTop) >= st.layerH*0.9 : true),
+           tooShallow: depth < st.pkD - 1e-6,
+           minThickness: Math.ceil(want*10)/10 };
+}
+
+/* ───────────────────────── mesh assembly ───────────────────────── */
+function buildParts(st){
+  const parts=[];
+  const T=st.T, h=st.h;
+  const cardLoop = cardOutline(st);
+  // keyring hole: a straight through-hole, so it appears in both caps and gets
+  // its own full-height wall. Reversed = a hole in the card.
+  const hangHole = st.hangOn ? [revLoop(circleLoop(st.hcx, st.hcy, st.hangD/2, 48))] : [];
+
+  /* --- art parts, one per colour slot --- */
+  const union = new Uint8Array(S.gw*S.gh);
+  for(let s=1; s<=st.k; s++){
+    const mask = labelMask(S.labelPx, S.gw, S.gh, s);
+    let any=false;
+    for(let i=0;i<mask.length;i++) if(mask[i]){ any=true; union[i]=1; }
+    if(!any) continue;
+    const loops = maskToLoops(mask, S.gw, S.gh, S.ox, S.oy, S.res, st.smooth, st.simp, st.minA);
+    if(!loops.length) continue;
+    const t=[];
+    extrude(t, loops, 0, h);
+    parts.push({ name:`colour${s}`, label:`Logo colour ${s}`, tris:t, zr:[0,h],
+                 color:(S.palette[s-1]||{}).hex||"#888888", ext:s+1 });
+  }
+
+  /* --- the card itself: one watertight solid, 0..T ---
+     Full prism, with the logo recessed out of the front face and the NFC
+     pocket recessed out of the back. The logo is cut against the UNION of the
+     colour masks, not against each colour loop: two colours that touch would
+     otherwise leave two holes sharing a boundary — a zero-width channel no
+     ear-clipper can triangulate cleanly. The union traces as one boundary. */
+  {
+    const t=[];
+    const uniLoops = maskToLoops(union, S.gw, S.gh, S.ox, S.oy, S.res, st.smooth, st.simp, st.minA);
+    // reversed, the art outline becomes a hole in the card; counters inside the
+    // art (the middle of an "O") flip back to solid.
+    const holes = uniLoops.map(revLoop);
+    let pocket=null;
+    if(st.pkOn){
+      const gap=st.pkGap;
+      const raw = st.pkShape==="circle"
+        ? circleLoop(st.pkX, st.pkY, (st.pkW+2*gap)/2, 96)
+        : rectLoop(st.pkX, st.pkY, st.pkW+2*gap, st.pkH+2*gap, 1.5);
+      pocket = fitPocket(raw, st);   // never let it breach the card edge
+    }
+    /* Cavity for the tag. Sealed: fully enclosed inside the card, with a cover
+       printed over it after a pause. Open: a recess in the back face.
+       The ceiling is snapped to a layer boundary so the pause lands cleanly. */
+    /* Layer boundaries sit at z = layer1 + n*layerH. Floor and ceiling are both
+       snapped onto them — a boundary landing mid-layer forces the slicer to
+       print one layer that is part solid, part bridge over the void, which
+       telegraphs straight through to the back surface as ridges. */
+    const plan = cavityPlan(st);
+    const lid = plan.lid, zTop = plan.zTop, zBot = plan.zBot;
+    const cavity = !!pocket && plan.valid;
+    S.cavityDepth = cavity ? +plan.depth.toFixed(3) : null;
+
+    addCaps (t, [cardLoop, ...holes, ...hangHole], 0, false); // front face, logo + hole cut out
+    addWalls(t, holes, 0, h);                                // sides of the logo recess
+    addCaps (t, uniLoops, h, false);                         // ceiling above the logo recess
+    addWalls(t, [cardLoop], 0, T);                           // card edge, full height
+    addWalls(t, hangHole, 0, T);                             // keyring hole wall
+
+    if(cavity && st.pkSeal){
+      addCaps (t, [cardLoop, ...hangHole], T, true);         // back face: solid, tag hidden
+      addCaps (t, [pocket], zBot, true);                     // cavity floor  (normal into void)
+      addWalls(t, [revLoop(pocket)], zBot, zTop);            // cavity wall
+      addCaps (t, [pocket], zTop, false);                    // cavity ceiling (normal into void)
+      S.pauseZ = zTop;
+    }else if(cavity){
+      addCaps (t, [cardLoop, revLoop(pocket), ...hangHole], T, true);  // back + pocket opening
+      addWalls(t, [revLoop(pocket)], zBot, T);               // pocket wall
+      addCaps (t, [pocket], zBot, true);                     // pocket floor
+      S.pauseZ = null;
+    }else{
+      addCaps (t, [cardLoop, ...hangHole], T, true);
+      S.pauseZ = null;
+    }
+    parts.unshift({ name:"card", label:"Card + NFC pocket", tris:t, zr:[0,T],
+                    color:S.cardColor, ext:1 });
+  }
+  // everything above is authored in "front view" — mirror it into print space
+  mirrorX(parts);
+  return parts;
+}
+
+/* ───────────────────────── STL / ZIP / 3MF ───────────────────────── */
+function stlBinary(tris, name){
+  const n = tris.length/9;
+  const buf = new ArrayBuffer(84 + n*50);
+  const dv = new DataView(buf), u8 = new Uint8Array(buf);
+  // STL headers are raw bytes — keep it ASCII so it reads cleanly everywhere
+  const hdr = ("Veer NFC Studio "+BUILD+" - "+name)
+                .replace(/[^\x20-\x7E]/g,"-").slice(0,79);
+  for(let i=0;i<hdr.length;i++) u8[i]=hdr.charCodeAt(i);
+  dv.setUint32(80, n, true);
+  let o=84;
+  for(let i=0;i<n;i++){
+    const b=i*9;
+    const ax=tris[b],ay=tris[b+1],az=tris[b+2];
+    const bx=tris[b+3],by=tris[b+4],bz=tris[b+5];
+    const cx=tris[b+6],cy=tris[b+7],cz=tris[b+8];
+    let nx=(by-ay)*(cz-az)-(bz-az)*(cy-ay);
+    let ny=(bz-az)*(cx-ax)-(bx-ax)*(cz-az);
+    let nz=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax);
+    const L=Math.hypot(nx,ny,nz)||1; nx/=L; ny/=L; nz/=L;
+    dv.setFloat32(o,nx,true); dv.setFloat32(o+4,ny,true); dv.setFloat32(o+8,nz,true);
+    dv.setFloat32(o+12,ax,true); dv.setFloat32(o+16,ay,true); dv.setFloat32(o+20,az,true);
+    dv.setFloat32(o+24,bx,true); dv.setFloat32(o+28,by,true); dv.setFloat32(o+32,bz,true);
+    dv.setFloat32(o+36,cx,true); dv.setFloat32(o+40,cy,true); dv.setFloat32(o+44,cz,true);
+    dv.setUint16(o+48,0,true);
+    o+=50;
+  }
+  return new Uint8Array(buf);
+}
+
+const CRC_T = (()=>{ const t=new Uint32Array(256);
+  for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; }
+  return t; })();
+function crc32(b){ let c=0xFFFFFFFF; for(let i=0;i<b.length;i++) c=CRC_T[(c^b[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+
+function zipStore(files){   // [{name, data:Uint8Array}] — stored, no compression
+  const enc=new TextEncoder(), parts=[], central=[];
+  let offset=0;
+  const now=new Date();
+  const dtime = ((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1))&0xFFFF;
+  const ddate = (((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate())&0xFFFF;
+  for(const f of files){
+    const nm=enc.encode(f.name), crc=crc32(f.data), sz=f.data.length;
+    const lh=new Uint8Array(30+nm.length), dv=new DataView(lh.buffer);
+    dv.setUint32(0,0x04034b50,true); dv.setUint16(4,20,true); dv.setUint16(6,0,true);
+    dv.setUint16(8,0,true); dv.setUint16(10,dtime,true); dv.setUint16(12,ddate,true);
+    dv.setUint32(14,crc,true); dv.setUint32(18,sz,true); dv.setUint32(22,sz,true);
+    dv.setUint16(26,nm.length,true); dv.setUint16(28,0,true);
+    lh.set(nm,30);
+    parts.push(lh, f.data);
+    const ch=new Uint8Array(46+nm.length), cv=new DataView(ch.buffer);
+    cv.setUint32(0,0x02014b50,true); cv.setUint16(4,20,true); cv.setUint16(6,20,true);
+    cv.setUint16(8,0,true); cv.setUint16(10,0,true); cv.setUint16(12,dtime,true); cv.setUint16(14,ddate,true);
+    cv.setUint32(16,crc,true); cv.setUint32(20,sz,true); cv.setUint32(24,sz,true);
+    cv.setUint16(28,nm.length,true); cv.setUint32(42,offset,true);
+    ch.set(nm,46);
+    central.push(ch);
+    offset += lh.length + sz;
+  }
+  let cdSize=0; for(const c of central) cdSize+=c.length;
+  const eo=new Uint8Array(22), ev=new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true); ev.setUint16(8,files.length,true); ev.setUint16(10,files.length,true);
+  ev.setUint32(12,cdSize,true); ev.setUint32(16,offset,true);
+  const all=[...parts,...central,eo];
+  let total=0; for(const a of all) total+=a.length;
+  const out=new Uint8Array(total); let p=0;
+  for(const a of all){ out.set(a,p); p+=a.length; }
+  return out;
+}
+
+function xmlEsc(s){ return String(s).replace(/[<>&"']/g,c=>({"<":"&lt;",">":"&gt;","&":"&amp;",'"':"&quot;","'":"&apos;"}[c])); }
+
+function make3mf(parts, st, name){
+  /* Mirrors how Bambu Studio itself writes a project, which is the only layout
+     it reliably reads back as a multi-part object:
+       - the 3MF *production extension* (requiredextensions="p"): each part's
+         geometry lives in its own /3D/Objects/object_N.model, pulled in by
+         p:path components and declared in 3D/_rels/3dmodel.model.rels
+       - one wrapper <object> whose <components> are those parts
+       - Metadata/model_settings.config, where <part id> is a 1-based index
+         within the object (NOT the 3MF object id), each carrying its extruder
+     Putting every part in one mesh — or even one file — gets flattened into a
+     single solid on import, which is why earlier attempts came in unpaintable. */
+  const enc = new TextEncoder();
+  const NS = 'xmlns="http://schemas.microsoft.com/3dmanufacturing/core/2015/02"'+
+             ' xmlns:BambuStudio="http://schemas.bambulab.com/package/2021"'+
+             ' xmlns:p="http://schemas.microsoft.com/3dmanufacturing/production/2015/06"'+
+             ' requiredextensions="p"';
+  let uc=0;
+  const uuid = ()=> (++uc).toString(16).padStart(8,"0")+"-b206-40ff-9872-83e8017abed1";
+  const IDENT = "1 0 0 0 1 0 0 0 1 0 0 0";
+  const files=[], comps=[], cfgParts=[], objXml=[];
+  const wrapId = parts.length+1;
+  const objPath = `/3D/Objects/object_${wrapId}.model`;   // Bambu names it after the wrapper
+
+  // Every part of one object lives in ONE object_N.model, as sibling <object>
+  // elements with ids 1..N. The wrapper's components all share that p:path and
+  // differ only by objectid — one file per part is NOT how Bambu reads it back.
+  parts.forEach((p,i)=>{
+    const oid=i+1;
+    const vmap=new Map(), verts=[], tris=[];
+    const vi=(x,y,z)=>{
+      const k=(Math.round(x*1e4)/1e4)+","+(Math.round(y*1e4)/1e4)+","+(Math.round(z*1e4)/1e4);
+      let v=vmap.get(k);
+      if(v===undefined){ v=verts.length/3; verts.push(x,y,z); vmap.set(k,v); }
+      return v;
+    };
+    for(let i2=0;i2<p.tris.length;i2+=9)
+      tris.push(vi(p.tris[i2],p.tris[i2+1],p.tris[i2+2]),
+                vi(p.tris[i2+3],p.tris[i2+4],p.tris[i2+5]),
+                vi(p.tris[i2+6],p.tris[i2+7],p.tris[i2+8]));
+    const V=[]; for(let k=0;k<verts.length;k+=3)
+      V.push(`<vertex x="${verts[k].toFixed(5)}" y="${verts[k+1].toFixed(5)}" z="${verts[k+2].toFixed(5)}"/>`);
+    const T=[]; for(let k=0;k<tris.length;k+=3)
+      T.push(`<triangle v1="${tris[k]}" v2="${tris[k+1]}" v3="${tris[k+2]}"/>`);
+    objXml.push(
+`  <object id="${oid}" p:UUID="${uuid()}" type="model">
+   <mesh><vertices>${V.join("")}</vertices><triangles>${T.join("")}</triangles></mesh>
+  </object>`);
+    comps.push(`    <component p:path="${objPath}" objectid="${oid}" p:UUID="${uuid()}" transform="${IDENT}"/>`);
+    cfgParts.push(
+`    <part id="${oid}" subtype="normal_part">
+      <metadata key="name" value="${xmlEsc(p.label)}"/>
+      <metadata key="matrix" value="1 0 0 0 0 1 0 0 0 0 1 0 0 0 0 1"/>
+      <metadata key="extruder" value="${p.ext}"/>
+      <mesh_stat face_count="${p.tris.length/9}" edges_fixed="0" degenerate_facets="0" facets_removed="0" facets_reversed="0" backwards_edges="0"/>
+    </part>`);
+  });
+
+  files.push({name:objPath.slice(1), data:enc.encode(
+`<?xml version="1.0" encoding="UTF-8"?>
+<model unit="millimeter" xml:lang="en-US" ${NS}>
+ <metadata name="BambuStudio:3mfVersion">1</metadata>
+ <resources>
+${objXml.join("\n")}
+ </resources>
+ <build/>
+</model>`)});
+  const place = `1 0 0 0 1 0 0 0 1 128 128 0`;   // drop it on the middle of the plate
+  const faces = parts.reduce((a,p)=>a+p.tris.length/9,0);
+
+  files.push({name:"3D/3dmodel.model", data:enc.encode(
+`<?xml version="1.0" encoding="UTF-8"?>
+<model unit="millimeter" xml:lang="en-US" ${NS}>
+ <metadata name="Application">Veer NFC Studio ${BUILD}</metadata>
+ <metadata name="BambuStudio:3mfVersion">1</metadata>
+ <metadata name="Title">${xmlEsc(name)}</metadata>
+ <resources>
+  <object id="${wrapId}" p:UUID="${uuid()}" type="model">
+   <components>
+${comps.join("\n")}
+   </components>
+  </object>
+ </resources>
+ <build>
+  <item objectid="${wrapId}" p:UUID="${uuid()}" transform="${place}" printable="1"/>
+ </build>
+</model>`)});
+
+  files.push({name:"3D/_rels/3dmodel.model.rels", data:enc.encode(
+`<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+ <Relationship Target="${objPath}" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>
+</Relationships>`)});
+
+  files.push({name:"Metadata/model_settings.config", data:enc.encode(
+`<?xml version="1.0" encoding="UTF-8"?>
+<config>
+  <object id="${wrapId}">
+    <metadata key="name" value="${xmlEsc(name)}"/>
+    <metadata key="extruder" value="1"/>
+    <metadata face_count="${faces}"/>
+${cfgParts.join("\n")}
+  </object>
+  <plate>
+    <metadata key="plater_id" value="1"/>
+    <metadata key="plater_name" value=""/>
+    <metadata key="locked" value="false"/>
+    <model_instance>
+      <metadata key="object_id" value="${wrapId}"/>
+      <metadata key="instance_id" value="0"/>
+    </model_instance>
+  </plate>
+  <assemble>
+   <assemble_item object_id="${wrapId}" instance_id="0" transform="${place}" offset="0 0 0"/>
+  </assemble>
+</config>`)});
+
+  files.push({name:"[Content_Types].xml", data:enc.encode(
+`<?xml version="1.0" encoding="UTF-8"?>
+<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">
+ <Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>
+ <Default Extension="model" ContentType="application/vnd.ms-package.3dmanufacturing-3dmodel+xml"/>
+ <Default Extension="png" ContentType="image/png"/>
+</Types>`)});
+
+  files.push({name:"_rels/.rels", data:enc.encode(
+`<?xml version="1.0" encoding="UTF-8"?>
+<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">
+ <Relationship Target="/3D/3dmodel.model" Id="rel-1" Type="http://schemas.microsoft.com/3dmanufacturing/2013/01/3dmodel"/>
+</Relationships>`)});
+
+  // [Content_Types] and _rels/.rels conventionally lead the archive
+  files.sort((a,b)=>{
+    const rank = n => n==="[Content_Types].xml" ? 0 : n==="_rels/.rels" ? 1 : 2;
+    return rank(a.name)-rank(b.name);
+  });
+  return zipStore(files);
+}
+
+function download(bytes, filename, mime){
+  const blob=new Blob([bytes],{type:mime||"application/octet-stream"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob); a.download=filename;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 1500);
+}
+
+/* ───────────────────────── 2D face preview ───────────────────────── */
+const c2 = $("face2d"), x2 = c2.getContext("2d");
+function draw2D(){
+  const st = readSettings();
+  const dpr = window.devicePixelRatio||1;
+  const W = c2.clientWidth, H = c2.clientHeight;
+  if(W<20 || H<20) return;                       // pane collapsed or not laid out yet
+  c2.width = W*dpr; c2.height = H*dpr;
+  x2.setTransform(dpr,0,0,dpr,0,0);
+  x2.clearRect(0,0,W,H);
+
+  const pad = Math.min(44, W/6, H/6);            // never let padding exceed the canvas
+  const sc = Math.max(0.05, Math.min((W-2*pad)/st.W, (H-2*pad)/st.H));
+  const cx=W/2, cy=H/2;
+  const toS = (x,y)=>[cx + x*sc, cy - y*sc];
+
+  // card
+  x2.save();
+  x2.beginPath();
+  const L=cardOutline(st);
+  L.forEach((p,i)=>{ const [X,Y]=toS(p.x,p.y); i?x2.lineTo(X,Y):x2.moveTo(X,Y); });
+  x2.closePath();
+  if(st.hangOn){                                   // punch the keyring hole out
+    const [HX,HY]=toS(st.hcx,st.hcy);
+    x2.moveTo(HX+st.hangD/2*sc, HY);
+    x2.arc(HX,HY,st.hangD/2*sc,0,Math.PI*2);
+  }
+  x2.shadowColor="#000a"; x2.shadowBlur=26; x2.shadowOffsetY=10;
+  x2.fillStyle=S.cardColor; x2.fill("evenodd");
+  x2.shadowColor="transparent";
+  x2.clip("evenodd");
+
+  // artwork
+  if(S.labelPx){
+    const gw=S.gw, gh=S.gh;
+    const im = x2.createImageData(gw,gh);
+    const cols = S.palette.map(p=>hex2rgb(p.hex));
+    for(let i=0;i<gw*gh;i++){
+      const l=S.labelPx[i];
+      if(!l) continue;
+      const c=cols[l-1]||[136,136,136];
+      im.data[i*4]=c[0]; im.data[i*4+1]=c[1]; im.data[i*4+2]=c[2]; im.data[i*4+3]=255;
+    }
+    const tmp=document.createElement("canvas"); tmp.width=gw; tmp.height=gh;
+    tmp.getContext("2d").putImageData(im,0,0);
+    const [X0,Y0]=toS(S.ox, S.oy+(gh-1)/S.res);
+    x2.imageSmoothingEnabled=true;
+    x2.drawImage(tmp, X0, Y0, gw*sc/S.res, gh*sc/S.res);
+  }
+  x2.restore();
+
+  // pocket ghost (it's on the far side)
+  if(st.pkOn){
+    x2.save();
+    x2.setLineDash([5,4]); x2.strokeStyle="#ffffff35"; x2.lineWidth=1.2;
+    x2.beginPath();
+    if(st.pkShape==="circle"){
+      const [X,Y]=toS(st.pkX,st.pkY);
+      x2.arc(X,Y,(st.pkW+2*st.pkGap)/2*sc,0,7);
+    }else{
+      const [X,Y]=toS(st.pkX-(st.pkW+2*st.pkGap)/2, st.pkY+(st.pkH+2*st.pkGap)/2);
+      x2.rect(X,Y,(st.pkW+2*st.pkGap)*sc,(st.pkH+2*st.pkGap)*sc);
+    }
+    x2.stroke();
+    x2.fillStyle="#ffffff55"; x2.font="11px system-ui"; x2.textAlign="center";
+    const [TX,TY]=toS(st.pkX, st.pkY);
+    x2.fillText("NFC pocket (back)", TX, TY+4);
+    x2.restore();
+  }
+
+  // ruler
+  x2.strokeStyle="#ffffff22"; x2.fillStyle="#8b98a6"; x2.font="11px system-ui"; x2.textAlign="center";
+  const [ax,ay]=toS(-st.W/2, -st.H/2-2.5), [bx,by]=toS(st.W/2, -st.H/2-2.5);
+  x2.beginPath(); x2.moveTo(ax,ay); x2.lineTo(bx,by); x2.stroke();
+  x2.fillText(st.W.toFixed(1)+" mm", (ax+bx)/2, ay+15);
+  x2.save(); x2.translate(...toS(-st.W/2-3, 0)); x2.rotate(-Math.PI/2);
+  x2.fillText(st.H.toFixed(1)+" mm", 0, -4); x2.restore();
+}
+
+/* eyedropper on the 2D preview */
+c2.addEventListener("click", ev=>{
+  if(S.picking<0 || !S.labelPx) return;
+  const st=readSettings();
+  const r=c2.getBoundingClientRect();
+  const W=c2.clientWidth,H=c2.clientHeight, pad=44;
+  const sc=Math.min((W-2*pad)/st.W,(H-2*pad)/st.H);
+  const mx=((ev.clientX-r.left)-W/2)/sc, my=(H/2-(ev.clientY-r.top))/sc;
+  const gx=Math.round((mx-S.ox)*S.res), gy=Math.round((S.gh-1)-(my-S.oy)*S.res);
+  if(gx<0||gy<0||gx>=S.gw||gy>=S.gh) return;
+  const p=wctx.getImageData(gx,gy,1,1).data;
+  if(p[3]<40) return;
+  S.palette[S.picking] = {hex:rgb2hex(p[0],p[1],p[2]), pct:S.palette[S.picking]?.pct||0};
+  $("lockPal").checked = true;
+  S.picking=-1;
+  refresh();
+});
+
+/* ───────────────────────── 3D preview (raw WebGL) ───────────────────────── */
+const glc=$("gl");
+// default view is from BELOW — that's the card's front, the face a customer sees
+let gl=null, prog=null, buffers=[], cam={az:-0.45, el:-0.85, dist:150};
+function initGL(){
+  if(gl) return true;
+  gl = glc.getContext("webgl",{antialias:true, alpha:false});
+  if(!gl) return false;
+  const vs=`attribute vec3 p; attribute vec3 n; uniform mat4 mvp; uniform mat4 mv;
+    varying vec3 vn; varying vec3 vp;
+    void main(){ vn=n; vp=p; gl_Position=mvp*vec4(p,1.0); }`;
+  const fs=`precision mediump float; varying vec3 vn; varying vec3 vp; uniform vec3 col;
+    void main(){
+      vec3 n=normalize(vn);
+      float k = 0.30
+              + 0.62*max(dot(n, normalize(vec3(-0.35,-0.55,0.86))),0.0)
+              + 0.22*max(dot(n, normalize(vec3(0.7,0.4,-0.3))),0.0);
+      vec3 c = col*k + vec3(0.05)*pow(max(n.z,0.0),3.0);
+      gl_FragColor=vec4(pow(c, vec3(0.85)),1.0);
+    }`;
+  const sh=(t,s)=>{ const o=gl.createShader(t); gl.shaderSource(o,s); gl.compileShader(o); return o; };
+  prog=gl.createProgram();
+  gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs));
+  gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));
+  gl.bindAttribLocation(prog,0,"p"); gl.bindAttribLocation(prog,1,"n");
+  gl.linkProgram(prog); gl.useProgram(prog);
+  gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
+  return true;
+}
+function mul(a,b){ const o=new Float32Array(16);
+  for(let i=0;i<4;i++)for(let j=0;j<4;j++){ let s=0; for(let k=0;k<4;k++) s+=a[k*4+j]*b[i*4+k]; o[i*4+j]=s; }
+  return o; }
+function persp(f,ar,n,fa){ const t=1/Math.tan(f/2); return new Float32Array([t/ar,0,0,0, 0,t,0,0, 0,0,(fa+n)/(n-fa),-1, 0,0,2*fa*n/(n-fa),0]); }
+function lookAt(e,c,u){
+  const z=[e[0]-c[0],e[1]-c[1],e[2]-c[2]]; let l=Math.hypot(...z); z.forEach((v,i)=>z[i]=v/l);
+  const x=[u[1]*z[2]-u[2]*z[1], u[2]*z[0]-u[0]*z[2], u[0]*z[1]-u[1]*z[0]];
+  l=Math.hypot(...x)||1; x.forEach((v,i)=>x[i]=v/l);
+  const y=[z[1]*x[2]-z[2]*x[1], z[2]*x[0]-z[0]*x[2], z[0]*x[1]-z[1]*x[0]];
+  return new Float32Array([x[0],y[0],z[0],0, x[1],y[1],z[1],0, x[2],y[2],z[2],0,
+    -(x[0]*e[0]+x[1]*e[1]+x[2]*e[2]), -(y[0]*e[0]+y[1]*e[1]+y[2]*e[2]), -(z[0]*e[0]+z[1]*e[1]+z[2]*e[2]),1]);
+}
+function uploadGL(parts){
+  if(!initGL()) return;
+  for(const b of buffers){ gl.deleteBuffer(b.pb); gl.deleteBuffer(b.nb); }
+  buffers=[];
+  for(const p of parts){
+    const n=p.tris.length/9;
+    if(!n) continue;
+    const pos=new Float32Array(p.tris), nor=new Float32Array(p.tris.length);
+    for(let i=0;i<n;i++){
+      const b=i*9;
+      const ux=pos[b+3]-pos[b], uy=pos[b+4]-pos[b+1], uz=pos[b+5]-pos[b+2];
+      const vx=pos[b+6]-pos[b], vy=pos[b+7]-pos[b+1], vz=pos[b+8]-pos[b+2];
+      let nx=uy*vz-uz*vy, ny=uz*vx-ux*vz, nz=ux*vy-uy*vx;
+      const L=Math.hypot(nx,ny,nz)||1; nx/=L; ny/=L; nz/=L;
+      for(let k=0;k<3;k++){ nor[b+k*3]=nx; nor[b+k*3+1]=ny; nor[b+k*3+2]=nz; }
+    }
+    const pb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,pb); gl.bufferData(gl.ARRAY_BUFFER,pos,gl.STATIC_DRAW);
+    const nb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,nb); gl.bufferData(gl.ARRAY_BUFFER,nor,gl.STATIC_DRAW);
+    buffers.push({pb,nb,count:n*3,color:hex2rgb(p.color).map(v=>v/255)});
+  }
+  drawGL();
+}
+function drawGL(){
+  if(!gl||!buffers.length) return;
+  const dpr=window.devicePixelRatio||1;
+  glc.width=glc.clientWidth*dpr; glc.height=glc.clientHeight*dpr;
+  gl.viewport(0,0,glc.width,glc.height);
+  gl.clearColor(0.055,0.066,0.086,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  const st=readSettings();
+  const d=cam.dist;
+  const eye=[d*Math.cos(cam.el)*Math.sin(cam.az), d*Math.cos(cam.el)*Math.cos(cam.az)*-1, d*Math.sin(cam.el)];
+  const P=persp(0.62, glc.width/glc.height, 1, 1200);
+  const V=lookAt(eye,[0,0,st.T/2],[0,0,1]);
+  const mvp=mul(P,V);
+  gl.useProgram(prog);
+  gl.uniformMatrix4fv(gl.getUniformLocation(prog,"mvp"),false,mvp);
+  gl.enableVertexAttribArray(0); gl.enableVertexAttribArray(1);
+  const cl=gl.getUniformLocation(prog,"col");
+  for(const b of buffers){
+    gl.uniform3fv(cl,new Float32Array(b.color));
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.pb); gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.nb); gl.vertexAttribPointer(1,3,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.TRIANGLES,0,b.count);
+  }
+}
+(function orbit(){
+  let down=false,lx=0,ly=0;
+  glc.addEventListener("mousedown",e=>{down=true;lx=e.clientX;ly=e.clientY;});
+  window.addEventListener("mouseup",()=>down=false);
+  window.addEventListener("mousemove",e=>{
+    if(!down) return;
+    cam.az -= (e.clientX-lx)*0.008;
+    cam.el = clamp(cam.el + (e.clientY-ly)*0.008, -1.45, 1.45);
+    lx=e.clientX; ly=e.clientY; drawGL();
+  });
+  glc.addEventListener("wheel",e=>{ e.preventDefault(); cam.dist=clamp(cam.dist*(1+e.deltaY*0.0012),25,600); drawGL(); },{passive:false});
+})();
+
+/* ───────────────────────── UI wiring ───────────────────────── */
+function setStatus(msg, cls){ const s=$("stat"); s.textContent=msg; s.className=cls||""; }
+
+function renderSwatches(){
+  const st = readSettings();
+  const box=$("swatches"); box.innerHTML="";
+  const mk = (slotLabel, sub, hex, onColor, extra) => {
+    const d=document.createElement("div"); d.className="swatch";
+    d.innerHTML=`<div class="slot"><b>${slotLabel}</b>${sub}</div>`;
+    const ci=document.createElement("input"); ci.type="color"; ci.value=hex;
+    ci.oninput=()=>onColor(ci.value);
+    d.appendChild(ci);
+    const nm=document.createElement("div"); nm.className="name"; nm.textContent=hex.toUpperCase();
+    d.appendChild(nm);
+    if(extra) d.appendChild(extra);
+    box.appendChild(d);
+  };
+  mk("AMS 1","card + back", S.cardColor, v=>{ S.cardColor=v; draw2D(); save(); });
+  for(let i=0;i<st.k;i++){
+    const p = S.palette[i] || {hex:"#888888", pct:0};
+    const wrap=document.createElement("div");
+    wrap.style.cssText="display:flex;gap:6px;align-items:center";
+    const pct=document.createElement("span"); pct.className="pct"; pct.textContent=(p.pct||0)+"%";
+    const pick=document.createElement("button");
+    pick.className="pickbtn"+(S.picking===i?" on":""); pick.textContent = S.picking===i?"click art":"pick";
+    pick.onclick=()=>{ S.picking = S.picking===i?-1:i; renderSwatches();
+      setStatus(S.picking>=0?"Click a colour in the card preview to sample it.":"Ready."); };
+    wrap.append(pct,pick);
+    mk("AMS "+(i+2), "logo "+(i+1), p.hex, v=>{
+      S.palette[i]={hex:v,pct:p.pct}; $("lockPal").checked=true; refresh();
+    }, wrap);
+  }
+  // text slot dropdown
+  const ts=$("txSlot"), cur=ts.value;
+  ts.innerHTML="";
+  for(let i=1;i<=st.k;i++){
+    const o=document.createElement("option"); o.value=i;
+    o.textContent=`AMS ${i+1} — logo colour ${i}`;
+    ts.appendChild(o);
+  }
+  ts.value = (cur && cur<=st.k) ? cur : 1;
+  $("colCount").textContent = ` (${st.k+1} filaments)`;
+
+  const cw=$("colWarn");
+  cw.innerHTML = st.k+1>4
+    ? `<div class="warnbox">${st.k+1} filaments — an AMS holds 4. Drop to ${3} logo colours to stay on a single AMS unit.</div>` : "";
+}
+
+let rafPending=false;
+function refresh(){
+  if(rafPending) return;
+  rafPending=true;
+  requestAnimationFrame(()=>{
+    rafPending=false;
+    const t0=performance.now();
+    const st=readSettings();
+    try{
+      rasterise(st);
+      if(st.hangPos!=="custom"){                 // show where the preset put the hole
+        $("hangX").value=st.hcx.toFixed(1); $("hangY").value=st.hcy.toFixed(1);
+      }
+      renderSwatches();
+      draw2D();
+      validate(st);
+      $("overlay").textContent = S.img
+        ? `${st.W}×${st.H}×${st.T} mm · logo ${st.k} colour${st.k>1?"s":""} · traced at ${st.res} px/mm · ${(performance.now()-t0).toFixed(0)} ms`
+        : "Drop a logo in the panel on the left to begin.";
+    }catch(e){ setStatus("Preview error: "+e.message,"err"); console.error(e); }
+    save();
+  });
+}
+function validate(st){
+  const w=[];
+  if(st.pkOn){
+    const P = cavityPlan(st);
+    if(!P.valid)
+      w.push(`No room for a tag cavity in a ${st.T} mm blank — raise the thickness to at least `+
+             `<b>${P.minThickness} mm</b>.`);
+    else if(P.tooShallow)
+      w.push(`After snapping to ${st.layerH} mm layers the cavity is only <b>${P.depth.toFixed(2)} mm</b> `+
+             `deep, but your tag is ${st.pkD} mm — the nozzle would hit it. Raise the thickness to at `+
+             `least <b>${P.minThickness} mm</b>, or use a thinner tag.`);
+    // checked for BOTH shapes, and including any offset — a pocket that runs
+    // past the card edge would cut through and leave the back open
+    const pw = st.pkW+2*st.pkGap;
+    const ph = (st.pkShape==="circle" ? st.pkW : st.pkH)+2*st.pkGap;
+    const needW = 2*Math.abs(st.pkX)+pw, needH = 2*Math.abs(st.pkY)+ph;
+    if(needW > st.W-2*POCKET_WALL || needH > st.H-2*POCKET_WALL)
+      w.push(`Pocket is ${pw.toFixed(1)} × ${ph.toFixed(1)} mm with clearance — too big for an `+
+             `${st.W} × ${st.H} mm card. It has been shrunk to fit so it doesn't cut through the `+
+             `back; use a smaller tag, less offset, or a larger card.`);
+  }
+  if(st.h >= st.T) w.push("Colour depth must be less than card thickness.");
+  if(st.hangOn && st.pkOn){
+    const pr = st.pkShape==="circle" ? st.pkW/2+st.pkGap
+             : Math.hypot(st.pkW/2+st.pkGap, st.pkH/2+st.pkGap);
+    if(Math.hypot(st.hcx-st.pkX, st.hcy-st.pkY) < pr + st.hangD/2 + POCKET_WALL)
+      w.push(`The keyring hole overlaps the tag cavity, so the cavity is being shrunk to clear it — `+
+             `which may make it too small for the tag. Move the hole, move the tag, or use a bigger blank.`);
+  }
+  if(st.hangOn && st.hangD > Math.min(st.W,st.H)/3)
+    w.push(`A ${st.hangD} mm hole is very large for a ${st.W} × ${st.H} mm blank and leaves little material around it.`);
+  $("pkWarn").innerHTML = w.length ? `<div class="warnbox">${w.join("<br>")}</div>` : "";
+}
+
+/* build + export */
+function doBuild(){
+  const st=readSettings();
+  if(!S.img){ setStatus("Load a logo first.","err"); return; }
+  if(!S.labelPx) rasterise(st);
+  setStatus("Building mesh…");
+  $("btnStl").disabled=true; $("btn3mf").disabled=true;
+  setTimeout(()=>{
+    const t0=performance.now();
+    try{
+      rasterise(st);
+      S.parts = buildParts(st);
+      const total = S.parts.reduce((a,p)=>a+p.tris.length/9,0);
+      uploadGL(S.parts);
+      showParts(S.parts);
+      $("btnStl").disabled=false; $("btn3mf").disabled=false;
+      setStatus(`Built ${S.parts.length} parts · ${total.toLocaleString()} triangles · ${(performance.now()-t0).toFixed(0)} ms`,"ok");
+      switchView("3d");
+    }catch(e){ setStatus("Build failed: "+e.message,"err"); console.error(e); }
+  },30);
+}
+function showParts(parts){
+  const box=$("partlist");
+  const st=readSettings();
+  box.style.display="block";
+  const lyr = S.pauseZ ? Math.round((S.pauseZ-st.layer1)/st.layerH)+1 : 0;
+  const grew = S.cavityDepth && S.cavityDepth > st.pkD+1e-6;
+  const pause = S.pauseZ ? `<div class="warnbox" style="background:#0b2a27;border-color:#12756a;color:#7ff0e0">
+    <b>Sealed tag — this print needs a pause.</b> Slice it, then right-click the layer slider at
+    <b>Z&nbsp;=&nbsp;${S.pauseZ.toFixed(2)}&nbsp;mm</b> (after layer ${lyr}) and choose
+    <b>Add pause</b>. Drop the tag in when it stops, press it flat, then resume.<br>
+    Cavity is <b>${S.cavityDepth.toFixed(2)} mm</b> deep${grew?` (rounded up from ${st.pkD} to a whole
+    number of ${st.layerH} mm layers)`:``}, cover is <b>${(st.T-S.pauseZ).toFixed(2)} mm</b>.
+    These assume layer height <b>${st.layerH}</b> / first layer <b>${st.layer1}</b> — if your slicer
+    profile differs, change them in section 4 or the pause will land mid-layer.</div>` : "";
+  box.innerHTML = pause + `<table><thead><tr><th>File</th><th>Part</th><th>Filament</th><th>Z range</th><th>Triangles</th></tr></thead><tbody>`+
+    parts.map(p=>{
+      const z = `${p.zr[0].toFixed(2)} – ${p.zr[1].toFixed(2)}`;
+      return `<tr><td class="n">${p.name}.stl</td><td>${p.label}</td>`+
+             `<td><span class="dot" style="background:${p.color}"></span> AMS ${p.ext}</td>`+
+             `<td>${z} mm</td><td>${(p.tris.length/9).toLocaleString()}</td></tr>`;
+    }).join("")+`</tbody></table>`;
+}
+function baseName(){
+  const st=readSettings();
+  return (S.imgName.replace(/\.[^.]+$/,"").replace(/[^\w\-]+/g,"_") || "nfc_card")
+    + `_${st.W}x${st.H}`;
+}
+$("btnStl").onclick=()=>{
+  if(!S.parts.length) return;
+  const bn=baseName();
+  const files=S.parts.map((p,i)=>({name:`${bn}/${i+1}_${p.name}.stl`, data:stlBinary(p.tris, p.label)}));
+  const st=readSettings();
+  files.push({name:`${bn}/README.txt`, data:new TextEncoder().encode(readmeText(st, S.parts, bn))});
+  download(zipStore(files), bn+"_STL.zip", "application/zip");
+  setStatus("STL set downloaded. Import all files at once in Bambu Studio and answer YES to “load as a single object with multiple parts”.","ok");
+};
+$("btn3mf").onclick=()=>{
+  if(!S.parts.length) return;
+  const st=readSettings(), bn=baseName();
+  download(make3mf(S.parts, st, bn), bn+".3mf", "model/3mf");
+  setStatus("3MF downloaded — WARNING: Bambu Studio flattens non-Bambu 3MFs into one solid and drops the "+
+            "filament assignments. This file is only useful in other slicers. For a multi-colour card, "+
+            "use the STL set.","err");
+};
+function readmeText(st, parts, bn){
+  return [
+`${bn}
+Generated by Veer NFC Studio  build ${BUILD}`,
+``,
+`CARD          ${st.W} x ${st.H} x ${st.T} mm, ${st.R} mm corner radius`,
+`COLOUR DEPTH  ${st.h} mm (the logo layers)`,
+st.pkOn ? `TAG CAVITY    ${st.pkShape==="circle"
+    ? (st.pkW+2*st.pkGap).toFixed(1)+" mm dia"
+    : (st.pkW+2*st.pkGap).toFixed(1)+" x "+(st.pkH+2*st.pkGap).toFixed(1)+" mm"} x ${st.pkD} mm deep, `+
+    (S.pauseZ ? `SEALED inside the card` : `opens on the BACK`)
+  : `TAG CAVITY    none`,
+...(S.pauseZ ? ["",
+`*** THIS PRINT NEEDS A PAUSE ***`,
+`  The tag is sealed inside the card, so the printer has to stop and let you`,
+`  drop it in before it closes over the top.`,
+``,
+`  1. Slice as normal.`,
+`  2. In the Preview tab, drag the layer slider to Z = ${S.pauseZ.toFixed(2)} mm (layer ${Math.round(S.pauseZ/st.layerH)}).`,
+`  3. Right-click the slider at that layer -> Add pause.`,
+`  4. Print. When it stops, drop the tag into the cavity and press it flat.`,
+`  5. Resume. The next layers close over the tag.`,
+``,
+`  Set the tag thickness to the REAL thickness of your tag. If the cavity is`,
+`  deeper than the tag, the cover has to bridge over open air and will sag.`,
+`  If it is shallower, the nozzle will hit the tag.`] : []),
+``,
+`PARTS (all share one origin — do not move them individually)`,
+...parts.map((p,i)=>`  ${i+1}_${p.name}.stl   ${p.label}  ->  filament / AMS slot ${p.ext}  (${p.color})`),
+``,
+`HOW TO IMPORT INTO BAMBU STUDIO`,
+`  1. Select ALL the .stl files at once and drag them onto the plate.`,
+`  2. Bambu Studio asks "load these files as a single object with multiple parts?" -> YES.`,
+`     (If it doesn't ask: import the first file, then right-click the object ->`,
+`      Add part -> Load and add the rest.)`,
+`  3. In the object list, click each part and set its filament to the slot above.`,
+`  4. Do NOT rotate the model. It is already face-down: the logo prints against`,
+`     the build plate and the NFC pocket opens upward.`,
+``,
+`SLICING`,
+`  Layer height 0.2 mm (colour depth ${st.h} mm = ${Math.round(st.h/0.2)} layers)`,
+`  100% infill - the card is thin, solid is faster than sparse plus top layers`,
+`  Textured PEI plate gives the nicest card face`,
+``,
+`AFTER PRINTING`,
+`  Drop the NFC tag into the back pocket, cover with a sticker or a drop of glue.`,
+`  Keep the card off metal surfaces - metal detunes the antenna.`
+].join("\n");
+}
+
+/* view tabs */
+function switchView(v){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.v===v));
+  $("face2d").style.display = v==="2d"?"block":"none";
+  $("gl").style.display = v==="3d"?"block":"none";
+  if(v==="3d"){ initGL(); drawGL(); } else draw2D();
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchView(t.dataset.v));
+
+/* file loading */
+function loadFile(f){
+  if(!f) return;
+  S.imgName=f.name;
+  const rd=new FileReader();
+  rd.onload=()=>{
+    const img=new Image();
+    img.onload=()=>{ S.img=img; $("drop").innerHTML=`<b>${f.name}</b><br>${img.naturalWidth}×${img.naturalHeight} px — click to replace`;
+      $("lockPal").checked=false; refresh(); setStatus("Logo loaded. Tune the colours, then Build mesh.","ok"); };
+    img.onerror=()=>setStatus("Could not read that image.","err");
+    img.src=rd.result;
+  };
+  rd.readAsDataURL(f);
+}
+$("drop").onclick=()=>$("file").click();
+$("file").onchange=e=>loadFile(e.target.files[0]);
+["dragenter","dragover"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.add("over");}));
+["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("over");}));
+$("drop").addEventListener("drop",e=>loadFile(e.dataTransfer.files[0]));
+window.addEventListener("dragover",e=>e.preventDefault());
+window.addEventListener("drop",e=>{ e.preventDefault(); if(e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+
+/* presets */
+$("preset").onchange=()=>{
+  // t = card thickness, tag = tag diameter, px/py = where the cavity sits.
+  // Keychains are smaller, so they take a smaller tag and the cavity is nudged
+  // clear of the keyring hole.
+  const P={
+    cr80  :{w:85.6,h:54,  s:"rect",  r:3.5,  t:2.5, hang:false, tag:25},
+    us    :{w:88.9,h:50.8,s:"rect",  r:3.5,  t:2.5, hang:false, tag:25},
+    eu    :{w:85,  h:55,  s:"rect",  r:3.5,  t:2.5, hang:false, tag:25},
+    kcRect:{w:45,  h:28,  s:"rect",  r:4,    t:3.0, hang:true, hp:"tl", tag:22},
+    kcPill:{w:50,  h:25,  s:"pill",  r:12.5, t:3.0, hang:true, hp:"lc", tag:20, px:6},
+    kcDisc:{w:35,  h:35,  s:"circle",r:17.5, t:3.0, hang:true, hp:"tc", tag:22, py:-1.5},
+    kcSq  :{w:38,  h:38,  s:"rect",  r:6,    t:3.0, hang:true, hp:"tl", tag:25}
+  }[$("preset").value];
+  if(!P) return;
+  $("cw").value=P.w; $("ch").value=P.h; $("shape").value=P.s;
+  $("cr").value=P.r; $("ct").value=P.t;
+  $("hangOn").checked=P.hang;
+  if(P.hang) $("hangPos").value=P.hp;
+  $("pkShape").value="circle"; $("pkW").value=P.tag; $("pkH").value=P.tag;
+  $("pkPreset").value = ({25:"25",22:"22"})[P.tag] || "custom";
+  $("pkX").value=P.px||0; $("pkY").value=P.py||0;
+  syncCardShape(); syncShape(); refresh();
+};
+function syncCardShape(){
+  const s=$("shape").value;
+  $("ch").disabled = s==="circle";
+  $("cr").disabled = s!=="rect";
+  if(s==="circle") $("ch").value=$("cw").value;
+  const custom = $("hangPos").value==="custom";
+  $("hangX").disabled = !custom;
+  $("hangY").disabled = !custom;
+}
+$("shape").onchange=()=>{ syncCardShape(); refresh(); };
+$("hangPos").onchange=()=>{ syncCardShape(); refresh(); };
+$("pkPreset").onchange=()=>{
+  const v=$("pkPreset").value;
+  if(v==="rect45"){ $("pkShape").value="rect"; $("pkW").value=45; $("pkH").value=25; }
+  else if(v!=="custom"){ $("pkShape").value="circle"; $("pkW").value=v; $("pkH").value=v; }
+  syncShape(); refresh();
+};
+function syncShape(){
+  const c = $("pkShape").value==="circle";
+  $("pkH").disabled=c;
+  $("pkDimL").textContent = c ? "Diameter (mm)" : "Width × Height (mm)";
+  if(c) $("pkH").value=$("pkW").value;
+}
+$("pkShape").onchange=()=>{ syncShape(); refresh(); };
+
+/* live bindings */
+const liveIds=["shape","hangOn","hangD","hangPos","hangX","hangY",
+  "artScale","artX","artY","margin","rmBg","bgTol","k","lockPal","despeckle",
+  "tx1","tx2","tx3","txFont","txSize","txLead","txAlign","txX","txY","txSlot","txOn","txBold",
+  "cw","ch","ct","cr","ah","layerH","layer1","pkOn","pkW","pkH","pkGap","pkD","pkSeal","pkLid",
+  "pkX","pkY","res","smooth","simp","minA"];
+liveIds.forEach(id=>{
+  const el=$(id); if(!el) return;
+  el.addEventListener("input", ()=>{ syncLabels(); refresh(); });
+  el.addEventListener("change", ()=>{ syncLabels(); refresh(); });
+});
+function syncLabels(){
+  $("artScaleV").textContent=$("artScale").value+"%";
+  $("bgTolV").textContent=$("bgTol").value;
+  $("smoothV").textContent=$("smooth").value;
+  $("simpV").textContent=(parseFloat($("simp").value)/100).toFixed(2);
+  $("txLeadV").textContent=(parseFloat($("txLead").value)/100).toFixed(2);
+  $("txBoldV").textContent=(parseFloat($("txBold").value)/100).toFixed(2);
+}
+$("btnBuild").onclick=doBuild;
+$("btnReset").onclick=()=>{ localStorage.removeItem("nfcCardStudio"); location.reload(); };
+window.addEventListener("resize",()=>{ draw2D(); drawGL(); });
+
+/* persistence */
+function save(){
+  const o={cardColor:S.cardColor, palette:S.palette};
+  liveIds.forEach(id=>{ const e=$(id); if(e) o[id]= e.type==="checkbox"?e.checked:e.value; });
+  try{ localStorage.setItem("nfcCardStudio", JSON.stringify(o)); }catch(e){}
+}
+(function restore(){
+  try{
+    const o=JSON.parse(localStorage.getItem("nfcCardStudio")||"null");
+    if(o){
+      liveIds.forEach(id=>{ const e=$(id); if(e && o[id]!==undefined){ if(e.type==="checkbox") e.checked=o[id]; else e.value=o[id]; } });
+      if(o.cardColor) S.cardColor=o.cardColor;
+      if(o.palette) S.palette=o.palette;
+    }
+  }catch(e){}
+  $("build").textContent = BUILD;
+  syncShape(); syncCardShape(); syncLabels(); renderSwatches(); draw2D();
+})();
+</script>
+</body>
+</html>
