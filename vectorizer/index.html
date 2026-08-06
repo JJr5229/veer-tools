@@ -42,6 +42,13 @@ h1{
   padding-bottom:.08em;
 }
 .hero p{margin:0;color:var(--tx2);max-width:62ch;font-size:16px}
+.titlerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
+.titlerow h1{margin:0}
+.build{
+  font:600 11.5px/1 ui-monospace,Consolas,monospace; letter-spacing:.08em;
+  color:var(--tx2); border:1px solid var(--line); background:var(--panel);
+  border-radius:999px; padding:5px 11px; white-space:nowrap;
+}
 
 main{padding:36px 0 64px}
 
@@ -120,6 +127,13 @@ input[type=file]{display:none}
 .slider input[type=range]{width:100%;accent-color:var(--orange)}
 .check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2);margin-top:14px}
 .check input{accent-color:var(--orange)}
+.check select{
+  font:inherit;font-size:13px;color:var(--tx);background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;
+}
+.check select:hover{border-color:var(--orange)}
+#bgHint{color:var(--faint,rgba(255,255,255,.38));font-size:12.5px}
+@media (max-width:620px){ #bgHint{display:none} }
 .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
 .btn{
   font:600 14px/1 "Segoe UI",system-ui,sans-serif; border-radius:9px; cursor:pointer;
@@ -165,7 +179,10 @@ footer a:hover{text-decoration:underline}
       <a class="back" href="../">← All tools</a>
     </div>
     <div class="hero">
-      <h1>Vectorizer</h1>
+      <div class="titlerow">
+        <h1>Vectorizer</h1>
+        <span class="build" id="build"></span>
+      </div>
       <p>Raster in, vector out. Drop a PNG or JPG logo and leave with a crisp,
          infinitely scalable SVG — traced entirely in your browser, nothing uploaded.</p>
     </div>
@@ -231,6 +248,16 @@ footer a:hover{text-decoration:underline}
           </div>
         </div>
         <label class="check">
+          Background
+          <select id="removebg">
+            <option value="edges" selected>Remove backdrop only</option>
+            <option value="all">Remove backdrop + enclosed areas</option>
+            <option value="off">Keep it</option>
+          </select>
+          <span id="bgHint">Enclosed areas are holes inside the mark — letter counters, a donut center.</span>
+          <span id="bgNote" style="color:var(--orange)"></span>
+        </label>
+        <label class="check">
           <input type="checkbox" id="rightangle" checked>
           Snap near-right angles (keeps geometric logos sharp)
         </label>
@@ -248,6 +275,7 @@ footer a:hover{text-decoration:underline}
 <footer>
   <div class="wrap">
     Veer · <a href="https://veersolutions.com">veersolutions.com</a>
+    <span id="buildFoot" style="color:#6f6e6a"></span>
   </div>
   <div class="powered">
     <div class="wrap">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
@@ -1475,6 +1503,14 @@ if(typeof define === 'function' && define.amd){
 <script>
 (function(){
 'use strict';
+
+/* ---- BUILD ----
+   Single source of truth for the version badge. Bump on every change that
+   ships: MINOR for a new capability, PATCH for a fix. The date is the ship
+   date, so a glance at the badge tells you whether the page you're looking
+   at is the current one or a stale cache. */
+var BUILD = 'v1.1.0 · 2026-08-06';
+
 var MAXDIM = 1600;
 
 var $ = function(id){ return document.getElementById(id); };
@@ -1486,11 +1522,13 @@ var ui = {
   presets:$('presets'),
   colors:$('colors'), detail:$('detail'), smooth:$('smooth'), speckle:$('speckle'),
   colorsOut:$('colorsOut'), detailOut:$('detailOut'), smoothOut:$('smoothOut'),
-  speckleOut:$('speckleOut'), rightangle:$('rightangle'),
+  speckleOut:$('speckleOut'), rightangle:$('rightangle'), removebg:$('removebg'),
+  bgNote:$('bgNote'),
   download:$('download'), copy:$('copy'), reset:$('reset')
 };
 
-var state = { imgd:null, name:'image', origBytes:0, origW:0, origH:0, scaled:false, svg:'' };
+var state = { rawImgd:null, bgEdges:null, bgAll:null, alphaSource:false, name:'image',
+              origBytes:0, origW:0, origH:0, scaled:false, svg:'' };
 
 var PRESETS = {
   logo:   {colors:8,  detail:5, smooth:0, speckle:8,  rightangle:true},
@@ -1503,6 +1541,135 @@ function fmtBytes(b){
   if(b < 1024) return b + ' B';
   if(b < 1024*1024) return (b/1024).toFixed(b < 102400 ? 1 : 0) + ' KB';
   return (b/1048576).toFixed(1) + ' MB';
+}
+
+/* ---- background knockout ----
+   Flood-fills inward from every edge pixel, clearing whatever flat colour the
+   backdrop is. Because the fill can only travel through connected pixels, white
+   *inside* the mark — letter counters, highlights, enclosed shapes — survives.
+   Returns null when the corners disagree, i.e. there's no flat backdrop to cut. */
+var BG_TOL = 48;
+
+function makeImageData(data, w, h){
+  try{ return new ImageData(data, w, h); }
+  catch(e){
+    var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+    var id = cv.getContext('2d').createImageData(w, h);
+    id.data.set(data); return id;
+  }
+}
+
+function near(a, b, tol){
+  if(a[3] < 8 && b[3] < 8) return true;
+  var dr=a[0]-b[0], dg=a[1]-b[1], db=a[2]-b[2], da=a[3]-b[3];
+  return (dr*dr + dg*dg + db*db + da*da) <= tol*tol;
+}
+
+function stripBackground(src, mode){
+  var w = src.width, h = src.height, n = w*h;
+  var d = new Uint8ClampedArray(src.data);
+  function at(p){ var i=p*4; return [d[i],d[i+1],d[i+2],d[i+3]]; }
+
+  /* Case A: the file already carries alpha — a transparent PNG. The checkerboard
+     the user sees IS the background, so it goes without asking. Cleared pixels get
+     their RGB zeroed as well: a transparent pixel still carries a colour, and left
+     alone that ghost becomes a white palette entry downstream (which is how a
+     transparent logo ends up as a white square in another tool). Surviving pixels
+     are forced fully opaque so the anti-aliased rim doesn't trace as halo paths. */
+  var clearCount = 0;
+  for(var t=0;t<n;t++) if(d[t*4+3] < 128) clearCount++;
+  if(clearCount > n*0.005){
+    for(var u=0;u<n;u++){
+      var ui4 = u*4;
+      if(d[ui4+3] < 128){ d[ui4]=0; d[ui4+1]=0; d[ui4+2]=0; d[ui4+3]=0; }
+      else d[ui4+3] = 255;
+    }
+    return makeImageData(d, w, h);
+  }
+
+  /* Case B: opaque file — the backdrop is whatever colour 3 of the 4 corners share */
+  var corners = [0, w-1, (h-1)*w, (h-1)*w + (w-1)];
+  var bg = null, bgVotes = 0;
+  for(var a=0;a<4;a++){
+    var c = at(corners[a]), votes = 0;
+    for(var b=0;b<4;b++){ if(near(c, at(corners[b]), 30)) votes++; }
+    if(votes > bgVotes){ bgVotes = votes; bg = c; }
+  }
+  if(bgVotes < 3) return null;
+  if(bg[3] < 8) return null;   /* already transparent — nothing to cut */
+
+  var cleared = new Uint8Array(n);
+
+  if(mode === 'all'){
+    /* every pixel of the backdrop colour goes, wherever it sits — this is what
+       opens up enclosed pockets like a donut hole or a letter counter */
+    for(var p2=0;p2<n;p2++){
+      if(near(bg, at(p2), BG_TOL)){ d[p2*4+3] = 0; cleared[p2] = 1; }
+    }
+  }else{
+    /* flood inward from the edges only, so enclosed pockets are preserved */
+    var seen = new Uint8Array(n), stack = [];
+    for(var x=0;x<w;x++){ stack.push(x); stack.push(x + (h-1)*w); }
+    for(var y=0;y<h;y++){ stack.push(y*w); stack.push(y*w + w-1); }
+
+    while(stack.length){
+      var p = stack.pop();
+      if(seen[p]) continue;
+      seen[p] = 1;
+      if(!near(bg, at(p), BG_TOL)) continue;
+      d[p*4+3] = 0; cleared[p] = 1;
+      var px = p % w, py = (p - px) / w;
+      if(px > 0)   stack.push(p-1);
+      if(px < w-1) stack.push(p+1);
+      if(py > 0)   stack.push(p-w);
+      if(py < h-1) stack.push(p+w);
+    }
+  }
+
+  /* two dilation passes with a looser tolerance clean up the anti-aliased
+     halo, which would otherwise trace as a thin outline around the mark */
+  for(var pass=0; pass<2; pass++){
+    var add = [];
+    for(var q=0;q<n;q++){
+      if(cleared[q] || d[q*4+3] === 0) continue;
+      var qx = q % w, qy = (q - qx) / w;
+      var adj = (qx>0   && cleared[q-1]) || (qx<w-1 && cleared[q+1]) ||
+                (qy>0   && cleared[q-w]) || (qy<h-1 && cleared[q+w]);
+      if(adj && near(bg, at(q), BG_TOL*2.2)) add.push(q);
+    }
+    if(!add.length) break;
+    for(var k=0;k<add.length;k++){ cleared[add[k]] = 1; d[add[k]*4+3] = 0; }
+  }
+
+  var count = 0;
+  for(var m=0;m<n;m++) if(cleared[m]) count++;
+  if(count < n*0.01) return null;   /* barely touched anything — not a backdrop */
+  return makeImageData(d, w, h);
+}
+
+function hasAlphaBackground(src){
+  var d = src.data, n = src.width*src.height, c = 0;
+  for(var i=0;i<n;i++) if(d[i*4+3] < 128) c++;
+  return c > n*0.005;
+}
+
+function setBgNote(){
+  if(state.alphaSource){
+    ui.bgNote.textContent = '— transparent PNG, cleared automatically';
+    ui.bgNote.style.color = 'var(--pass)';
+  }else if(!state.bgEdges){
+    ui.bgNote.textContent = '— no flat background found';
+    ui.bgNote.style.color = 'var(--orange)';
+  }else{
+    ui.bgNote.textContent = '';
+  }
+}
+
+function activeImgd(){
+  var m = ui.removebg.value;
+  if(m === 'all'   && state.bgAll)   return state.bgAll;
+  if(m === 'edges' && state.bgEdges) return state.bgEdges;
+  return state.rawImgd;
 }
 
 function syncOutputs(){
@@ -1520,7 +1687,9 @@ function buildOpts(){
     ltres:tres, qtres:tres,
     pathomit:+ui.speckle.value,
     rightangleenhance:ui.rightangle.checked,
-    colorsampling:(ncolors === 2 ? 0 : 2),
+    /* deterministic sampling keeps alpha in the palette; the generated
+       greyscale palette used for 2-colour work would force it back opaque */
+    colorsampling:((ncolors === 2 && activeImgd() === state.rawImgd) ? 0 : 2),
     numberofcolors:ncolors,
     mincolorratio:0, colorquantcycles:3,
     strokewidth:1,
@@ -1533,14 +1702,16 @@ function buildOpts(){
 /* ---- tracing ---- */
 var traceTimer = null;
 function retrace(){
-  if(!state.imgd) return;
+  if(!state.rawImgd) return;
   clearTimeout(traceTimer);
   ui.svgBox.classList.add('tracing');
   traceTimer = setTimeout(function(){
     var svg;
     try{
-      svg = ImageTracer.imagedataToSVG(state.imgd, buildOpts())
-        .replace(/ desc="[^"]*"/, '');
+      svg = ImageTracer.imagedataToSVG(activeImgd(), buildOpts())
+        .replace(/ desc="[^"]*"/, '')
+        /* fully transparent regions trace as invisible paths — pure bloat */
+        .replace(/<path [^>]*opacity="0"[^>]*\/>/g, '');
     }catch(err){
       ui.svgBox.classList.remove('tracing');
       ui.verdictMsg.textContent = 'Tracing failed: ' + err.message;
@@ -1617,7 +1788,11 @@ function loadDataURL(dataurl, name, bytes){
     cv.width = w; cv.height = h;
     var cx = cv.getContext('2d', {willReadFrequently:true});
     cx.drawImage(img, 0, 0, w, h);
-    state.imgd = cx.getImageData(0, 0, w, h);
+    state.rawImgd = cx.getImageData(0, 0, w, h);
+    state.alphaSource = hasAlphaBackground(state.rawImgd);
+    state.bgEdges = stripBackground(state.rawImgd, 'edges');
+    state.bgAll   = stripBackground(state.rawImgd, 'all');
+    setBgNote();
 
     ui.origImg.src = dataurl;
     ui.origMeta.textContent = state.origW + '×' + state.origH + ' px · ' + fmtBytes(state.origBytes)
@@ -1658,7 +1833,9 @@ ui.copy.addEventListener('click', function(){
 });
 
 ui.reset.addEventListener('click', function(){
-  state.imgd = null; state.svg = '';
+  state.rawImgd = null; state.bgEdges = null; state.bgAll = null;
+  state.alphaSource = false; state.svg = '';
+  ui.bgNote.textContent = '';
   ui.svgOut.innerHTML = ''; ui.origImg.removeAttribute('src');
   ui.verdict.classList.remove('show');
   ui.work.style.display = 'none';
@@ -1706,8 +1883,11 @@ ui.presets.addEventListener('click', function(e){
   });
 });
 ui.rightangle.addEventListener('change', retrace);
+ui.removebg.addEventListener('change', retrace);
 
 syncOutputs();
+$('build').textContent = BUILD;
+$('buildFoot').textContent = '· Vectorizer ' + BUILD;
 
 /* hook for automated testing */
 window.__veerVectorizer = { loadDataURL:loadDataURL, getState:function(){ return state; } };
