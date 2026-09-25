@@ -1,0 +1,516 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veer · Social Care</title>
+<meta name="description" content="Proposed pricing, deliverables and production workflow for Veer's social media management service line.">
+<style>
+:root{
+  --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
+  --tx:#f2efe9; --tx2:#9b9a96; --tx3:#6f6e6a;
+  --red:#ef4037; --red2:#bd222f; --orange:#f69322; --peach:#ffd9a1;
+  --ok:#41c777;
+  --sunset:linear-gradient(90deg,#FEC97E 0%,#F69323 34%,#EE5A2A 72%,#C33A18 100%);
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%}
+body{
+  background:var(--bg); color:var(--tx);
+  font:16px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+a{color:var(--orange)}
+
+/* ---- header ---- */
+header{
+  border-bottom:1px solid var(--line);
+  background:
+    radial-gradient(900px 320px at 12% -40%, rgba(239,64,55,.18), transparent 70%),
+    radial-gradient(700px 300px at 78% -50%, rgba(246,147,34,.14), transparent 70%);
+}
+.bar{display:flex;align-items:center;gap:12px;padding:26px 0 0}
+.bar b{font-size:19px;letter-spacing:.2px}
+.bar a{text-decoration:none;color:var(--tx2);font-size:13px;margin-left:auto}
+.bar a:hover{color:var(--orange)}
+.hero{padding:40px 0 48px}
+.chip{
+  display:inline-block;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  font-weight:700;color:var(--peach);border:1px solid rgba(246,147,34,.45);
+  background:rgba(246,147,34,.10);border-radius:999px;padding:4px 11px;margin-bottom:16px;
+}
+h1{
+  margin:0 0 14px; font-size:clamp(30px,5.2vw,46px); line-height:1.12; letter-spacing:-.5px;
+  background:linear-gradient(96deg,var(--red) 0%,var(--orange) 62%,var(--peach) 100%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+  padding-bottom:.08em;
+}
+.hero p{margin:0;color:var(--tx2);max-width:62ch;font-size:17px}
+
+/* ---- sections ---- */
+main{padding:44px 0 20px}
+section{margin-bottom:52px}
+.eyebrow{
+  display:flex;align-items:baseline;gap:9px;
+  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tx2);
+  margin:0 0 6px;font-weight:600;
+}
+.eyebrow .n{color:var(--orange);font-weight:700}
+h2{margin:0 0 8px;font-size:clamp(21px,3.6vw,26px);letter-spacing:-.3px;line-height:1.2}
+section > p{color:var(--tx2);max-width:70ch;margin:0 0 18px}
+.grule{height:3px;background:var(--sunset);border-radius:3px;margin:0 0 40px;opacity:.85}
+
+/* ---- tables ---- */
+.tbl{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:4px}
+.tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+.tbl thead th{
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);
+  border-bottom:1px solid var(--line);white-space:nowrap;
+}
+.tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
+.tbl td.num{color:var(--peach)}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl .sub{color:var(--tx3);font-weight:400}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ---- tier cards ---- */
+.tiers{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:6px}
+.tier{
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;
+  padding:20px;display:flex;flex-direction:column;
+}
+.tier.rec{border-color:var(--orange);background:var(--panel2)}
+.tier .tag{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx2)}
+.tier.rec .tag{color:var(--orange)}
+.tier h3{margin:5px 0 0;font-size:19px;letter-spacing:-.2px}
+.tier .price{font-size:30px;font-weight:700;margin:8px 0 2px;letter-spacing:-1px}
+.tier .price span{font-size:13px;font-weight:400;color:var(--tx2);letter-spacing:0}
+.tier ul{list-style:none;padding:0;margin:14px 0 0}
+.tier li{position:relative;padding-left:20px;margin:6px 0;font-size:13.5px;color:var(--tx2)}
+.tier li::before{content:"✓";position:absolute;left:0;font-weight:700;color:var(--tx3)}
+.tier.rec li::before{color:var(--orange)}
+.tier li b{color:var(--tx);font-weight:600}
+.tier .foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--tx3);margin-top:14px}
+
+/* ---- flow ---- */
+.flow{list-style:none;padding:0;margin:6px 0 0}
+.step{display:flex;gap:16px;align-items:flex-start;position:relative;padding-bottom:20px}
+.step:not(:last-child)::before{
+  content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line);
+}
+.dot{
+  width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;
+  justify-content:center;font-size:11.5px;font-weight:700;letter-spacing:.02em;
+  background:var(--panel2);color:var(--peach);border:1px solid var(--line);
+}
+.step h4{margin:7px 0 3px;font-size:16px;letter-spacing:-.1px}
+.step p{margin:0;font-size:14px;color:var(--tx2);max-width:64ch}
+.step p code{
+  background:var(--panel2);border:1px solid var(--line);border-radius:5px;
+  padding:1px 5px;font-size:12.5px;color:var(--peach);
+}
+
+/* ---- callouts ---- */
+.note{
+  border:1px solid var(--line);border-left:3px solid var(--orange);
+  background:var(--panel);border-radius:0 12px 12px 0;padding:16px 18px;margin-top:18px;
+}
+.note.warn{border-left-color:var(--red)}
+.note p{margin:0;font-size:14px;color:var(--tx2)}
+.note p + p{margin-top:9px}
+.note b{color:var(--tx)}
+.note .lbl{
+  display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:var(--orange);margin-bottom:6px;
+}
+.note.warn .lbl{color:var(--red)}
+
+.two{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
+.box{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:18px 20px}
+.box h4{margin:0 0 9px;font-size:15px}
+.box ul{margin:0;padding-left:19px}
+.box li{font-size:13.5px;color:var(--tx2);margin:5px 0}
+.box li b{color:var(--tx);font-weight:600}
+.box.no h4{color:var(--red)}
+.box.yes h4{color:var(--ok)}
+
+ol.q{margin:6px 0 0;padding-left:22px}
+ol.q li{color:var(--tx2);margin:11px 0;font-size:14.5px}
+ol.q li b{color:var(--tx)}
+
+/* ---- footer ---- */
+footer{border-top:1px solid var(--line);padding:26px 0 0;color:var(--tx2);font-size:13px}
+footer a{color:var(--orange);text-decoration:none}
+footer a:hover{text-decoration:underline}
+.powered{
+  background:#0b0d10;margin-top:26px;padding:9px 0 10px;
+  font-size:.72rem;letter-spacing:.05em;color:var(--tx3);
+  text-align:center;line-height:1.3;
+}
+.powered a{color:var(--tx2);font-weight:600;text-decoration:none}
+.powered a:hover{color:#fff}
+@media print{
+  body{background:#fff;color:#111}
+  .tier,.box,.note{break-inside:avoid}
+  *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap">
+    <div class="bar">
+      <b>VEER</b>
+      <a href="../">← Tools</a>
+    </div>
+    <div class="hero">
+      <span class="chip">Internal · proposed, not published</span>
+      <h1>Social Care</h1>
+      <p>Pricing, deliverables and production workflow for managing a client's social
+         accounts — derived from the rates already published on the Veer rate card, so
+         the two never contradict each other. Full working notes in
+         <a href="SPEC.md">SPEC.md</a>.</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <section>
+    <div class="eyebrow"><span class="n">01</span> Where it fits</div>
+    <h2>The rung that was advertised and never priced</h2>
+    <p>The published rate card already ends on this promise — step 3 of the
+       &ldquo;What&rsquo;s next&rdquo; ladder reads <em>&ldquo;AI working behind the
+       scenes — chases invoices, replies to reviews, and drafts your posts.&rdquo;</em>
+       Social isn&rsquo;t a new direction. It&rsquo;s the rung clients are already being
+       shown.</p>
+    <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>Existing monthly product</th><th class="num">Price</th><th>What it covers</th></tr></thead>
+      <tbody>
+        <tr><td>Website Care</td><td class="num">$25/mo</td><td>Hosting, SSL, backups, 30 min edits</td></tr>
+        <tr><td>Website Care Plus</td><td class="num">$45/mo</td><td>+ AI chat assistant, traffic insights, 60 min edits</td></tr>
+        <tr><td>Google Care</td><td class="num">$85/mo</td><td>8 posts/mo, review replies in 48h, monthly re-score</td></tr>
+        <tr><td>Google Care Plus</td><td class="num">$150/mo</td><td>+ review campaign, Tap-to-Review, 3 competitors tracked</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note">
+      <span class="lbl">The number that sets the floor</span>
+      <p><b>Google Care is $85/mo for 8 posts to a single surface</b>, with a 48-hour reply
+         SLA and a monthly re-score. Social management is the same shape of work across
+         two to four surfaces, with original creative and short-form video on top — so it
+         can&rsquo;t price below that, and the entry tier has to clear Care Plus ($150)
+         or the ladder stops making sense.</p>
+      <p>That puts the entry at <b>$250/mo</b>. It&rsquo;s the first Veer product above
+         the &ldquo;small monthly&rdquo; band, and deliberately so: social is the first
+         service line where the labour is genuinely recurring rather than mostly
+         automated upkeep.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">02</span> One-time</div>
+    <h2>Social Rescue — $300</h2>
+    <p>Priced identically to <b>Google Profile Rescue</b>, and for the same reason: a week
+       of fixing everything an audit found, at a fixed price, before any retainer starts.
+       Matching the two keeps the bundle maths legible and means a client who bought one
+       already knows what the other is. Sold on its own — they can take the Rescue and
+       run the account themselves.</p>
+    <div class="two">
+      <div class="box">
+        <h4>Found and fixed</h4>
+        <ul>
+          <li><b>Profile audit scored out of 100</b> — same rubric shape as the GBP audit, so before/after is a number, not an opinion</li>
+          <li><b>Handles, names, bios rewritten</b> — one voice, keyword-aware, full character count used</li>
+          <li><b>Profile and cover art</b> sized per platform, plus Instagram highlight covers</li>
+          <li><b>Grid cleanup plan</b> — what to archive, pin, keep</li>
+          <li><b>30-day re-score</b> so they watch the number move</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4>Built to hand over</h4>
+        <ul>
+          <li><b>One link page on their own domain</b> — the <code>links.html</code> pattern, not a service they rent</li>
+          <li><b>Six post templates</b> in their colours and type, locked as a Canva brand template</li>
+          <li><b>Five content pillars</b> — written down, so no month starts from nothing</li>
+          <li><b>A 30-day calendar</b> ready to publish at the tier&rsquo;s cadence</li>
+          <li><b>Twelve hashtag sets</b> researched for their market and city, grouped by pillar</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">03</span> Monthly</div>
+    <h2>Three tiers, named to match the house convention</h2>
+    <p>A client already on Website Care and Google Care understands <b>Social Care</b> and
+       <b>Social Care Plus</b> with no explanation. Social Studio is the anchor — it makes
+       Care Plus read as the sensible middle, which is where most clients should land.</p>
+    <div class="tiers">
+      <div class="tier">
+        <span class="tag">Entry</span>
+        <h3>Social Care</h3>
+        <div class="price">$250<span>/mo</span></div>
+        <ul>
+          <li><b>8 posts</b> a month (2/wk)</li>
+          <li><b>2 platforms</b></li>
+          <li>Comments &amp; DMs — <b>48h</b>, weekdays</li>
+          <li>Monthly report</li>
+          <li>Approval link, 1 revision round</li>
+        </ul>
+        <div class="foot">No video. For an account that needs to look alive and consistent.</div>
+      </div>
+      <div class="tier rec">
+        <span class="tag">Recommended</span>
+        <h3>Social Care Plus</h3>
+        <div class="price">$550<span>/mo</span></div>
+        <ul>
+          <li><b>16 posts</b> a month (4/wk)</li>
+          <li><b>3 platforms</b></li>
+          <li><b>4 reels/shorts</b> + 8 stories</li>
+          <li>Comments, DMs &amp; reviews — <b>24h</b>, weekdays</li>
+          <li>1 content capture day per quarter</li>
+          <li>Report + <b>3 competitors tracked</b></li>
+        </ul>
+        <div class="foot">Where most clients should land. Video is what actually moves a local account.</div>
+      </div>
+      <div class="tier">
+        <span class="tag">Anchor</span>
+        <h3>Social Studio</h3>
+        <div class="price">$950<span>/mo</span></div>
+        <ul>
+          <li><b>24 posts</b> a month (6/wk)</li>
+          <li><b>4 platforms</b></li>
+          <li><b>8 reels/shorts</b> + 2 ad cuts + 16 stories</li>
+          <li>Replies <b>24h, including weekends</b></li>
+          <li>Monthly capture day</li>
+          <li>Quarterly strategy call</li>
+          <li>Unlimited revisions in-cycle</li>
+        </ul>
+        <div class="foot">For a business where social is the main channel, not a checkbox.</div>
+      </div>
+    </div>
+
+    <div class="note">
+      <span class="lbl">Bundle</span>
+      <p><b>Social Rescue + 3 months of Social Care = $950</b> (vs $1,050 separately).
+         Mirrors the published &ldquo;Rescue + 3 months of Care = $500&rdquo; bundle, and
+         for the same stated reason — an account that gets cleaned up and then left alone
+         drifts back within a season. Three months is the shortest honest commitment.</p>
+    </div>
+
+    <h2 style="margin-top:34px;font-size:18px">Add-ons</h2>
+    <div class="scroll">
+    <table class="tbl">
+      <tbody>
+        <tr><td>Extra platform</td><td class="num">+$75/mo</td></tr>
+        <tr><td>Extra reel / short</td><td class="num">+$60 ea</td></tr>
+        <tr><td>Content capture day <span class="sub">— on-site, ~2 hrs, 60–80 assets</span></td><td class="num">$250</td></tr>
+        <tr><td>Paid ad management <span class="sub">— 15% of spend, $150/mo minimum</span></td><td class="num">15%</td></tr>
+        <tr><td>Community management only <span class="sub">— replies, DMs, reviews, no posting</span></td><td class="num">$150/mo</td></tr>
+        <tr><td>Extra location <span class="sub">— matches the published GBP add-on</span></td><td class="num">+$150/mo</td></tr>
+        <tr><td>Google Care bolted onto any social tier <span class="sub">— instead of $85; the GBP posts come from the same month's content</span></td><td class="num">+$50/mo</td></tr>
+        <tr><td>Friends &amp; Family <span class="sub">— tier and Rescue, same as every Veer line</span></td><td class="num">−15%</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+    <div class="note">
+      <span class="lbl">Two ways to pay — always presented as a choice</span>
+      <p><b>Pay six months up front</b> and the seventh is free. Or <b>month to month</b>,
+         billed on the 1st, no contract, 30 days&rsquo; notice to cancel. Cash App, Apple
+         Pay or a formal invoice — client picks. The Rescue bills separately from the first
+         month unless they take the bundle.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">04</span> Margin</div>
+    <h2>Every tier is built to $50/hr</h2>
+    <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>Tier</th><th class="num">Price</th><th class="num">Budgeted hrs/mo</th><th class="num">Effective rate</th></tr></thead>
+      <tbody>
+        <tr><td>Social Care</td><td class="num">$250</td><td class="num">~5</td><td class="num">$50/hr</td></tr>
+        <tr><td>Social Care Plus</td><td class="num">$550</td><td class="num">~11</td><td class="num">$50/hr</td></tr>
+        <tr><td>Social Studio</td><td class="num">$950</td><td class="num">~19</td><td class="num">$50/hr</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note warn">
+      <span class="lbl">The constraint the whole line rests on</span>
+      <p>That budget only holds because of batching. A month of captions written in one
+         sitting is about 90 minutes; the same sixteen written one at a time across four
+         weeks is closer to five hours. <b>If the monthly cycle stops being batched, every
+         tier loses money.</b></p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">05</span> Production</div>
+    <h2>Nothing new to build — a client to add to a system already running four brands</h2>
+    <p><code>Veer Internal/Social Engine/</code> already drives Veer, MDRN, Camden
+       Shapeworks and Common Press. <code>build-desk.py</code> regenerates
+       <b>Social Desk</b> from one <code>&lt;brand&gt;-posts.json</code> per brand,
+       resolves platform routing per post, and flags any media reference missing from
+       disk. Statuses run <code>pending → approved → scheduled → posted</code>, and the
+       app keeps its own browser state so a rebuild re-seeds the archive without wiping
+       what&rsquo;s already marked posted.</p>
+    <div class="note">
+      <span class="lbl">Onboarding a client, in full</span>
+      <p>Add <code>&lt;client&gt;-posts.json</code>, register it in the <code>EXTRA</code>
+         map in <code>build-desk.py</code>, point <code>mediaRoot</code> at
+         <code>Clients/&lt;Name&gt;/</code>, re-run the build. That&rsquo;s it — the same
+         shape MDRN and Camden already use.</p>
+    </div>
+
+    <h2 style="margin-top:36px;font-size:18px">The monthly cycle</h2>
+    <p>The client-facing promise is the one the website service already makes:
+       <em>you do almost nothing.</em></p>
+    <ol class="flow">
+      <li class="step"><span class="dot">D1–2</span><div>
+        <h4>Intake</h4>
+        <p>One 15-minute voice note or call, plus a photo dump into a shared Drive folder.
+           Capped at 30 minutes of the client&rsquo;s time. Any format, any quality — the
+           cropping and cleanup is Veer&rsquo;s problem.</p>
+      </div></li>
+      <li class="step"><span class="dot">D2–3</span><div>
+        <h4>Batch write — the whole month in one pass</h4>
+        <p>Claude drafts every caption straight into <code>&lt;client&gt;-posts.json</code>
+           from the five pillars, the client&rsquo;s voice sample and whatever they sent —
+           caption, hashtag set, platform routing and media refs all in the same pass.
+           <b>This is the biggest lever in the service and the reason the margin works.</b></p>
+      </div></li>
+      <li class="step"><span class="dot">D3–4</span><div>
+        <h4>Media</h4>
+        <p>Graphics from the locked Canva brand template. Short-form video and motion cuts
+           through Higgsfield, which also handles background removal and upscaling on rough
+           client photos. Logo and vector work through the Vectorizer in this repo. Client
+           photos cropped per platform.</p>
+      </div></li>
+      <li class="step"><span class="dot">D4</span><div>
+        <h4>Route and review — one link</h4>
+        <p><code>build-desk.py</code> regenerates the Desk with per-post routing, then an
+           approval page deploys under the existing <code>veer-proposals</code> Vercel
+           project. The client gets <b>one link</b> and taps approve or comments per post.
+           No email threads, no PDF markup, no app to install — and nothing new to
+           maintain.</p>
+      </div></li>
+      <li class="step"><span class="dot">D5</span><div>
+        <h4>Schedule</h4>
+        <p>Approved posts queued for the month, statuses tracked in the Desk.</p>
+      </div></li>
+      <li class="step"><span class="dot">→</span><div>
+        <h4>Engagement, ongoing</h4>
+        <p>Comments, DMs and reviews triaged at the tier&rsquo;s SLA. Anything needing the
+           owner&rsquo;s own answer gets forwarded, not guessed at.</p>
+      </div></li>
+      <li class="step"><span class="dot">WK4</span><div>
+        <h4>Report</h4>
+        <p>What posted, what performed, follower and engagement delta, next month&rsquo;s
+           angle — plus the re-scored profile number. Same &ldquo;watch it climb&rdquo;
+           framing as Google Care, because it&rsquo;s the same promise: measurable before
+           and after.</p>
+      </div></li>
+    </ol>
+    <div class="note">
+      <span class="lbl">Why the approval link earns its keep</span>
+      <p>It&rsquo;s the difference between a service the client trusts and one they
+         micromanage — one tap per post, on their phone, between jobs. It&rsquo;s also a
+         work sample: a client looking at a clean approval page is looking at evidence of
+         why they hired a design studio instead of a cousin with Canva.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">06</span> Fine print</div>
+    <h2>The boundaries that make this deliverable</h2>
+    <div class="two">
+      <div class="box yes">
+        <h4>Guaranteed, in writing</h4>
+        <ul>
+          <li><b>The cadence</b> — posts land on schedule</li>
+          <li><b>The reply times</b> — per the tier&rsquo;s SLA</li>
+          <li><b>The creative quality</b> — on-brand, from locked templates</li>
+          <li><b>A measurable profile score</b> before and after</li>
+          <li><b>The client owns everything</b> — accounts, assets, captions; all handed back on exit</li>
+          <li><b>30 days&rsquo; notice either way</b>, and the final approved queue is delivered scheduled and ready regardless of who ended it</li>
+        </ul>
+      </div>
+      <div class="box no">
+        <h4>Never promised, never included</h4>
+        <ul>
+          <li><b>Follower counts, reach, or a post going viral.</b> Nobody can promise those — they depend on the algorithm and on competitors. Same rule as the published GBP promise: the fixable things get fixed, and the score is visible before and after</li>
+          <li><b>Purchased followers or engagement</b> of any kind</li>
+          <li><b>Crisis and PR response</b></li>
+          <li><b>Paid spend on Veer&rsquo;s card</b></li>
+          <li>Anything needing the owner&rsquo;s own voice on a legal or personnel matter</li>
+        </ul>
+      </div>
+    </div>
+    <div class="note">
+      <span class="lbl">Operational terms</span>
+      <p><b>Delegated access only</b> — Meta Business Suite partner access or equivalent.
+         Never a shared password, never posting from a personal login.</p>
+      <p><b>Approval deadline: 3 business days.</b> Past that the queue publishes as
+         drafted — otherwise one unresponsive week kills a month&rsquo;s cadence.
+         <b>Unused posts don&rsquo;t roll over</b>: the cadence is the product, a backlog
+         isn&rsquo;t.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">07</span> Open</div>
+    <h2>Four calls that are yours, not mine</h2>
+    <ol class="q">
+      <li><b>Is $250 the right entry, or does a $150 &ldquo;posts only&rdquo; tier belong
+        below it</b> to convert $500-website clients who balk? Risk: $150 for 8 posts is
+        $30/hr once graphics are in, and it cannibalises Care Plus.</li>
+      <li><b>Local SMB only, or does Social Studio get pitched to e-comm?</b> Camden and
+        Common Press prove the pipeline handles product catalogues, and an e-comm account
+        carries $1,500+/mo — but that&rsquo;s a different sales conversation than a
+        restaurant.</li>
+      <li><b>Content capture day at $250</b> — is two hours on-site the right shape, or a
+        half-day at $400?</li>
+      <li><b>Should Social Rescue bundle into Digital Presence Rescue</b> ($750 website +
+        GBP) as a three-way at, say, $950?</li>
+    </ol>
+    <div class="note">
+      <span class="lbl">Once those are settled</span>
+      <p>Tier table into <code>pricing.html</code>; service names and rates into the
+         <code>veer-proposal</code> skill&rsquo;s known-services list (so no proposal ever
+         invents a social price the way <em>Google Profile Setup</em> once got invented);
+         and a customer-facing <code>social.html</code> built on the
+         <code>care.html</code> pattern.</p>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    Internal working document · <a href="SPEC.md">SPEC.md</a> ·
+    <a href="../">Veer Tools</a> ·
+    <a href="https://veersolutions.com">veersolutions.com</a>
+  </div>
+  <div class="powered">VEER LLC · DESIGN · PRINT · TECH</div>
+</footer>
+
+</body>
+</html>
