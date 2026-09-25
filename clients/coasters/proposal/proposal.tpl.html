@@ -1,0 +1,387 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veer × Coasters Bar &amp; Grill — Website Rebuild Proposal</title>
+<meta name="description" content="A rebuilt website for Coasters Bar &amp; Grill, Racine WI. Built first, quoted second. From Veer — Design · Print · Tech.">
+__FONTCSS__
+<style>
+:root{
+  --red:#EF4138; --maroon:#BE2430; --orange:#F69323; --ink:#0A0A0F; --mut:#5b5b63;
+  --line:#e7e7ea; --green:#2f7d55;
+  --sunset: radial-gradient(120% 115% at 80% 16%, #FEC97E 0%, #F69323 22%, #EE5A2A 46%, #8A2216 72%, #0A0503 100%);
+}
+*{box-sizing:border-box}
+body{
+  margin:0;background:#fff;color:var(--ink);
+  font:400 15.5px/1.68 "DM Sans",system-ui,-apple-system,Segoe UI,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+img{max-width:100%;display:block}
+a{color:var(--maroon)}
+.wrap{max-width:860px;margin:0 auto;padding:0 26px}
+
+/* ── hero ─────────────────────────────────────────── */
+.hero{
+  background:var(--sunset);color:#fff;padding:56px 0 52px;position:relative;overflow:hidden;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.hero .wrap{position:relative;z-index:2}
+.hero-top{display:flex;align-items:center;gap:11px;margin-bottom:34px}
+.hero-top .wm{font-size:19px;font-weight:700;letter-spacing:.14em;color:#fff;text-decoration:none}
+.hero-top .tl{font-size:11.5px;letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.82)}
+.chip{
+  display:inline-block;font-size:10.5px;font-weight:700;letter-spacing:.16em;text-transform:uppercase;
+  border:1px solid rgba(255,255,255,.55);border-radius:999px;padding:6px 13px;color:#fff;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact;
+}
+.hero h1{
+  font-size:clamp(33px,5.4vw,49px);line-height:1.08;margin:18px 0 0;letter-spacing:-.6px;font-weight:700;
+}
+.hero .sub{font-size:18px;color:rgba(255,255,255,.93);max-width:44ch;margin:15px 0 0}
+.hero-meta{
+  margin-top:26px;padding-top:18px;border-top:1px solid rgba(255,255,255,.3);
+  display:flex;flex-wrap:wrap;gap:8px 26px;font-size:13px;color:rgba(255,255,255,.9)
+}
+
+/* ── sections ─────────────────────────────────────── */
+main{padding:46px 0 10px}
+h2{
+  display:flex;align-items:baseline;gap:9px;
+  font-size:12.5px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--maroon);
+  margin:36px 0 12px;
+}
+h2 .n{font-size:10.5px;font-weight:700;color:var(--orange);letter-spacing:.14em;-webkit-text-fill-color:var(--orange)}
+h3.big{font-size:25px;line-height:1.24;font-weight:700;margin:0 0 10px;letter-spacing:-.3px}
+p{margin:0 0 13px}
+.lead{font-size:17px}
+.grule{height:3px;background:var(--sunset);border-radius:3px;margin:38px 0 0;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+
+/* preview frames */
+.preview{margin-top:14px;border-radius:14px;overflow:hidden;border:1px solid var(--line);
+  box-shadow:0 22px 44px -26px rgba(10,10,15,.55)}
+.pv-bar{background:#f4f4f6;padding:9px 13px;display:flex;align-items:center;gap:6px;border-bottom:1px solid var(--line)}
+.pv-dot{width:9px;height:9px;border-radius:50%;background:#d9d9df}
+.pv-url{margin-left:9px;font-size:11px;color:var(--mut);background:#fff;border:1px solid var(--line);border-radius:20px;padding:3px 13px}
+.pv-shot img.shot{display:block;width:100%}
+.pv-cap{display:flex;justify-content:space-between;align-items:center;gap:12px;flex-wrap:wrap;
+  padding:11px 14px;background:#faf7f5;border-top:1px solid var(--line);font-size:12.5px;color:var(--mut)}
+
+.two{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:14px;align-items:start}
+.phone{border:1px solid var(--line);border-radius:22px;overflow:hidden;background:#fff;
+  box-shadow:0 18px 36px -24px rgba(10,10,15,.5);max-width:270px;margin:0 auto}
+.phone .notch{height:20px;background:#f4f4f6;border-bottom:1px solid var(--line);display:grid;place-items:center}
+.phone .notch i{display:block;width:56px;height:5px;border-radius:5px;background:#d9d9df}
+.capt{font-size:12.5px;color:var(--mut);margin-top:9px;text-align:center}
+
+/* observation list */
+.obs{border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-top:12px}
+.obs .row{display:grid;grid-template-columns:150px 1fr;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line);font-size:14px}
+.obs .row:last-child{border-bottom:0}
+.obs .k{font-weight:700;font-size:12.5px;letter-spacing:.06em;text-transform:uppercase;color:var(--maroon)}
+.explain{background:#fdf6ef;border:1px solid #f3e0c8;border-left:4px solid var(--orange);border-radius:10px;
+  padding:14px 16px;margin-top:13px;font-size:13.8px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.explain b{display:block;margin-top:9px}
+.explain b:first-child{margin-top:0}
+
+/* feature grid */
+.feats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.feat{border:1px solid var(--line);border-radius:12px;padding:15px 17px}
+.feat h4{margin:0 0 4px;font-size:15.5px}
+.feat p{margin:0;font-size:13.5px;color:var(--mut)}
+
+/* plan cards */
+.plans{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.plan{border:1px solid var(--line);border-radius:14px;padding:18px 20px 16px;background:#fff}
+.plan.web{border-top:5px solid var(--maroon)}
+.plan.google{border-top:5px solid var(--orange)}
+.plan .tag{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+.plan.web .tag{color:var(--maroon)} .plan.google .tag{color:var(--orange)}
+.plan h3{font-size:19px;font-weight:700;margin:4px 0 2px}
+.plan .price{font-size:23px;font-weight:700;margin:6px 0 2px}
+.plan .price span{font-size:12.5px;font-weight:400;color:var(--mut)}
+.plan ul{list-style:none;padding:0;margin:10px 0 0}
+.plan li{position:relative;padding-left:19px;margin:5px 0;font-size:13.5px}
+.plan li::before{content:"✓";position:absolute;left:0;font-weight:700}
+.plan.web li::before{color:var(--maroon)} .plan.google li::before{color:var(--orange)}
+.plan .foot{margin-top:11px;padding-top:9px;border-top:1px solid var(--line);font-size:12px;color:var(--mut)}
+
+/* tables */
+table.inv{width:100%;border-collapse:collapse;margin-top:12px;font-size:14.5px}
+table.inv th{
+  text-align:left;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);
+  border-bottom:1px solid var(--line);padding:0 0 9px
+}
+table.inv th:last-child,table.inv td:last-child{text-align:right}
+table.inv td{padding:13px 0;border-bottom:1px solid var(--line);vertical-align:top}
+table.inv td.num{font-variant-numeric:tabular-nums;font-weight:700;white-space:nowrap}
+table.inv tr.total td{border-bottom:0;font-size:18px;font-weight:700;padding-top:15px}
+table.inv td small{display:block;color:var(--mut);font-size:12.5px;font-weight:400}
+
+.pay{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:12px}
+.pay .opt{border:1px solid var(--line);border-radius:14px;padding:17px 19px}
+.pay .opt.a{border-top:5px solid var(--green)}
+.pay .opt.b{border-top:5px solid var(--ink)}
+.pay .opt .tag{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
+.pay .opt h4{margin:5px 0 4px;font-size:17px}
+.pay .opt p{margin:0;font-size:13.5px;color:var(--mut)}
+
+ol.steps{margin:12px 0 0;padding-left:20px}
+ol.steps li{margin:7px 0}
+ul.fine{list-style:none;padding:0;margin:12px 0 0}
+ul.fine li{position:relative;padding-left:16px;margin:9px 0;font-size:14px}
+ul.fine li::before{content:"—";position:absolute;left:0;color:var(--orange);font-weight:700}
+ul.fine b{color:var(--ink)}
+
+.cta{
+  margin-top:20px;border:1px solid var(--line);border-radius:14px;padding:20px 22px;background:#faf7f5;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact
+}
+.cta h3{margin:0 0 6px;font-size:20px}
+.cta p{margin:0;font-size:14.5px;color:var(--mut)}
+
+/* footer */
+footer{
+  margin-top:44px;background:var(--sunset);color:#fff;padding:28px 0;
+  -webkit-print-color-adjust:exact;print-color-adjust:exact
+}
+.fw{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.fl{display:flex;align-items:center;gap:11px}
+.fl .wm{font-size:18px;font-weight:700;letter-spacing:.14em;color:#fff;text-decoration:none}
+.fl .tl{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:#fff;opacity:.92}
+.fr{font-size:13.5px;color:#fff;text-align:right}
+.fr a{color:#fff;text-decoration:underline}
+
+@media(max-width:620px){
+  .plans,.pay,.feats,.two{grid-template-columns:1fr}
+  .obs .row{grid-template-columns:1fr;gap:3px}
+  .fw{flex-direction:column;align-items:flex-start}
+  .fr{text-align:left}
+}
+@media print{ body{font-size:12.5px} .hero{padding:34px 0} }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="hero-top">
+      __VEERMARK__
+      <a class="wm" href="https://veersolutions.com">VEER</a>
+      <span class="tl">Design · Print · Tech</span>
+    </div>
+    <span class="chip">Concept build · unlisted</span>
+    <h1>Your website, rebuilt.<br>Look at it before you decide anything.</h1>
+    <p class="sub">A new site for Coasters Bar &amp; Grill — designed, built and running. No mockup, no slide deck. The link is in here.</p>
+    <div class="hero-meta">
+      <span>Prepared for Coasters Bar &amp; Grill · 1301 N Main St, Racine WI</span>
+      <span>__DATE__</span>
+      <span>Veer LLC</span>
+    </div>
+  </div>
+</header>
+
+<main>
+<div class="wrap">
+
+  <h2><span class="n">01</span> Why you're hearing from me</h2>
+  <h3 class="big">You didn't ask for this, so I built it first.</h3>
+  <p class="lead">I'm Jessie Redmond. I run Veer, a small design and tech studio. Nobody referred me to you and you didn't fill out a form — I'm reaching out cold, and I'd rather say that plainly than pretend otherwise.</p>
+  <p>What I don't like about cold pitches is that they ask you to imagine something. So instead of describing what I'd do with your site, I went and did a version of it. It's finished enough to click through on your phone right now. If you like it, we finish it properly with your real menu and your real photos. If you don't, you've lost four minutes and I've lost an afternoon — that's a fair trade.</p>
+
+  <div class="grule"></div>
+
+  <h2><span class="n">02</span> What I looked at — and what I couldn't</h2>
+  <h3 class="big">Straight about the homework.</h3>
+  <p>Normally this section is a measured audit of your current site: how many requests it makes, how heavy the page is, which security headers are set. I run that with a tool, not by eye. <b>This time I couldn't run it</b> — the machine I was working from couldn't reach coasterspubngrill.com, so I'm not going to print numbers I didn't measure. Here's only what I could actually verify from public listings:</p>
+
+  <div class="obs">
+    <div class="row"><div class="k">Page title</div><div>Your homepage title reads <b>"Coasters - Best American food in Racine, WI - Pizza Near You."</b> That's ordering-platform boilerplate, not your name. It's also the line Google shows people.</div></div>
+    <div class="row"><div class="k">Platform</div><div>The site has a <code>/cart</code> route and generic SEO phrasing — the signature of a templated ordering platform, where your bar gets the same page as every other restaurant on it.</div></div>
+    <div class="row"><div class="k">Listings</div><div>Google, Yelp, Tripadvisor, Grubhub, Facebook and a dozen scraper sites all carry a version of your menu. Several disagree with each other.</div></div>
+    <div class="row"><div class="k">Rating</div><div>Roughly <b>4.3 on Google</b> as reported across listing sites. The food and the room get credit; service complaints are the recurring theme in the low ones.</div></div>
+  </div>
+
+  <div class="explain">
+    <b>Why the title matters.</b> "Pizza Near You" is a phrase a template wrote. It doesn't say Racine's corner bar since 1995, it doesn't say eleven flavors of wings, and it doesn't say Friday fish fry — which are the three reasons someone picks you.
+    <b>Why the platform matters.</b> On a templated ordering site you're renting a page shaped like everyone else's. You can't put your fish fry above the fold, you can't run your own events, and the design isn't yours to change.
+    <b>Why the disagreeing listings matter.</b> When your hours or menu differ between your site and Google, Google trusts itself. People show up at the wrong time and blame you.
+    <b>What I'd still like to run.</b> A real measured audit of the live site — requests, page weight, security headers — plus the free Google Business Profile score. Both are free, both take me an afternoon, and I'd send you the numbers whether or not you hire me.
+  </div>
+
+  <div class="grule"></div>
+
+  <h2><span class="n">03</span> The rebuild</h2>
+  <h3 class="big">Here's the thing itself.</h3>
+  <p>Dark, warm, neon-sign colors — a bar two blocks off the lake, not a corporate menu page. Everything a hungry person needs is one thumb-reach away: call, order, menu, hours, directions.</p>
+
+  <div class="preview">
+    <div class="pv-bar">
+      <span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-dot"></span>
+      <span class="pv-url">coastersbarandgrill.com</span>
+    </div>
+    <div class="pv-shot"><img class="shot" alt="Homepage of the rebuilt Coasters Bar &amp; Grill site" src="__PVDESKTOP__"></div>
+    <div class="pv-cap">
+      <span>Concept homepage — built, not mocked up.</span>
+      <span>Domain shown is an example; yours stays yours.</span>
+    </div>
+  </div>
+
+  <div class="two">
+    <div>
+      <div class="preview" style="box-shadow:none">
+        <div class="pv-bar">
+          <span class="pv-dot"></span><span class="pv-dot"></span><span class="pv-dot"></span>
+          <span class="pv-url">/menu</span>
+        </div>
+        <div class="pv-shot"><img class="shot" alt="Menu section with tabbed categories" src="__PVMENU__"></div>
+      </div>
+      <p class="capt">Tabbed menu — wings, handhelds, pizza, shareables, and the Friday fish fry on its own tab.</p>
+    </div>
+    <div>
+      <div class="phone">
+        <div class="notch"><i></i></div>
+        <img class="shot" alt="The rebuilt site on a phone" src="__PVMOBILE__">
+      </div>
+      <p class="capt">On a phone, with a call button pinned to the bottom of the screen.</p>
+    </div>
+  </div>
+
+  <div class="grule"></div>
+
+  <h2><span class="n">04</span> What's under the hood</h2>
+  <h3 class="big">Built light on purpose.</h3>
+  <div class="feats">
+    <div class="feat"><h4>One page, loads instantly</h4><p>No page builder, no plugin stack. Hand-written HTML and CSS, hosted on a global CDN.</p></div>
+    <div class="feat"><h4>Fonts served from your own site</h4><p>Zero third-party font requests — faster on bar wifi, and nothing leaks to an ad network.</p></div>
+    <div class="feat"><h4>Google-readable business data</h4><p>Name, address, phone, hours and amenities marked up so Google can read them straight off the page.</p></div>
+    <div class="feat"><h4>The fish fry gets its own tab</h4><p>"Where's fish fry tonight?" is a Friday-afternoon search in Racine. The page answers it.</p></div>
+    <div class="feat"><h4>Eleven flavors, on a heat scale</h4><p>The thing regulars screenshot and text to friends. Names and heat ratings come off your board.</p></div>
+    <div class="feat"><h4>Tap to call, tap for directions</h4><p>Phone bar fixed to the bottom on mobile. Directions open straight into Maps.</p></div>
+    <div class="feat"><h4>Reviews pulled live from Google</h4><p>Real reviews, never invented ones — and they update themselves.</p></div>
+    <div class="feat"><h4>Room for events</h4><p>Live music and trivia nights get a spot you can actually keep current.</p></div>
+  </div>
+  <div class="explain">
+    <b>Where the placeholders are — and I'm telling you, not hiding it.</b> The menu items, most prices, and the eleven flavor names are placeholders pulled from public listings. Two prices are real (wings at 10 pc / $8 and the Cuban at $11, both publicly listed). There are no food photos on the concept because I don't have yours, and I won't put AI-generated food or stock images of somebody else's wings on a real restaurant's site. Your real menu, prices and photos go in before anything goes live.
+  </div>
+
+  <div class="grule"></div>
+
+  <h2><span class="n">05</span> Also worth checking: your Google Business Profile</h2>
+  <h3 class="big">More people see that than see your website.</h3>
+  <p>Someone searching "wings near me" in Racine sees your Google listing long before they see any website — the photos, the hours, the reviews and whether anyone ever replied to them. Veer has a free audit that scores a profile out of 100 against 22 ranking factors. <b>I haven't run yours yet</b> — same reason as above — so there's no score in this document. Say the word and I'll run it and send you the results either way.</p>
+
+  <div class="plans">
+    <div class="plan web">
+      <div class="tag">Website</div>
+      <h3>Veer Care</h3>
+      <div class="price">$25<span> / month</span></div>
+      <ul>
+        <li>Hosting &amp; SSL</li>
+        <li>Automated backups</li>
+        <li>Uptime monitoring</li>
+        <li>Security updates</li>
+        <li>30 min of edits a month</li>
+      </ul>
+      <div class="foot">Optional, month-to-month. Cancel any time — the site is yours either way.</div>
+    </div>
+    <div class="plan google">
+      <div class="tag">Google Business Profile</div>
+      <h3>Profile Rescue → Google Care</h3>
+      <div class="price">$300<span> one-time</span> · $85<span>/mo</span></div>
+      <ul>
+        <li>Free audit first, no charge</li>
+        <li>Description, categories, photos</li>
+        <li>Replies for up to 25 reviews</li>
+        <li>8 posts a month, replies in 48h</li>
+        <li>Monthly re-score you can watch</li>
+      </ul>
+      <div class="foot">Bundle: Rescue + 3 months of Care = <b>$500</b> (vs $555 apart). Care Plus is $150/mo.</div>
+    </div>
+  </div>
+
+  <div class="grule"></div>
+
+  <h2><span class="n">06</span> Investment</h2>
+  <table class="inv">
+    <tr><th>Item</th><th>Price</th></tr>
+    <tr>
+      <td>Website rebuild<small>Design, build, your real menu and photos loaded in, launch</small></td>
+      <td class="num">$500</td>
+    </tr>
+    <tr>
+      <td>Pointing your existing domain at it<small>You keep ownership of the domain</small></td>
+      <td class="num">$0</td>
+    </tr>
+    <tr>
+      <td>New domain, if you want one<small>Billed at cost, roughly $15–20/yr</small></td>
+      <td class="num">at cost</td>
+    </tr>
+    <tr>
+      <td>Website audit &amp; Google Profile audit<small>Measured numbers and a score out of 100</small></td>
+      <td class="num">free</td>
+    </tr>
+    <tr class="total"><td>Total to launch</td><td class="num">$500</td></tr>
+  </table>
+  <p style="font-size:13.5px;color:var(--mut);margin-top:10px">Veer Care ($25/mo) and anything on the Google side are separate and entirely optional — nothing above depends on them.</p>
+  <!-- Friends &amp; Family: if this lead turns out to be a personal referral, apply -15% => $425,
+       and scale the split payments to $212.50 + $212.50. -->
+
+  <h2><span class="n">07</span> How you'd pay</h2>
+  <div class="pay">
+    <div class="opt a">
+      <div class="tag">Option A</div>
+      <h4>$500 up front</h4>
+      <p>Pay in full and the first month of Veer Care is free if you decide you want it.</p>
+    </div>
+    <div class="opt b">
+      <div class="tag">Option B</div>
+      <h4>$250 now, $250 in 30 days</h4>
+      <p>Split it in two, no fee either way. Same site, same timeline.</p>
+    </div>
+  </div>
+  <p style="font-size:13.5px;color:var(--mut);margin-top:11px">Cash App, Apple Pay or a formal invoice — whichever is easiest for your books.</p>
+
+  <h2><span class="n">08</span> What happens next</h2>
+  <ol class="steps">
+    <li><b>You look at the concept</b> and tell me what's wrong with it. There'll be something.</li>
+    <li><b>You send me the real stuff</b> — menu with current prices, the eleven flavor names, and photos of the food and the room. A few phone photos are fine.</li>
+    <li><b>I finish the build</b> — about a week from getting your menu, less if you're in a hurry.</li>
+    <li><b>We point your domain at it</b> and it's live. I stay on the hook for what I built.</li>
+  </ol>
+
+  <h2><span class="n">09</span> The fine print</h2>
+  <ul class="fine">
+    <li><b>You own it.</b> The site, the domain and the content are yours. If we part ways, you take the files with you.</li>
+    <li><b>Edits.</b> Veer Care covers about 30 minutes of changes a month — new prices, new hours, a seasonal item. Bigger changes get quoted first, never billed by surprise.</li>
+    <li><b>If Care lapses.</b> Nothing breaks and nothing gets held hostage. You just handle hosting yourself, and I'll help you move it.</li>
+    <li><b>No ranking promises.</b> Nobody can promise you the top spot on Google or the Maps pack — anyone who does is guessing. What I'll promise is that the fixable things get fixed, and that the score is measured before and after so you can see it move.</li>
+    <li><b>Placeholders are marked.</b> Everything in the concept that isn't confirmed is labelled as a placeholder, in this document and on the page itself.</li>
+    <li><b>This price holds for 30 days</b> from the date at the top.</li>
+  </ul>
+
+  <div class="cta">
+    <h3>Worst case, you got a free audit out of it.</h3>
+    <p>Text or call <b>(651) 301-9307</b>, or email <b>info@veersolutions.com</b>. Tell me yes, no, or "run the audits first" — all three are useful answers.</p>
+  </div>
+
+</div>
+</main>
+
+<footer>
+  <div class="wrap fw">
+    <div class="fl">
+      __VEERMARK__
+      <a class="wm" href="https://veersolutions.com">VEER</a>
+      <span class="tl">Design · Print · Tech</span>
+    </div>
+    <div class="fr">
+      Jessie Redmond · (651) 301-9307 · info@veersolutions.com<br>
+      <a href="https://veersolutions.com">veersolutions.com</a>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
