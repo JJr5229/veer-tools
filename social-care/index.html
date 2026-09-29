@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Veer · Social Care</title>
-<meta name="description" content="Proposed pricing, deliverables and production workflow for Veer's social media management service line.">
+<meta name="description" content="Pricing matrix, deliverables and production workflow for Veer's social media management service line — with a live quote calculator.">
 <style>
 :root{
   --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
@@ -22,6 +22,10 @@ body{
 }
 .wrap{max-width:940px;margin:0 auto;padding:0 24px}
 a{color:var(--orange)}
+code{
+  background:var(--panel2);border:1px solid var(--line);border-radius:5px;
+  padding:1px 5px;font-size:.87em;color:var(--peach);
+}
 
 /* ---- header ---- */
 header{
@@ -58,6 +62,7 @@ section{margin-bottom:52px}
 }
 .eyebrow .n{color:var(--orange);font-weight:700}
 h2{margin:0 0 8px;font-size:clamp(21px,3.6vw,26px);letter-spacing:-.3px;line-height:1.2}
+h3{margin:30px 0 8px;font-size:17px;letter-spacing:-.1px}
 section > p{color:var(--tx2);max-width:70ch;margin:0 0 18px}
 .grule{height:3px;background:var(--sunset);border-radius:3px;margin:0 0 40px;opacity:.85}
 
@@ -65,21 +70,29 @@ section > p{color:var(--tx2);max-width:70ch;margin:0 0 18px}
 .tbl{width:100%;border-collapse:collapse;font-size:14.5px;margin-top:4px}
 .tbl th,.tbl td{text-align:left;padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
 .tbl thead th{
-  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);
-  border-bottom:1px solid var(--line);white-space:nowrap;
+  font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2);white-space:nowrap;
 }
 .tbl td.num,.tbl th.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}
 .tbl td.num{color:var(--peach)}
 .tbl tbody tr:last-child td{border-bottom:0}
 .tbl .sub{color:var(--tx3);font-weight:400}
+.tbl .rec td{background:rgba(246,147,34,.07)}
 .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+
+/* ---- axis cards ---- */
+.axes{display:grid;gap:14px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));margin-top:6px}
+.axis{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:18px 20px}
+.axis .k{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+.axis h4{margin:6px 0 6px;font-size:16px}
+.axis p{margin:0;font-size:13.5px;color:var(--tx2)}
+.axis .bill{
+  margin-top:11px;padding-top:9px;border-top:1px solid var(--line);
+  font-size:12px;color:var(--tx3);
+}
 
 /* ---- tier cards ---- */
 .tiers{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));margin-top:6px}
-.tier{
-  background:var(--panel);border:1px solid var(--line);border-radius:14px;
-  padding:20px;display:flex;flex-direction:column;
-}
+.tier{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;display:flex;flex-direction:column}
 .tier.rec{border-color:var(--orange);background:var(--panel2)}
 .tier .tag{font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--tx2)}
 .tier.rec .tag{color:var(--orange)}
@@ -91,26 +104,7 @@ section > p{color:var(--tx2);max-width:70ch;margin:0 0 18px}
 .tier li::before{content:"✓";position:absolute;left:0;font-weight:700;color:var(--tx3)}
 .tier.rec li::before{color:var(--orange)}
 .tier li b{color:var(--tx);font-weight:600}
-.tier .foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);
-  font-size:12px;color:var(--tx3);margin-top:14px}
-
-/* ---- flow ---- */
-.flow{list-style:none;padding:0;margin:6px 0 0}
-.step{display:flex;gap:16px;align-items:flex-start;position:relative;padding-bottom:20px}
-.step:not(:last-child)::before{
-  content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line);
-}
-.dot{
-  width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;
-  justify-content:center;font-size:11.5px;font-weight:700;letter-spacing:.02em;
-  background:var(--panel2);color:var(--peach);border:1px solid var(--line);
-}
-.step h4{margin:7px 0 3px;font-size:16px;letter-spacing:-.1px}
-.step p{margin:0;font-size:14px;color:var(--tx2);max-width:64ch}
-.step p code{
-  background:var(--panel2);border:1px solid var(--line);border-radius:5px;
-  padding:1px 5px;font-size:12.5px;color:var(--peach);
-}
+.tier .foot{margin-top:auto;padding-top:12px;border-top:1px solid var(--line);font-size:12px;color:var(--tx3)}
 
 /* ---- callouts ---- */
 .note{
@@ -121,10 +115,7 @@ section > p{color:var(--tx2);max-width:70ch;margin:0 0 18px}
 .note p{margin:0;font-size:14px;color:var(--tx2)}
 .note p + p{margin-top:9px}
 .note b{color:var(--tx)}
-.note .lbl{
-  display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;
-  font-weight:700;color:var(--orange);margin-bottom:6px;
-}
+.note .lbl{display:block;font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--orange);margin-bottom:6px}
 .note.warn .lbl{color:var(--red)}
 
 .two{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(260px,1fr))}
@@ -136,9 +127,91 @@ section > p{color:var(--tx2);max-width:70ch;margin:0 0 18px}
 .box.no h4{color:var(--red)}
 .box.yes h4{color:var(--ok)}
 
+/* ---- calculator ---- */
+.calc{
+  background:var(--panel);border:1px solid var(--line);border-radius:16px;
+  padding:0;overflow:hidden;margin-top:8px;
+}
+.calc-grid{display:grid;grid-template-columns:1.25fr 1fr}
+@media(max-width:760px){.calc-grid{grid-template-columns:1fr}}
+.calc-in{padding:22px 24px;border-right:1px solid var(--line)}
+@media(max-width:760px){.calc-in{border-right:0;border-bottom:1px solid var(--line)}}
+.calc-out{padding:22px 24px;background:var(--panel2)}
+fieldset{border:0;padding:0;margin:0 0 22px}
+fieldset:last-of-type{margin-bottom:6px}
+legend{
+  padding:0;font-size:10.5px;font-weight:700;letter-spacing:.14em;text-transform:uppercase;
+  color:var(--orange);margin-bottom:10px;
+}
+legend .ax{color:var(--tx3);font-weight:600}
+.f{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:14px}
+.f label{flex:1;color:var(--tx2);min-width:0}
+.f label b{color:var(--tx);font-weight:600}
+.f label .hint{display:block;font-size:12px;color:var(--tx3)}
+.f .rate{font-size:12px;color:var(--tx3);font-variant-numeric:tabular-nums;white-space:nowrap}
+input[type=number],select{
+  background:var(--bg);color:var(--tx);border:1px solid var(--line);border-radius:8px;
+  padding:7px 9px;font:inherit;font-size:14px;width:88px;text-align:right;
+  font-variant-numeric:tabular-nums;
+}
+select{width:100%;text-align:left}
+input[type=number]:focus,select:focus{outline:2px solid var(--orange);outline-offset:1px}
+input[type=checkbox]{
+  appearance:none;-webkit-appearance:none;width:18px;height:18px;flex:none;
+  border:1px solid var(--line);border-radius:5px;background:var(--bg);cursor:pointer;position:relative;
+}
+input[type=checkbox]:checked{background:var(--orange);border-color:var(--orange)}
+input[type=checkbox]:checked::after{
+  content:"✓";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  color:#0f1114;font-size:12px;font-weight:800;
+}
+.adrow{display:grid;grid-template-columns:18px 1fr 96px;gap:10px;align-items:center;margin:8px 0;font-size:14px}
+.adrow label{color:var(--tx2)}
+.adrow input[type=number]{width:100%}
+.adrow.off label{color:var(--tx3)}
+
+/* output */
+.calc-out h4{margin:0 0 4px;font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--tx2);font-weight:700}
+.lines{list-style:none;padding:0;margin:8px 0 0;font-size:13.5px}
+.lines li{display:flex;justify-content:space-between;gap:12px;padding:5px 0;color:var(--tx2)}
+.lines li span:last-child{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--tx);font-weight:600}
+.lines li.disc span:last-child{color:var(--ok)}
+.lines li.none{color:var(--tx3);justify-content:flex-start}
+.total{
+  display:flex;justify-content:space-between;align-items:baseline;gap:12px;
+  margin-top:10px;padding-top:11px;border-top:1px solid var(--line);
+}
+.total .lab{font-size:13px;color:var(--tx2);font-weight:600}
+.total .val{font-size:26px;font-weight:700;letter-spacing:-.8px;font-variant-numeric:tabular-nums;color:var(--peach)}
+.total .val small{font-size:13px;font-weight:400;color:var(--tx2);letter-spacing:0}
+.blk{margin-bottom:24px}
+.spend{
+  margin-top:16px;padding:11px 13px;border:1px dashed var(--line);border-radius:10px;
+  font-size:12.5px;color:var(--tx2);
+}
+.spend b{color:var(--tx);font-variant-numeric:tabular-nums}
+.btn{
+  margin-top:16px;width:100%;background:var(--orange);color:#0f1114;border:0;border-radius:10px;
+  padding:11px 14px;font:inherit;font-weight:700;font-size:14px;cursor:pointer;
+}
+.btn:hover{filter:brightness(1.08)}
+.btn.done{background:var(--ok)}
+.ftr-note{margin-top:12px;font-size:11.5px;color:var(--tx3);line-height:1.5}
+
 ol.q{margin:6px 0 0;padding-left:22px}
-ol.q li{color:var(--tx2);margin:11px 0;font-size:14.5px}
+ol.q li{color:var(--tx2);margin:12px 0;font-size:14.5px}
 ol.q li b{color:var(--tx)}
+
+/* ---- flow ---- */
+.flow{list-style:none;padding:0;margin:6px 0 0}
+.step{display:flex;gap:16px;align-items:flex-start;position:relative;padding-bottom:20px}
+.step:not(:last-child)::before{content:"";position:absolute;left:17px;top:38px;bottom:0;width:2px;background:var(--line)}
+.dot{
+  width:36px;height:36px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-size:11.5px;font-weight:700;background:var(--panel2);color:var(--peach);border:1px solid var(--line);
+}
+.step h4{margin:7px 0 3px;font-size:16px}
+.step p{margin:0;font-size:14px;color:var(--tx2);max-width:64ch}
 
 /* ---- footer ---- */
 footer{border-top:1px solid var(--line);padding:26px 0 0;color:var(--tx2);font-size:13px}
@@ -146,14 +219,12 @@ footer a{color:var(--orange);text-decoration:none}
 footer a:hover{text-decoration:underline}
 .powered{
   background:#0b0d10;margin-top:26px;padding:9px 0 10px;
-  font-size:.72rem;letter-spacing:.05em;color:var(--tx3);
-  text-align:center;line-height:1.3;
+  font-size:.72rem;letter-spacing:.05em;color:var(--tx3);text-align:center;line-height:1.3;
 }
 .powered a{color:var(--tx2);font-weight:600;text-decoration:none}
-.powered a:hover{color:#fff}
 @media print{
   body{background:#fff;color:#111}
-  .tier,.box,.note{break-inside:avoid}
+  .tier,.box,.note,.calc{break-inside:avoid}
   *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
 }
 </style>
@@ -169,9 +240,10 @@ footer a:hover{text-decoration:underline}
     <div class="hero">
       <span class="chip">Internal · proposed, not published</span>
       <h1>Social Care</h1>
-      <p>Pricing, deliverables and production workflow for managing a client's social
-         accounts — derived from the rates already published on the Veer rate card, so
-         the two never contradict each other. Full working notes in
+      <p>A build-your-quote matrix for managing a client's social accounts — account setup,
+         organic content, and paid ads priced on separate axes, because they scale
+         separately. Every rate is derived from the Veer rate card already published, so
+         the two pages never contradict each other. Working notes in
          <a href="SPEC.md">SPEC.md</a>.</p>
     </div>
   </div>
@@ -183,77 +255,112 @@ footer a:hover{text-decoration:underline}
     <div class="eyebrow"><span class="n">01</span> Where it fits</div>
     <h2>The rung that was advertised and never priced</h2>
     <p>The published rate card already ends on this promise — step 3 of the
-       &ldquo;What&rsquo;s next&rdquo; ladder reads <em>&ldquo;AI working behind the
-       scenes — chases invoices, replies to reviews, and drafts your posts.&rdquo;</em>
-       Social isn&rsquo;t a new direction. It&rsquo;s the rung clients are already being
-       shown.</p>
+       &ldquo;What&rsquo;s next&rdquo; ladder reads <em>&ldquo;AI working behind the scenes
+       — chases invoices, replies to reviews, and drafts your posts.&rdquo;</em> Social
+       isn&rsquo;t a new direction. It&rsquo;s the rung clients are already being shown.</p>
+    <div class="note">
+      <span class="lbl">The number that sets the floor</span>
+      <p><b>Google Care is $85/mo for 8 posts to a single surface</b>, with a 48-hour reply
+         SLA and a monthly re-score. Social management is the same shape of work across two
+         to four surfaces, with original creative and video on top — so it can&rsquo;t price
+         below that, and the organic entry has to clear Google Care Plus ($150) or the
+         ladder stops making sense. That puts the entry at <b>$250/mo</b>.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">02</span> The matrix</div>
+    <h2>Three axes, because one tier number can&rsquo;t carry the quote</h2>
+    <p>A quote has to answer three questions that scale independently. Fold them into one
+       tier price and a client with one live Instagram pays the same as a client with four
+       accounts that don&rsquo;t exist yet — wrong in both directions.</p>
+    <div class="axes">
+      <div class="axis">
+        <span class="k">Axis A</span>
+        <h4>Accounts</h4>
+        <p>Does it exist, or am I building it? Scales with how many accounts there are and
+           what state each one is in.</p>
+        <div class="bill">One-time</div>
+      </div>
+      <div class="axis">
+        <span class="k">Axis B</span>
+        <h4>Organic</h4>
+        <p>How much content, pushed to how many surfaces? Volume sets the tier; platform
+           count is priced on top of it.</p>
+        <div class="bill">Monthly</div>
+      </div>
+      <div class="axis">
+        <span class="k">Axis C</span>
+        <h4>Paid ads</h4>
+        <p>How many ad platforms, at what spend on each? Entirely separate from organic —
+           its own setup, fee and risk.</p>
+        <div class="bill">One-time setup + monthly</div>
+      </div>
+    </div>
+    <div class="note">
+      <span class="lbl">The decomposition that makes a matrix possible</span>
+      <p><b>Client-level strategy work happens once, no matter how many accounts there
+         are.</b> Pillars, templates, calendar, hashtag research and the voice guide are a
+         fixed cost. Account work multiplies. Charging one number for both is what made a
+         flat &ldquo;$300 Social Rescue&rdquo; unable to answer <em>what if they have four
+         accounts?</em></p>
+      <p>So the Rescue splits: <b>Foundation</b> (once) <b>+ per-account work</b>
+         (multiplies).</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">03</span> Axis A</div>
+    <h2>Accounts — one-time</h2>
+
+    <h3 style="margin-top:8px">Social Foundation — $300, charged once</h3>
+    <p>Required on every engagement. Holds everything that isn&rsquo;t per-account: five
+       content pillars, a voice guide taken off one 15-minute call, six post templates
+       locked as a Canva brand template, a 30-day calendar, twelve hashtag sets researched
+       for their market, a link page on their own domain — <b>plus the first account
+       brought to standard.</b></p>
+    <p>$300 matches <b>Google Profile Rescue</b> exactly, and the parallel is precise: GBP
+       Rescue is scoped to <em>one location</em>, extra locations +$150 each. Foundation is
+       scoped to one account.</p>
+
+    <h3>Each additional account</h3>
     <div class="scroll">
     <table class="tbl">
-      <thead><tr><th>Existing monthly product</th><th class="num">Price</th><th>What it covers</th></tr></thead>
+      <thead><tr><th>State of the account</th><th class="num">Price</th><th>What it takes</th></tr></thead>
       <tbody>
-        <tr><td>Website Care</td><td class="num">$25/mo</td><td>Hosting, SSL, backups, 30 min edits</td></tr>
-        <tr><td>Website Care Plus</td><td class="num">$45/mo</td><td>+ AI chat assistant, traffic insights, 60 min edits</td></tr>
-        <tr><td>Google Care</td><td class="num">$85/mo</td><td>8 posts/mo, review replies in 48h, monthly re-score</td></tr>
-        <tr><td>Google Care Plus</td><td class="num">$150/mo</td><td>+ review campaign, Tap-to-Review, 3 competitors tracked</td></tr>
+        <tr><td>Already live, healthy</td><td class="num">$0</td>
+            <td>Verify access and routing. Nothing to fix.</td></tr>
+        <tr><td>Already live, needs work</td><td class="num">+$75</td>
+            <td>Audit and score out of 100, bio and handle rewritten, links wired, covers, grid cleanup plan, 30-day re-score.</td></tr>
+        <tr><td>Doesn&rsquo;t exist yet</td><td class="num">+$150</td>
+            <td>Handle availability research and claim, business verification, Business Suite / asset linkage, 2FA, category and attributes, profile art — <b>plus a 6-post starter grid</b>.</td></tr>
       </tbody>
     </table>
     </div>
     <div class="note">
-      <span class="lbl">The number that sets the floor</span>
-      <p><b>Google Care is $85/mo for 8 posts to a single surface</b>, with a 48-hour reply
-         SLA and a monthly re-score. Social management is the same shape of work across
-         two to four surfaces, with original creative and short-form video on top — so it
-         can&rsquo;t price below that, and the entry tier has to clear Care Plus ($150)
-         or the ladder stops making sense.</p>
-      <p>That puts the entry at <b>$250/mo</b>. It&rsquo;s the first Veer product above
-         the &ldquo;small monthly&rdquo; band, and deliberately so: social is the first
-         service line where the labour is genuinely recurring rather than mostly
-         automated upkeep.</p>
+      <span class="lbl">Both numbers already exist on the rate card</span>
+      <p><b>$150</b> is the published extra-location rate. <b>$75</b> is the published
+         review-backlog rate. Nothing was invented to make this table work.</p>
+      <p><b>Why building costs more than fixing.</b> A neglected account is already
+         populated — the work is corrective and desk-bound. A new one needs handle research
+         (the good ones are taken), business verification that runs on Meta&rsquo;s clock
+         and needs documents from the client, asset linkage, and a starter grid, because an
+         account with zero posts converts worse than no account at all. The starter grid
+         alone is most of the delta.</p>
     </div>
   </section>
 
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">02</span> One-time</div>
-    <h2>Social Rescue — $300</h2>
-    <p>Priced identically to <b>Google Profile Rescue</b>, and for the same reason: a week
-       of fixing everything an audit found, at a fixed price, before any retainer starts.
-       Matching the two keeps the bundle maths legible and means a client who bought one
-       already knows what the other is. Sold on its own — they can take the Rescue and
-       run the account themselves.</p>
-    <div class="two">
-      <div class="box">
-        <h4>Found and fixed</h4>
-        <ul>
-          <li><b>Profile audit scored out of 100</b> — same rubric shape as the GBP audit, so before/after is a number, not an opinion</li>
-          <li><b>Handles, names, bios rewritten</b> — one voice, keyword-aware, full character count used</li>
-          <li><b>Profile and cover art</b> sized per platform, plus Instagram highlight covers</li>
-          <li><b>Grid cleanup plan</b> — what to archive, pin, keep</li>
-          <li><b>30-day re-score</b> so they watch the number move</li>
-        </ul>
-      </div>
-      <div class="box">
-        <h4>Built to hand over</h4>
-        <ul>
-          <li><b>One link page on their own domain</b> — the <code>links.html</code> pattern, not a service they rent</li>
-          <li><b>Six post templates</b> in their colours and type, locked as a Canva brand template</li>
-          <li><b>Five content pillars</b> — written down, so no month starts from nothing</li>
-          <li><b>A 30-day calendar</b> ready to publish at the tier&rsquo;s cadence</li>
-          <li><b>Twelve hashtag sets</b> researched for their market and city, grouped by pillar</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <div class="grule"></div>
-
-  <section>
-    <div class="eyebrow"><span class="n">03</span> Monthly</div>
-    <h2>Three tiers, named to match the house convention</h2>
-    <p>A client already on Website Care and Google Care understands <b>Social Care</b> and
-       <b>Social Care Plus</b> with no explanation. Social Studio is the anchor — it makes
-       Care Plus read as the sensible middle, which is where most clients should land.</p>
+    <div class="eyebrow"><span class="n">04</span> Axis B</div>
+    <h2>Organic content — monthly</h2>
+    <p>The tier sets <b>volume</b>. Platform reach is priced separately, because pushing
+       sixteen posts to two platforms and to five platforms is not the same job.</p>
     <div class="tiers">
       <div class="tier">
         <span class="tag">Entry</span>
@@ -261,12 +368,12 @@ footer a:hover{text-decoration:underline}
         <div class="price">$250<span>/mo</span></div>
         <ul>
           <li><b>8 posts</b> a month (2/wk)</li>
-          <li><b>2 platforms</b></li>
+          <li>No video</li>
+          <li><b>1 native + 1 mirrored</b> platform</li>
           <li>Comments &amp; DMs — <b>48h</b>, weekdays</li>
-          <li>Monthly report</li>
-          <li>Approval link, 1 revision round</li>
+          <li>Monthly report, 1 revision round</li>
         </ul>
-        <div class="foot">No video. For an account that needs to look alive and consistent.</div>
+        <div class="foot">For an account that needs to look alive and consistent.</div>
       </div>
       <div class="tier rec">
         <span class="tag">Recommended</span>
@@ -274,10 +381,10 @@ footer a:hover{text-decoration:underline}
         <div class="price">$550<span>/mo</span></div>
         <ul>
           <li><b>16 posts</b> a month (4/wk)</li>
-          <li><b>3 platforms</b></li>
-          <li><b>4 reels/shorts</b> + 8 stories</li>
+          <li><b>4 reels</b> + 8 stories</li>
+          <li><b>2 native + 1 mirrored</b> platform</li>
           <li>Comments, DMs &amp; reviews — <b>24h</b>, weekdays</li>
-          <li>1 content capture day per quarter</li>
+          <li>Quarterly capture day</li>
           <li>Report + <b>3 competitors tracked</b></li>
         </ul>
         <div class="foot">Where most clients should land. Video is what actually moves a local account.</div>
@@ -288,69 +395,301 @@ footer a:hover{text-decoration:underline}
         <div class="price">$950<span>/mo</span></div>
         <ul>
           <li><b>24 posts</b> a month (6/wk)</li>
-          <li><b>4 platforms</b></li>
-          <li><b>8 reels/shorts</b> + 2 ad cuts + 16 stories</li>
-          <li>Replies <b>24h, including weekends</b></li>
-          <li>Monthly capture day</li>
-          <li>Quarterly strategy call</li>
+          <li><b>8 reels</b> + 2 ad cuts + 16 stories</li>
+          <li><b>3 native + 1 mirrored</b> platform</li>
+          <li>Replies <b>24h, incl. weekends</b></li>
+          <li>Monthly capture day, quarterly strategy call</li>
           <li>Unlimited revisions in-cycle</li>
         </ul>
         <div class="foot">For a business where social is the main channel, not a checkbox.</div>
       </div>
     </div>
 
-    <div class="note">
-      <span class="lbl">Bundle</span>
-      <p><b>Social Rescue + 3 months of Social Care = $950</b> (vs $1,050 separately).
-         Mirrors the published &ldquo;Rescue + 3 months of Care = $500&rdquo; bundle, and
-         for the same stated reason — an account that gets cleaned up and then left alone
-         drifts back within a season. Three months is the shortest honest commitment.</p>
-    </div>
-
-    <h2 style="margin-top:34px;font-size:18px">Add-ons</h2>
+    <h3>Native vs mirrored — the distinction that makes platform count priceable</h3>
     <div class="scroll">
     <table class="tbl">
       <tbody>
-        <tr><td>Extra platform</td><td class="num">+$75/mo</td></tr>
-        <tr><td>Extra reel / short</td><td class="num">+$60 ea</td></tr>
-        <tr><td>Content capture day <span class="sub">— on-site, ~2 hrs, 60–80 assets</span></td><td class="num">$250</td></tr>
-        <tr><td>Paid ad management <span class="sub">— 15% of spend, $150/mo minimum</span></td><td class="num">15%</td></tr>
-        <tr><td>Community management only <span class="sub">— replies, DMs, reviews, no posting</span></td><td class="num">$150/mo</td></tr>
+        <tr><td><b>Mirrored platform</b> <span class="sub">— the same content, reformatted: aspect ratio, caption length, hashtag conventions. Facebook mirroring Instagram. Cheap because the thinking is already done.</span></td><td class="num">+$50/mo</td></tr>
+        <tr><td><b>Native platform</b> <span class="sub">— its own content, adapted to that platform's culture. TikTok is not LinkedIn; a post that works on one reads as a tourist on the other.</span></td><td class="num">+$125/mo</td></tr>
         <tr><td>Extra location <span class="sub">— matches the published GBP add-on</span></td><td class="num">+$150/mo</td></tr>
-        <tr><td>Google Care bolted onto any social tier <span class="sub">— instead of $85; the GBP posts come from the same month's content</span></td><td class="num">+$50/mo</td></tr>
-        <tr><td>Friends &amp; Family <span class="sub">— tier and Rescue, same as every Veer line</span></td><td class="num">−15%</td></tr>
+        <tr><td>Extra reel or short beyond the tier</td><td class="num">+$60 ea</td></tr>
       </tbody>
     </table>
     </div>
-
     <div class="note">
-      <span class="lbl">Two ways to pay — always presented as a choice</span>
-      <p><b>Pay six months up front</b> and the seventh is free. Or <b>month to month</b>,
-         billed on the 1st, no contract, 30 days&rsquo; notice to cancel. Cash App, Apple
-         Pay or a formal invoice — client picks. The Rescue bills separately from the first
-         month unless they take the bundle.</p>
+      <span class="lbl">This replaces the flat &ldquo;+$75 per platform&rdquo;</span>
+      <p>A client adding Facebook alongside Instagram is buying something genuinely cheap.
+         A client adding TikTok is not. One flat rate lied about both.</p>
     </div>
   </section>
 
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">04</span> Margin</div>
-    <h2>Every tier is built to $50/hr</h2>
+    <div class="eyebrow"><span class="n">05</span> Axis C</div>
+    <h2>Paid ads — setup and monthly</h2>
+    <p>Separated from organic entirely. Meta (Facebook + Instagram together) counts as
+       <b>one</b> ad platform, because it is one ads account. Google, TikTok, LinkedIn and
+       Pinterest each count separately.</p>
+
+    <h3 style="margin-top:8px">Ads setup, one-time per platform</h3>
     <div class="scroll">
     <table class="tbl">
-      <thead><tr><th>Tier</th><th class="num">Price</th><th class="num">Budgeted hrs/mo</th><th class="num">Effective rate</th></tr></thead>
       <tbody>
-        <tr><td>Social Care</td><td class="num">$250</td><td class="num">~5</td><td class="num">$50/hr</td></tr>
-        <tr><td>Social Care Plus</td><td class="num">$550</td><td class="num">~11</td><td class="num">$50/hr</td></tr>
-        <tr><td>Social Studio</td><td class="num">$950</td><td class="num">~19</td><td class="num">$50/hr</td></tr>
+        <tr><td><b>First ad platform</b> <span class="sub">— Business Manager / ads account, pixel or CAPI installed and firing, domain verification, conversion events defined, three starter audiences, billing thresholds set</span></td><td class="num">$250</td></tr>
+        <tr><td><b>Each additional ad platform</b> <span class="sub">— same shape, less discovery; audiences and creative already exist</span></td><td class="num">+$150</td></tr>
       </tbody>
     </table>
     </div>
+
+    <h3>Ads management, monthly per platform</h3>
+    <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>Monthly spend on that platform</th><th class="num">Management fee</th></tr></thead>
+      <tbody>
+        <tr><td>Under $1,000</td><td class="num">$200/mo flat</td></tr>
+        <tr><td>$1,000 – $2,499</td><td class="num">$300/mo flat</td></tr>
+        <tr><td>$2,500 – $9,999</td><td class="num">15% of spend</td></tr>
+        <tr><td>$10,000 and up</td><td class="num">12% of spend</td></tr>
+        <tr class="rec"><td><b>Each additional ad platform</b> <span class="sub">— audiences, creative and reporting are shared, so the second platform genuinely costs less. Applied to the cheaper platforms, so the client's biggest channel is never the discounted one.</span></td><td class="num">−25%</td></tr>
+        <tr><td>Ad creative <span class="sub">— 2 per platform per month included; extras at the same rate as a reel</span></td><td class="num">+$60 ea</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note">
+      <span class="lbl">Why flat at the bottom, and why it drops at the top</span>
+      <p>15% of $600 is $90 — less than the cost of opening the account and looking at it
+         properly. A percentage-only model quietly loses money on every small client, and
+         small local businesses are the whole book. <b>The $200 floor is what the work
+         costs.</b> At the other end, above $10k spend grows faster than the work does, so
+         12% keeps a scaling client from being punished for scaling.</p>
+    </div>
+    <div class="note warn">
+      <span class="lbl">The two hard rules on ads</span>
+      <p><b>1. The client pays spend on their own card.</b> Veer never fronts ad spend and
+         never holds client billing on a Veer payment method. Fronting spend turns a
+         $550/mo retainer into an unsecured loan.</p>
+      <p><b>2. No performance promise. Ever.</b> No ROAS, no cost-per-lead, no
+         cost-per-acquisition figure in any proposal or conversation. What&rsquo;s
+         guaranteed is that campaigns are built correctly, watched, and reported honestly.
+         The numbers the auction returns are not Veer&rsquo;s to promise — and a quoted CPL
+         that misses is the fastest way to lose a client in a city this size.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">06</span> Quote builder</div>
+    <h2>The matrix, live</h2>
+    <p>Everything above, assembled. Runs entirely in the browser — nothing is sent
+       anywhere.</p>
+    <div class="calc">
+      <div class="calc-grid">
+        <div class="calc-in">
+
+          <fieldset>
+            <legend>Accounts <span class="ax">· axis A</span></legend>
+            <div class="f">
+              <label><b>Social Foundation</b>
+                <span class="hint">Required. Covers the first account.</span></label>
+              <span class="rate">$300</span>
+            </div>
+            <div class="f">
+              <label>Additional accounts <b>already live, needing work</b></label>
+              <span class="rate">$75 ea</span>
+              <input type="number" id="aExist" min="0" max="20" step="1" value="0">
+            </div>
+            <div class="f">
+              <label>Additional accounts to <b>build from scratch</b></label>
+              <span class="rate">$150 ea</span>
+              <input type="number" id="aNew" min="0" max="20" step="1" value="0">
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Organic <span class="ax">· axis B</span></legend>
+            <div class="f">
+              <label for="tier">Monthly tier</label>
+            </div>
+            <div class="f">
+              <select id="tier">
+                <option value="none">None — setup only</option>
+                <option value="care">Social Care — $250/mo · 8 posts · 1 native + 1 mirrored</option>
+                <option value="plus" selected>Social Care Plus — $550/mo · 16 posts · 2 native + 1 mirrored</option>
+                <option value="studio">Social Studio — $950/mo · 24 posts · 3 native + 1 mirrored</option>
+              </select>
+            </div>
+            <div class="f">
+              <label>Extra <b>mirrored</b> platforms <span class="hint">same content, reformatted</span></label>
+              <span class="rate">$50 ea</span>
+              <input type="number" id="bMirror" min="0" max="10" step="1" value="0">
+            </div>
+            <div class="f">
+              <label>Extra <b>native</b> platforms <span class="hint">its own content</span></label>
+              <span class="rate">$125 ea</span>
+              <input type="number" id="bNative" min="0" max="10" step="1" value="0">
+            </div>
+            <div class="f">
+              <label>Extra locations</label>
+              <span class="rate">$150 ea</span>
+              <input type="number" id="bLoc" min="0" max="20" step="1" value="0">
+            </div>
+            <div class="f">
+              <label>Extra reels / shorts</label>
+              <span class="rate">$60 ea</span>
+              <input type="number" id="bReel" min="0" max="40" step="1" value="0">
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Paid ads <span class="ax">· axis C</span></legend>
+            <div class="f" style="margin-bottom:4px">
+              <label class="hint" style="color:var(--tx3);font-size:12px">
+                Tick a platform and enter that platform&rsquo;s own monthly spend.</label>
+            </div>
+            <div class="adrow off" data-ad>
+              <input type="checkbox" class="adOn" id="ad0" aria-label="Meta ads">
+              <label for="ad0">Meta <span style="color:var(--tx3)">(FB + IG)</span></label>
+              <input type="number" class="adSpend" min="0" step="100" value="1500" aria-label="Meta monthly spend" disabled>
+            </div>
+            <div class="adrow off" data-ad>
+              <input type="checkbox" class="adOn" id="ad1" aria-label="Google ads">
+              <label for="ad1">Google</label>
+              <input type="number" class="adSpend" min="0" step="100" value="1000" aria-label="Google monthly spend" disabled>
+            </div>
+            <div class="adrow off" data-ad>
+              <input type="checkbox" class="adOn" id="ad2" aria-label="TikTok ads">
+              <label for="ad2">TikTok</label>
+              <input type="number" class="adSpend" min="0" step="100" value="500" aria-label="TikTok monthly spend" disabled>
+            </div>
+            <div class="adrow off" data-ad>
+              <input type="checkbox" class="adOn" id="ad3" aria-label="LinkedIn ads">
+              <label for="ad3">LinkedIn</label>
+              <input type="number" class="adSpend" min="0" step="100" value="500" aria-label="LinkedIn monthly spend" disabled>
+            </div>
+            <div class="f" style="margin-top:12px">
+              <label>Extra ad creatives <span class="hint">2 per platform per month included</span></label>
+              <span class="rate">$60 ea</span>
+              <input type="number" id="cCreative" min="0" max="40" step="1" value="0">
+            </div>
+          </fieldset>
+
+          <fieldset>
+            <legend>Terms</legend>
+            <div class="f">
+              <input type="checkbox" id="mCommit">
+              <label for="mCommit"><b>6-month commitment</b>
+                <span class="hint">Foundation waived — $300 free</span></label>
+            </div>
+            <div class="f">
+              <input type="checkbox" id="mFF">
+              <label for="mFF"><b>Friends &amp; Family</b>
+                <span class="hint">−15% on everything</span></label>
+            </div>
+          </fieldset>
+
+        </div>
+
+        <div class="calc-out">
+          <div class="blk">
+            <h4>One-time</h4>
+            <ul class="lines" id="outOne"></ul>
+            <div class="total"><span class="lab">One-time total</span>
+              <span class="val" id="totOne">$0</span></div>
+          </div>
+          <div class="blk">
+            <h4>Monthly</h4>
+            <ul class="lines" id="outMo"></ul>
+            <div class="total"><span class="lab">Monthly total</span>
+              <span class="val" id="totMo">$0<small>/mo</small></span></div>
+          </div>
+          <div class="total" style="border-top-width:2px">
+            <span class="lab">Due at signing <span style="color:var(--tx3);font-weight:400;white-space:nowrap">incl. month 1</span></span>
+            <span class="val" id="totFirst">$0</span>
+          </div>
+          <div class="spend" id="spendNote" hidden></div>
+          <button class="btn" id="copyBtn" type="button">Copy quote as text</button>
+          <p class="ftr-note">Internal working figures. Ad spend is billed to the client by
+             the platform, never through Veer. No reach, follower or advertising
+             performance figure is ever quoted.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">07</span> Worked examples</div>
+    <h2>Four real shapes of client</h2>
+    <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>Client</th><th>Axis A — accounts</th><th>Axis B — organic</th><th>Axis C — ads</th><th class="num">One-time</th><th class="num">Monthly</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><b>New food truck</b><br><span class="sub">nothing exists</span></td>
+          <td>Foundation + 1 new (FB)</td>
+          <td>Care — IG native, FB mirrored</td>
+          <td>None</td>
+          <td class="num">$450</td><td class="num">$250</td>
+        </tr>
+        <tr>
+          <td><b>Gym</b><br><span class="sub">3 live but neglected</span></td>
+          <td>Foundation + 2 tune-ups</td>
+          <td>Care Plus — IG + TikTok native, FB mirrored</td>
+          <td>Meta @ $1,500</td>
+          <td class="num">$700</td><td class="num">$850</td>
+        </tr>
+        <tr>
+          <td><b>Restaurant group</b><br><span class="sub">2 locations, 4 new accounts</span></td>
+          <td>Foundation + 3 new</td>
+          <td>Studio + 1 extra location</td>
+          <td>Meta @ $4,000 + Google @ $2,000</td>
+          <td class="num">$1,150</td><td class="num">$1,925</td>
+        </tr>
+        <tr>
+          <td><b>Friends &amp; Family</b><br><span class="sub">1 live IG, 6-month commit</span></td>
+          <td>Foundation waived</td>
+          <td>Care, −15%</td>
+          <td>None</td>
+          <td class="num">$0</td><td class="num">~$215</td>
+        </tr>
+      </tbody>
+    </table>
+    </div>
+    <p style="margin-top:14px;font-size:13.5px">Monthly figures exclude the client&rsquo;s
+       own ad spend — $1,500 for the gym, $6,000 for the restaurant group, billed to them
+       directly by the platform.</p>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">08</span> Margin</div>
+    <h2>Organic is built to $50/hr, ads to $60–75</h2>
+    <div class="two">
+      <div class="box">
+        <h4>Organic — $50/hr</h4>
+        <ul>
+          <li>Social Care · $250 · ~5 hrs</li>
+          <li>Social Care Plus · $550 · ~11 hrs</li>
+          <li>Social Studio · $950 · ~19 hrs</li>
+        </ul>
+      </div>
+      <div class="box">
+        <h4>Ads — $57–75/hr, deliberately higher</h4>
+        <ul>
+          <li>Meta @ $800 · $200 · ~3.5 hrs · ~$57/hr</li>
+          <li>Meta @ $1,500 · $300 · ~4.5 hrs · ~$67/hr</li>
+          <li>Meta @ $4,000 · $600 · ~8 hrs · ~$75/hr</li>
+        </ul>
+      </div>
+    </div>
     <div class="note warn">
       <span class="lbl">The constraint the whole line rests on</span>
-      <p>That budget only holds because of batching. A month of captions written in one
-         sitting is about 90 minutes; the same sixteen written one at a time across four
+      <p>The organic budget only holds because of batching. A month of captions written in
+         one sitting is about 90 minutes; the same sixteen written one at a time across four
          weeks is closer to five hours. <b>If the monthly cycle stops being batched, every
          tier loses money.</b></p>
     </div>
@@ -359,24 +698,27 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">05</span> Production</div>
+    <div class="eyebrow"><span class="n">09</span> Production</div>
     <h2>Nothing new to build — a client to add to a system already running four brands</h2>
     <p><code>Veer Internal/Social Engine/</code> already drives Veer, MDRN, Camden
-       Shapeworks and Common Press. <code>build-desk.py</code> regenerates
-       <b>Social Desk</b> from one <code>&lt;brand&gt;-posts.json</code> per brand,
-       resolves platform routing per post, and flags any media reference missing from
-       disk. Statuses run <code>pending → approved → scheduled → posted</code>, and the
-       app keeps its own browser state so a rebuild re-seeds the archive without wiping
-       what&rsquo;s already marked posted.</p>
+       Shapeworks and Common Press. <code>build-desk.py</code> regenerates <b>Social
+       Desk</b> from one <code>&lt;brand&gt;-posts.json</code> per brand, resolves platform
+       routing per post, and flags any media reference missing from disk. Statuses run
+       <code>pending → approved → scheduled → posted</code>, and the app keeps its own
+       browser state so a rebuild re-seeds the archive without wiping what&rsquo;s already
+       marked posted.</p>
     <div class="note">
       <span class="lbl">Onboarding a client, in full</span>
       <p>Add <code>&lt;client&gt;-posts.json</code>, register it in the <code>EXTRA</code>
          map in <code>build-desk.py</code>, point <code>mediaRoot</code> at
-         <code>Clients/&lt;Name&gt;/</code>, re-run the build. That&rsquo;s it — the same
-         shape MDRN and Camden already use.</p>
+         <code>Clients/&lt;Name&gt;/</code>, re-run the build. The same shape MDRN and
+         Camden already use.</p>
+      <p>The <code>platforms</code> array on each post is what makes axis B auditable —
+         mirrored platforms are extra entries on an existing post, native ones are their own
+         posts. <b>The month&rsquo;s invoice is derivable from the file.</b></p>
     </div>
 
-    <h2 style="margin-top:36px;font-size:18px">The monthly cycle</h2>
+    <h3>The monthly cycle</h3>
     <p>The client-facing promise is the one the website service already makes:
        <em>you do almost nothing.</em></p>
     <ol class="flow">
@@ -389,16 +731,15 @@ footer a:hover{text-decoration:underline}
       <li class="step"><span class="dot">D2–3</span><div>
         <h4>Batch write — the whole month in one pass</h4>
         <p>Claude drafts every caption straight into <code>&lt;client&gt;-posts.json</code>
-           from the five pillars, the client&rsquo;s voice sample and whatever they sent —
-           caption, hashtag set, platform routing and media refs all in the same pass.
-           <b>This is the biggest lever in the service and the reason the margin works.</b></p>
+           from the five pillars, the voice guide and whatever they sent — caption, hashtag
+           set, platform routing and media refs in the same pass.
+           <b>The biggest lever in the service and the reason the margin works.</b></p>
       </div></li>
       <li class="step"><span class="dot">D3–4</span><div>
         <h4>Media</h4>
         <p>Graphics from the locked Canva brand template. Short-form video and motion cuts
            through Higgsfield, which also handles background removal and upscaling on rough
-           client photos. Logo and vector work through the Vectorizer in this repo. Client
-           photos cropped per platform.</p>
+           client photos. Logo and vector work through the Vectorizer in this repo.</p>
       </div></li>
       <li class="step"><span class="dot">D4</span><div>
         <h4>Route and review — one link</h4>
@@ -412,17 +753,16 @@ footer a:hover{text-decoration:underline}
         <h4>Schedule</h4>
         <p>Approved posts queued for the month, statuses tracked in the Desk.</p>
       </div></li>
-      <li class="step"><span class="dot">→</span><div>
-        <h4>Engagement, ongoing</h4>
-        <p>Comments, DMs and reviews triaged at the tier&rsquo;s SLA. Anything needing the
-           owner&rsquo;s own answer gets forwarded, not guessed at.</p>
+      <li class="step"><span class="dot">WKLY</span><div>
+        <h4>Ads, if running</h4>
+        <p>Budget and bid checks, kill the losers, scale the winners, creative refresh when
+           frequency climbs. Logged so the monthly report can show what changed and why.</p>
       </div></li>
       <li class="step"><span class="dot">WK4</span><div>
         <h4>Report</h4>
-        <p>What posted, what performed, follower and engagement delta, next month&rsquo;s
-           angle — plus the re-scored profile number. Same &ldquo;watch it climb&rdquo;
-           framing as Google Care, because it&rsquo;s the same promise: measurable before
-           and after.</p>
+        <p>What posted, what performed, follower and engagement delta, the re-scored profile
+           number, and — if ads ran — spend, results and what changed. Same &ldquo;watch it
+           climb&rdquo; framing as Google Care: measurable before and after.</p>
       </div></li>
     </ol>
     <div class="note">
@@ -437,7 +777,7 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">06</span> Fine print</div>
+    <div class="eyebrow"><span class="n">10</span> Fine print</div>
     <h2>The boundaries that make this deliverable</h2>
     <div class="two">
       <div class="box yes">
@@ -446,18 +786,20 @@ footer a:hover{text-decoration:underline}
           <li><b>The cadence</b> — posts land on schedule</li>
           <li><b>The reply times</b> — per the tier&rsquo;s SLA</li>
           <li><b>The creative quality</b> — on-brand, from locked templates</li>
+          <li><b>Campaigns built correctly and actively watched</b></li>
           <li><b>A measurable profile score</b> before and after</li>
-          <li><b>The client owns everything</b> — accounts, assets, captions; all handed back on exit</li>
-          <li><b>30 days&rsquo; notice either way</b>, and the final approved queue is delivered scheduled and ready regardless of who ended it</li>
+          <li><b>The client owns everything</b> — accounts, assets, captions, ad accounts. An account <em>Veer created</em> is theirs from day one, stated explicitly, because that is exactly where an ownership fight would start</li>
+          <li><b>30 days&rsquo; notice either way</b>, and the final approved queue delivered scheduled and ready regardless of who ended it</li>
         </ul>
       </div>
       <div class="box no">
         <h4>Never promised, never included</h4>
         <ul>
-          <li><b>Follower counts, reach, or a post going viral.</b> Nobody can promise those — they depend on the algorithm and on competitors. Same rule as the published GBP promise: the fixable things get fixed, and the score is visible before and after</li>
+          <li><b>Follower counts, reach, or a post going viral</b></li>
+          <li><b>Any advertising performance figure</b> — no ROAS, CPL or CPA, ever. They depend on the auction and on competitors</li>
           <li><b>Purchased followers or engagement</b> of any kind</li>
+          <li><b>Ad spend fronted by Veer.</b> If the client&rsquo;s card fails, campaigns pause; Veer does not cover the gap</li>
           <li><b>Crisis and PR response</b></li>
-          <li><b>Paid spend on Veer&rsquo;s card</b></li>
           <li>Anything needing the owner&rsquo;s own voice on a legal or personnel matter</li>
         </ul>
       </div>
@@ -476,28 +818,35 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">07</span> Open</div>
-    <h2>Four calls that are yours, not mine</h2>
+    <div class="eyebrow"><span class="n">11</span> Open</div>
+    <h2>Five calls that are yours, not mine</h2>
     <ol class="q">
-      <li><b>Is $250 the right entry, or does a $150 &ldquo;posts only&rdquo; tier belong
-        below it</b> to convert $500-website clients who balk? Risk: $150 for 8 posts is
-        $30/hr once graphics are in, and it cannibalises Care Plus.</li>
+      <li><b>Do you want to own paid ads at all?</b> The big one, and strategic rather than
+        pricing. Ads carries a different liability profile — the client spends their own
+        money on your recommendation, and a bad month is felt immediately in a way a
+        mediocre post never is. Three honest options: build it in as specced; <b>refer it
+        out at a 15% referral</b> with none of the exposure; or <b>sell ad creative only</b>
+        at $60 a cut and let someone else run the account. The matrix supports all three —
+        axis C just switches off.</li>
+      <li><b>Is $250 the right organic entry, or does a $150 &ldquo;posts only&rdquo; tier
+        belong below it</b> to convert $500-website clients who balk? Risk: $150 for 8 posts
+        is $30/hr once graphics are in, and it cannibalises Care Plus.</li>
+      <li><b>Does the $0 row on axis A actually happen?</b> A client whose accounts are
+        genuinely healthy is rare, and advertising &ldquo;free&rdquo; invites them to argue
+        every account is fine. It may be better to price every account at $75 minimum and
+        let you waive it as a goodwill move.</li>
       <li><b>Local SMB only, or does Social Studio get pitched to e-comm?</b> Camden and
         Common Press prove the pipeline handles product catalogues, and an e-comm account
-        carries $1,500+/mo — but that&rsquo;s a different sales conversation than a
-        restaurant.</li>
-      <li><b>Content capture day at $250</b> — is two hours on-site the right shape, or a
-        half-day at $400?</li>
-      <li><b>Should Social Rescue bundle into Digital Presence Rescue</b> ($750 website +
-        GBP) as a three-way at, say, $950?</li>
+        carries $1,500+/mo — a different sales conversation than a restaurant.</li>
+      <li><b>Content capture day at $250</b> — two hours on-site, or a half-day at $400?</li>
     </ol>
     <div class="note">
       <span class="lbl">Once those are settled</span>
-      <p>Tier table into <code>pricing.html</code>; service names and rates into the
+      <p>Matrix into <code>pricing.html</code>; service names and rates into the
          <code>veer-proposal</code> skill&rsquo;s known-services list (so no proposal ever
          invents a social price the way <em>Google Profile Setup</em> once got invented);
-         and a customer-facing <code>social.html</code> built on the
-         <code>care.html</code> pattern.</p>
+         and a customer-facing <code>social.html</code> built on the <code>care.html</code>
+         pattern.</p>
     </div>
   </section>
 
@@ -511,6 +860,255 @@ footer a:hover{text-decoration:underline}
   </div>
   <div class="powered">VEER LLC · DESIGN · PRINT · TECH</div>
 </footer>
+
+<script>
+(function(){
+  "use strict";
+
+  var R = {
+    foundation: 300,
+    acctExisting: 75,
+    acctNew: 150,
+    adSetupFirst: 250,
+    adSetupMore: 150,
+    mirrored: 50,
+    native: 125,
+    location: 150,
+    reel: 60,
+    creative: 60,
+    ffDiscount: 0.15,
+    adPlatformDiscount: 0.25
+  };
+
+  var TIERS = {
+    none:   { label: null,                price: 0 },
+    care:   { label: "Social Care",       price: 250 },
+    plus:   { label: "Social Care Plus",  price: 550 },
+    studio: { label: "Social Studio",     price: 950 }
+  };
+
+  var AD_NAMES = ["Meta", "Google", "TikTok", "LinkedIn"];
+
+  // Management fee for one ad platform, from that platform's own monthly spend.
+  // Flat at the bottom because 15% of a small budget is less than the work costs;
+  // eased at the top because above $10k spend grows faster than the work does.
+  function adFee(spend) {
+    if (!(spend > 0)) return 0;
+    if (spend < 1000)  return 200;
+    if (spend < 2500)  return 300;
+    if (spend < 10000) return spend * 0.15;
+    return spend * 0.12;
+  }
+
+  function money(n) {
+    var whole = Math.abs(n - Math.round(n)) < 0.005;
+    return "$" + n.toLocaleString("en-US", {
+      minimumFractionDigits: whole ? 0 : 2,
+      maximumFractionDigits: whole ? 0 : 2
+    });
+  }
+
+  function $(id) { return document.getElementById(id); }
+  function intOf(id) {
+    var v = parseInt($(id).value, 10);
+    return (isFinite(v) && v > 0) ? v : 0;
+  }
+
+  var rows = [].slice.call(document.querySelectorAll("[data-ad]"));
+
+  function adInputs() {
+    return rows.map(function (row, i) {
+      var on = row.querySelector(".adOn").checked;
+      var raw = parseFloat(row.querySelector(".adSpend").value);
+      return {
+        name: AD_NAMES[i],
+        on: on,
+        spend: (on && isFinite(raw) && raw > 0) ? raw : 0
+      };
+    }).filter(function (a) { return a.on; });
+  }
+
+  function build() {
+    var one = [], mo = [];
+    var tier = TIERS[$("tier").value] || TIERS.none;
+    var commit = $("mCommit").checked;
+    var ff = $("mFF").checked;
+
+    // ---- axis A: accounts (one-time) ----
+    if (commit) {
+      one.push({ t: "Social Foundation — waived on 6-month commitment", v: 0, disc: true });
+    } else {
+      one.push({ t: "Social Foundation (incl. first account)", v: R.foundation });
+    }
+    var nExist = intOf("aExist"), nNew = intOf("aNew");
+    if (nExist) one.push({ t: nExist + " account" + (nExist > 1 ? "s" : "") + " live, needing work", v: nExist * R.acctExisting });
+    if (nNew)   one.push({ t: nNew + " account" + (nNew > 1 ? "s" : "") + " built from scratch", v: nNew * R.acctNew });
+
+    // ---- axis C: ads setup (one-time) ----
+    var ads = adInputs();
+    if (ads.length) {
+      var setup = R.adSetupFirst + R.adSetupMore * (ads.length - 1);
+      one.push({
+        t: "Ads setup — " + ads.map(function (a) { return a.name; }).join(", "),
+        v: setup
+      });
+    }
+
+    // ---- axis B: organic (monthly) ----
+    if (tier.label) mo.push({ t: tier.label, v: tier.price });
+    var nMir = intOf("bMirror"), nNat = intOf("bNative"),
+        nLoc = intOf("bLoc"), nReel = intOf("bReel");
+    if (nMir)  mo.push({ t: nMir + " extra mirrored platform" + (nMir > 1 ? "s" : ""), v: nMir * R.mirrored });
+    if (nNat)  mo.push({ t: nNat + " extra native platform" + (nNat > 1 ? "s" : ""), v: nNat * R.native });
+    if (nLoc)  mo.push({ t: nLoc + " extra location" + (nLoc > 1 ? "s" : ""), v: nLoc * R.location });
+    if (nReel) mo.push({ t: nReel + " extra reel" + (nReel > 1 ? "s" : ""), v: nReel * R.reel });
+
+    // ---- axis C: ads management (monthly) ----
+    // Full price on the largest fee, -25% on the rest, so the client's biggest
+    // channel is never the discounted one.
+    var spendTotal = 0;
+    if (ads.length) {
+      var fees = ads.map(function (a) {
+        spendTotal += a.spend;
+        return { name: a.name, spend: a.spend, fee: adFee(a.spend) };
+      }).sort(function (x, y) { return y.fee - x.fee; });
+
+      fees.forEach(function (f, i) {
+        var discounted = i > 0;
+        var fee = discounted ? f.fee * (1 - R.adPlatformDiscount) : f.fee;
+        mo.push({
+          t: f.name + " ads — " + money(f.spend) + " spend" + (discounted ? " (−25%)" : ""),
+          v: fee
+        });
+      });
+    }
+    var nCre = intOf("cCreative");
+    if (nCre) mo.push({ t: nCre + " extra ad creative" + (nCre > 1 ? "s" : ""), v: nCre * R.creative });
+
+    // ---- totals, then Friends & Family on everything ----
+    function sum(list) {
+      return list.reduce(function (a, b) { return a + b.v; }, 0);
+    }
+    var totOne = sum(one), totMo = sum(mo);
+
+    if (ff) {
+      if (totOne > 0) { var dOne = totOne * R.ffDiscount; one.push({ t: "Friends & Family −15%", v: -dOne, disc: true }); totOne -= dOne; }
+      if (totMo  > 0) { var dMo  = totMo  * R.ffDiscount; mo.push({ t: "Friends & Family −15%", v: -dMo, disc: true }); totMo  -= dMo; }
+    }
+
+    return { one: one, mo: mo, totOne: totOne, totMo: totMo, spend: spendTotal, adCount: ads.length };
+  }
+
+  function render() {
+    var q = build();
+
+    function paint(ul, list, empty) {
+      ul.textContent = "";
+      if (!list.length) {
+        var li = document.createElement("li");
+        li.className = "none";
+        li.textContent = empty;
+        ul.appendChild(li);
+        return;
+      }
+      list.forEach(function (item) {
+        var li = document.createElement("li");
+        if (item.disc) li.className = "disc";
+        var a = document.createElement("span"); a.textContent = item.t;
+        var b = document.createElement("span");
+        b.textContent = (item.v < 0 ? "−" : "") + money(Math.abs(item.v));
+        li.appendChild(a); li.appendChild(b);
+        ul.appendChild(li);
+      });
+    }
+
+    paint($("outOne"), q.one, "Nothing one-time.");
+    paint($("outMo"), q.mo, "No monthly retainer — setup only.");
+
+    $("totOne").textContent = money(q.totOne);
+    $("totMo").textContent = money(q.totMo);
+    $("totMo").appendChild(Object.assign(document.createElement("small"), { textContent: "/mo" }));
+    $("totFirst").textContent = money(q.totOne + q.totMo);
+
+    var sn = $("spendNote");
+    if (q.spend > 0) {
+      sn.hidden = false;
+      sn.textContent = "Plus the client's own ad spend of " + money(q.spend) +
+        "/mo across " + q.adCount + " platform" + (q.adCount > 1 ? "s" : "") +
+        ", billed to them directly by the platform — never through Veer.";
+    } else {
+      sn.hidden = true;
+    }
+
+    rows.forEach(function (row) {
+      var on = row.querySelector(".adOn").checked;
+      row.querySelector(".adSpend").disabled = !on;
+      row.classList.toggle("off", !on);
+    });
+
+    return q;
+  }
+
+  function quoteText(q) {
+    var out = ["VEER — SOCIAL CARE QUOTE", ""];
+    out.push("ONE-TIME");
+    q.one.forEach(function (i) {
+      out.push("  " + i.t + " — " + (i.v < 0 ? "-" : "") + money(Math.abs(i.v)));
+    });
+    out.push("  TOTAL: " + money(q.totOne), "");
+    out.push("MONTHLY");
+    if (!q.mo.length) {
+      out.push("  (setup only, no retainer)");
+    } else {
+      q.mo.forEach(function (i) {
+        out.push("  " + i.t + " — " + (i.v < 0 ? "-" : "") + money(Math.abs(i.v)));
+      });
+    }
+    out.push("  TOTAL: " + money(q.totMo) + "/mo", "");
+    out.push("DUE AT SIGNING: " + money(q.totOne + q.totMo));
+    if (q.spend > 0) {
+      out.push("", "Plus the client's own ad spend of " + money(q.spend) +
+        "/mo, billed to them directly by the platform — never through Veer.");
+    }
+    out.push("", "No reach, follower or advertising performance figure is quoted.");
+    return out.join("\n");
+  }
+
+  document.addEventListener("input", render);
+  document.addEventListener("change", render);
+
+  $("copyBtn").addEventListener("click", function () {
+    var btn = this;
+    var text = quoteText(build());
+    var done = function () {
+      btn.textContent = "Copied";
+      btn.classList.add("done");
+      setTimeout(function () {
+        btn.textContent = "Copy quote as text";
+        btn.classList.remove("done");
+      }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+    } else {
+      fallback(text, done);
+    }
+  });
+
+  function fallback(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text;
+    ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:-1000px;left:0;opacity:0";
+    document.body.appendChild(ta);
+    ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { window.prompt("Copy the quote:", text); }
+    document.body.removeChild(ta);
+  }
+
+  render();
+})();
+</script>
 
 </body>
 </html>
