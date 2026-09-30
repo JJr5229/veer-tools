@@ -228,6 +228,39 @@ MONTHLY   =  tier price
 
 The live calculator on `index.html` implements exactly this.
 
+### Intake → quote
+
+`intake.html` is the client-facing questionnaire; `intake-questions.md` is the same thing
+as a call script. Six questions carry the entire price — per-platform state, platform
+count, cadence, locations, the ads block, and the management budget band as a sanity
+check. Everything else in the form shapes the work, not the number.
+
+The form computes the axis inputs itself and emits a query string that opens the
+calculator prefilled (`index.html?tier=plus&aExist=2&ads=meta:1500`). Design notes:
+
+- **Foundation absorbs the most expensive first account.** If there is any from-scratch
+  build, Foundation covers a $150 build rather than a $75 tune-up — the client gets the
+  benefit of the doubt.
+- **Overflow platforms default to mirrored (+$50), not native (+$125).** The cheaper
+  reading, deliberately. Whether a client truly needs native TikTok content is a
+  judgement from the conversation.
+- **The tier is a suggestion.** Cadence maps 2/wk → Care, 4/wk → Care Plus, daily →
+  Studio, unsure → Care Plus. If the derived tier and their stated budget band disagree,
+  that mismatch is the sales conversation — surfacing it is the form's job, resolving it
+  isn't.
+- **No backend required.** The page works from a file or any static host: answers save to
+  `localStorage`, and it ends with a copy button and a mailto. Set the `ENDPOINT` constant
+  at the top of its script and it POSTs the full JSON payload instead — a Vercel function
+  emailing through Resend is the obvious next step, matching how the Camden store already
+  deploys API routes.
+- **The ads block only renders if they say yes**, so a client with no interest in ads
+  never sees four questions about pixels.
+- **The two ads disclosures appear inside the form**, not just in the contract: spend is
+  on their card, and no performance figure gets quoted before anything runs.
+
+Deploy target when it goes live: `veersolutions.com/social-intake`, linked from the
+pricing page's "Start a project" path.
+
 ### Worked examples
 
 **1 — New food truck. Nothing exists, no ads.**

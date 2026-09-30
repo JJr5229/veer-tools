@@ -243,8 +243,9 @@ footer a:hover{text-decoration:underline}
       <p>A build-your-quote matrix for managing a client's social accounts — account setup,
          organic content, and paid ads priced on separate axes, because they scale
          separately. Every rate is derived from the Veer rate card already published, so
-         the two pages never contradict each other. Working notes in
-         <a href="SPEC.md">SPEC.md</a>.</p>
+         the two pages never contradict each other. Send a prospect the
+         <a href="intake.html">questionnaire</a> and it fills the calculator for you.
+         Working notes in <a href="SPEC.md">SPEC.md</a>.</p>
     </div>
   </div>
 </header>
@@ -480,10 +481,55 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">06</span> Quote builder</div>
+    <div class="eyebrow"><span class="n">06</span> Intake</div>
+    <h2>The questionnaire that fills this in</h2>
+    <p><a href="intake.html"><b>intake.html</b></a> is the client-facing questionnaire —
+       light Veer brand, about five minutes, almost entirely tapping rather than typing.
+       It saves to the phone as they go, only shows the ads block if they say they want
+       ads, and ends with a copy button and a mailto. It needs no backend to work; set the
+       <code>ENDPOINT</code> constant at the top of its script and it POSTs JSON instead.
+       <a href="intake-questions.md">intake-questions.md</a> is the same thing as a call
+       script.</p>
+    <p>Six questions carry the entire price. Everything else shapes the work, not the
+       number.</p>
+    <div class="scroll">
+    <table class="tbl">
+      <thead><tr><th>What they answer</th><th>Where it lands</th></tr></thead>
+      <tbody>
+        <tr><td>Per-platform state — <em>sitting</em> vs <em>doesn&rsquo;t exist</em></td>
+            <td><b>Axis A.</b> +$75 each sitting, +$150 each build; Foundation absorbs the first, preferring a build so the client gets the benefit of the doubt</td></tr>
+        <tr><td>How many platforms aren&rsquo;t marked &ldquo;not for us&rdquo;</td>
+            <td><b>Axis B.</b> Anything past the tier&rsquo;s included slots is an extra platform</td></tr>
+        <tr><td>Cadence</td>
+            <td><b>Axis B.</b> 2/wk → Care · 4/wk → Care Plus · daily → Studio · unsure → Care Plus</td></tr>
+        <tr><td>Locations</td>
+            <td><b>Axis B.</b> Each past the first is +$150/mo</td></tr>
+        <tr><td>Ads: yes/no, platforms, budget band</td>
+            <td><b>Axis C.</b> Setup $250 first + $150 each after; management from the spend table</td></tr>
+        <tr><td>Management budget band</td>
+            <td>Sanity check. If their band and the derived tier disagree, <b>that is the conversation to have before sending anything</b></td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="note">
+      <span class="lbl">Two things the form deliberately won&rsquo;t decide</span>
+      <p><b>Native vs mirrored.</b> Every overflow platform defaults to mirrored (+$50),
+         the cheaper call. Whether a client genuinely needs native content on TikTok
+         (+$125) comes out of the conversation, not a checkbox.</p>
+      <p><b>The tier.</b> Cadence gives a starting point. If someone picks &ldquo;2 a
+         week&rdquo; but wants online sales and video, Care can&rsquo;t deliver it — the
+         form&rsquo;s job is to surface that mismatch, not resolve it.</p>
+    </div>
+  </section>
+
+  <div class="grule"></div>
+
+  <section>
+    <div class="eyebrow"><span class="n">07</span> Quote builder</div>
     <h2>The matrix, live</h2>
     <p>Everything above, assembled. Runs entirely in the browser — nothing is sent
-       anywhere.</p>
+       anywhere. Opening it from a questionnaire&rsquo;s quote link fills every field in
+       advance.</p>
     <div class="calc">
       <div class="calc-grid">
         <div class="calc-in">
@@ -621,7 +667,7 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">07</span> Worked examples</div>
+    <div class="eyebrow"><span class="n">08</span> Worked examples</div>
     <h2>Four real shapes of client</h2>
     <div class="scroll">
     <table class="tbl">
@@ -666,7 +712,7 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">08</span> Margin</div>
+    <div class="eyebrow"><span class="n">09</span> Margin</div>
     <h2>Organic is built to $50/hr, ads to $60–75</h2>
     <div class="two">
       <div class="box">
@@ -698,7 +744,7 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">09</span> Production</div>
+    <div class="eyebrow"><span class="n">10</span> Production</div>
     <h2>Nothing new to build — a client to add to a system already running four brands</h2>
     <p><code>Veer Internal/Social Engine/</code> already drives Veer, MDRN, Camden
        Shapeworks and Common Press. <code>build-desk.py</code> regenerates <b>Social
@@ -777,7 +823,7 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">10</span> Fine print</div>
+    <div class="eyebrow"><span class="n">11</span> Fine print</div>
     <h2>The boundaries that make this deliverable</h2>
     <div class="two">
       <div class="box yes">
@@ -818,7 +864,7 @@ footer a:hover{text-decoration:underline}
   <div class="grule"></div>
 
   <section>
-    <div class="eyebrow"><span class="n">11</span> Open</div>
+    <div class="eyebrow"><span class="n">12</span> Open</div>
     <h2>Five calls that are yours, not mine</h2>
     <ol class="q">
       <li><b>Do you want to own paid ads at all?</b> The big one, and strategic rather than
@@ -1074,6 +1120,37 @@ footer a:hover{text-decoration:underline}
     return out.join("\n");
   }
 
+  // Prefill from the intake questionnaire's quote link, e.g.
+  // ?tier=plus&aExist=2&ads=meta:1500,google:1000
+  function applyParams() {
+    if (!location.search) return;
+    var p = new URLSearchParams(location.search);
+
+    var tier = p.get("tier");
+    if (tier && TIERS[tier]) $("tier").value = tier;
+
+    ["aExist", "aNew", "bMirror", "bNative", "bLoc", "bReel", "cCreative"].forEach(function (id) {
+      var v = parseInt(p.get(id), 10);
+      if (isFinite(v) && v >= 0) $(id).value = String(v);
+    });
+
+    ["commit", "ff"].forEach(function (k) {
+      if (p.get(k) === "1") $(k === "commit" ? "mCommit" : "mFF").checked = true;
+    });
+
+    var ads = p.get("ads");
+    if (ads) {
+      ads.split(",").forEach(function (pair) {
+        var bits = pair.split(":");
+        var i = AD_NAMES.map(function (n) { return n.toLowerCase(); }).indexOf(bits[0].trim().toLowerCase());
+        if (i < 0) return;
+        var spend = parseFloat(bits[1]);
+        rows[i].querySelector(".adOn").checked = true;
+        if (isFinite(spend) && spend > 0) rows[i].querySelector(".adSpend").value = String(spend);
+      });
+    }
+  }
+
   document.addEventListener("input", render);
   document.addEventListener("change", render);
 
@@ -1106,6 +1183,7 @@ footer a:hover{text-decoration:underline}
     document.body.removeChild(ta);
   }
 
+  applyParams();
   render();
 })();
 </script>

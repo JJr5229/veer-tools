@@ -1,0 +1,826 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Social Media Questionnaire — VEER</title>
+<meta name="description" content="Five minutes, mostly tapping. Tell Veer what your business needs from social media and get a straight answer on what it costs.">
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=Inter:wght@400;500;600;700&display=swap');
+:root{
+  --ink:#1c1c1a; --muted:#55534d; --faint:#8a8880; --line:#e6e0d5;
+  --accent:#c1591f; --accent2:#F69323; --paper:#ffffff; --cream:#fff8ee;
+  --ok:#2f7d55;
+  --grad:radial-gradient(120% 130% at 82% 12%, #FEC97E 0%, #F69323 22%, #EE5A2A 46%, #8A2216 72%, #0A0503 100%);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{
+  font-family:'Inter','Segoe UI',Arial,sans-serif; color:var(--ink); background:var(--paper);
+  line-height:1.55; -webkit-font-smoothing:antialiased;
+}
+.wrap{width:100%;max-width:720px;margin:0 auto;padding:0 22px}
+
+/* ---- hero ---- */
+.hero{background:var(--grad);color:#FAF6F1;padding:26px 0 40px}
+.brand{display:flex;align-items:center;gap:11px;padding-top:6px}
+.wordmark{font-family:'DM Sans',sans-serif;font-weight:800;font-size:17px;letter-spacing:3px}
+.sep{opacity:.45;font-weight:300}
+.svc{font-family:'DM Sans',sans-serif;font-weight:600;font-size:10px;letter-spacing:3px;opacity:.62}
+.eyebrow{
+  margin-top:34px;font-family:'DM Sans',sans-serif;font-weight:700;
+  font-size:clamp(11px,3vw,13px);letter-spacing:2.4px;text-transform:uppercase;opacity:.95;
+}
+h1{
+  font-family:'DM Sans',sans-serif;font-weight:800;font-size:clamp(34px,8vw,54px);
+  line-height:1.05;letter-spacing:-1px;color:#fff;margin-top:10px;
+}
+.blurb{font-size:clamp(15px,4.2vw,18px);color:rgba(255,255,255,.93);margin-top:14px;max-width:38ch}
+.badge{
+  display:inline-block;margin-top:20px;background:rgba(255,255,255,.15);
+  border:1px solid rgba(255,255,255,.4);color:#fff;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:12px;letter-spacing:1px;text-transform:uppercase;
+  padding:8px 14px;border-radius:22px;
+}
+
+/* ---- sections ---- */
+section{padding:34px 0;border-top:1px solid var(--line)}
+section:first-of-type{border-top:0}
+.kicker{
+  font-family:'DM Sans',sans-serif;font-size:12px;font-weight:700;letter-spacing:1.6px;
+  text-transform:uppercase;color:var(--accent);margin-bottom:7px;
+}
+h2{font-family:'DM Sans',sans-serif;font-size:clamp(22px,5.5vw,28px);font-weight:700;
+   line-height:1.15;letter-spacing:-.4px;margin-bottom:8px}
+.lede{color:var(--muted);font-size:15.5px;margin-bottom:20px;max-width:56ch}
+
+.q{margin-bottom:26px}
+.q:last-child{margin-bottom:0}
+.q > label.qt, .qt{
+  display:block;font-family:'DM Sans',sans-serif;font-weight:700;font-size:16px;margin-bottom:3px;
+}
+.qh{display:block;color:var(--faint);font-size:13.5px;margin-bottom:10px}
+.opt{color:var(--faint);font-weight:400;font-size:13px}
+
+/* ---- chips ---- */
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.chip span{
+  display:inline-block;padding:9px 15px;border:1.5px solid var(--line);border-radius:999px;
+  font-size:14.5px;color:var(--muted);background:#fff;cursor:pointer;transition:.13s;
+  user-select:none;
+}
+.chip input:checked + span{
+  border-color:var(--accent);background:var(--cream);color:var(--ink);font-weight:600;
+}
+.chip input:focus-visible + span{outline:2px solid var(--accent);outline-offset:2px}
+.chip span:hover{border-color:var(--accent2)}
+
+/* ---- text inputs ---- */
+input[type=text],input[type=email],input[type=tel],textarea{
+  width:100%;font:inherit;font-size:15.5px;color:var(--ink);background:#fff;
+  border:1.5px solid var(--line);border-radius:11px;padding:11px 13px;
+}
+textarea{min-height:82px;resize:vertical;line-height:1.5}
+input:focus,textarea:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+.grid2{display:grid;gap:13px;grid-template-columns:1fr}
+@media(min-width:560px){.grid2{grid-template-columns:1fr 1fr}}
+
+/* ---- platform matrix ---- */
+.plat{
+  border:1.5px solid var(--line);border-radius:13px;padding:13px 15px;margin-bottom:10px;background:#fff;
+}
+.plat.set{border-color:#d9cfbc;background:var(--cream)}
+.plat .pname{font-family:'DM Sans',sans-serif;font-weight:700;font-size:15.5px;margin-bottom:9px}
+.plat .pname small{font-weight:400;color:var(--faint);font-size:12.5px}
+.plat .chips .chip span{padding:7px 12px;font-size:13.5px}
+
+/* ---- conditional block ---- */
+.cond{
+  border-left:3px solid var(--accent2);background:var(--cream);border-radius:0 12px 12px 0;
+  padding:18px 20px;margin-top:6px;
+}
+.cond[hidden]{display:none}
+
+/* ---- notes ---- */
+.note{
+  border:1.5px solid var(--line);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;
+  padding:15px 17px;margin-top:16px;background:#fff;
+}
+.note p{font-size:14px;color:var(--muted)}
+.note p + p{margin-top:8px}
+.note b{color:var(--ink)}
+.note .lbl{
+  display:block;font-family:'DM Sans',sans-serif;font-size:11px;letter-spacing:1.4px;
+  text-transform:uppercase;font-weight:700;color:var(--accent);margin-bottom:6px;
+}
+
+/* ---- submit ---- */
+.actions{padding:30px 0 10px;border-top:1px solid var(--line)}
+.btn{
+  display:inline-block;width:100%;text-align:center;font-family:'DM Sans',sans-serif;
+  font-weight:700;font-size:17px;padding:15px 24px;border-radius:12px;border:0;cursor:pointer;
+}
+.btn-primary{background:var(--ink);color:#fff}
+.btn-primary:hover{background:#000}
+.btn-ghost{background:#fff;color:var(--ink);border:1.5px solid var(--line);margin-top:10px;font-size:15px;padding:12px 20px}
+.btn-ghost:hover{border-color:var(--accent)}
+.btn.done{background:var(--ok);color:#fff}
+.saved{font-size:12.5px;color:var(--faint);text-align:center;margin-top:12px}
+
+/* ---- result ---- */
+#result[hidden]{display:none}
+#result{padding:30px 0}
+.res-card{border:2px solid var(--accent);border-radius:14px;background:var(--cream);padding:22px}
+.res-card h3{font-family:'DM Sans',sans-serif;font-size:21px;font-weight:800;margin-bottom:6px}
+.res-card p{font-size:15px;color:var(--muted)}
+pre.summary{
+  margin-top:16px;background:#fff;border:1.5px solid var(--line);border-radius:11px;
+  padding:15px;font:13px/1.55 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  white-space:pre-wrap;word-break:break-word;max-height:340px;overflow:auto;color:var(--ink);
+}
+
+/* ---- closer ---- */
+.closer{background:var(--ink);color:#faf9f5;margin-top:10px}
+.closer .wrap{padding-top:34px;padding-bottom:34px}
+.closer h2{color:#fff}
+.closer p{color:#c9c6bf;font-size:15.5px;max-width:46ch}
+.closer .contact{margin-top:18px;font-size:15px;color:#c9c6bf}
+.closer .contact b{color:#FFC98A}
+.closer a{color:#FFC98A}
+.foot{padding:20px 0;text-align:center;font-size:12px;color:var(--faint);
+      font-family:'DM Sans',sans-serif;letter-spacing:1px;text-transform:uppercase}
+@media print{.actions,.btn{display:none}*{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="wrap">
+    <div class="brand">
+      <span class="wordmark">VEER</span>
+      <span class="sep">|</span>
+      <span class="svc">DESIGN · PRINT · TECH</span>
+    </div>
+    <div class="eyebrow">Social media questionnaire</div>
+    <h1>What does your business actually need?</h1>
+    <p class="blurb">About five minutes, mostly tapping. Answer what you know, skip what
+       you don't — there are no wrong answers and nothing here commits you to anything.</p>
+    <span class="badge">Your answers → a real price, not a &ldquo;contact us&rdquo;</span>
+  </div>
+</div>
+
+<form id="f" novalidate>
+<main class="wrap">
+
+  <!-- 1 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">01 · The basics</div>
+    <h2>Who are we talking to?</h2>
+    <div class="q grid2">
+      <div><label class="qt" for="biz">Business name</label>
+        <input type="text" id="biz" name="biz" autocomplete="organization"></div>
+      <div><label class="qt" for="who">Your name</label>
+        <input type="text" id="who" name="who" autocomplete="name"></div>
+    </div>
+    <div class="q grid2" style="margin-top:13px">
+      <div><label class="qt" for="phone">Phone</label>
+        <input type="tel" id="phone" name="phone" autocomplete="tel"></div>
+      <div><label class="qt" for="email">Email</label>
+        <input type="email" id="email" name="email" autocomplete="email"></div>
+    </div>
+    <div class="q" style="margin-top:13px">
+      <label class="qt" for="city">City / neighborhood you serve</label>
+      <input type="text" id="city" name="city">
+    </div>
+    <div class="q">
+      <label class="qt" for="does">In one sentence, what does the business do?</label>
+      <span class="qh">However you'd say it to someone at a bar.</span>
+      <textarea id="does" name="does"></textarea>
+    </div>
+    <div class="q">
+      <label class="qt" for="site">Website <span class="opt">— if you have one</span></label>
+      <input type="text" id="site" name="site" placeholder="yourbusiness.com — or leave blank">
+    </div>
+  </section>
+
+  <!-- 2 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">02 · Where you are now</div>
+    <h2>Which accounts exist, and what shape are they in?</h2>
+    <p class="lede">This is the single biggest thing that moves the price — building an
+       account from nothing is different work from tidying one that's been sitting. Be
+       honest; &ldquo;it's been sitting&rdquo; is the most common answer and it's fine.</p>
+    <div id="plats"></div>
+    <div class="q" style="margin-top:20px">
+      <span class="qt">Do you have a Google Business Profile <small class="opt">(the listing that shows up on Maps)</small>?</span>
+      <div class="chips" data-single="gbp">
+        <label class="chip"><input type="radio" name="gbp" value="Yes, claimed"><span>Yes, claimed</span></label>
+        <label class="chip"><input type="radio" name="gbp" value="Not sure"><span>Not sure</span></label>
+        <label class="chip"><input type="radio" name="gbp" value="No"><span>No</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">Who has the logins?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="logins" value="I do"><span>I do</span></label>
+        <label class="chip"><input type="radio" name="logins" value="A staff member"><span>A staff member</span></label>
+        <label class="chip"><input type="radio" name="logins" value="A former employee / agency"><span>A former employee or agency</span></label>
+        <label class="chip"><input type="radio" name="logins" value="Nobody knows"><span>Honestly, nobody knows</span></label>
+      </div>
+    </div>
+    <div class="note">
+      <span class="lbl">However this goes, you own it</span>
+      <p>Every account stays yours — including any Veer builds for you. We work from
+         delegated access, never your personal password, and everything hands back if we
+         ever part ways.</p>
+    </div>
+  </section>
+
+  <!-- 3 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">03 · What you want</div>
+    <h2>What would make this worth paying for?</h2>
+    <div class="q">
+      <span class="qt">Pick the one or two that matter most</span>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="goal" value="More foot traffic"><span>More foot traffic</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="More calls / bookings"><span>More calls or bookings</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="Online orders / sales"><span>Online orders or sales</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="Look established & credible"><span>Look established</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="Keep up with a competitor"><span>Keep up with a competitor</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="Launch / announce something"><span>Launch something</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="Hiring"><span>Hiring</span></label>
+        <label class="chip"><input type="checkbox" name="goal" value="Just stop being embarrassed by it"><span>Stop being embarrassed by it</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="qt" for="good">What does a good month look like, in your words?</label>
+      <span class="qh">&ldquo;Ten more catering calls&rdquo; is a better answer than &ldquo;more engagement.&rdquo;</span>
+      <textarea id="good" name="good"></textarea>
+    </div>
+    <div class="q">
+      <span class="qt">Is anyone doing this for you now?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="current" value="Nobody"><span>Nobody</span></label>
+        <label class="chip"><input type="radio" name="current" value="Me, when I remember"><span>Me, when I remember</span></label>
+        <label class="chip"><input type="radio" name="current" value="A staff member"><span>A staff member</span></label>
+        <label class="chip"><input type="radio" name="current" value="An agency / freelancer"><span>An agency or freelancer</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">04 · Content</div>
+    <h2>What should we be posting?</h2>
+    <div class="q">
+      <span class="qt">Pick anything that fits</span>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="pillar" value="Products / menu"><span>Products or menu</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="Behind the scenes"><span>Behind the scenes</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="The staff / owner"><span>The staff or owner</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="Customers & reviews"><span>Customers &amp; reviews</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="Deals & promos"><span>Deals &amp; promos</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="Events"><span>Events</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="Tips / how-to"><span>Tips &amp; how-to</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="Before & after"><span>Before &amp; after</span></label>
+        <label class="chip"><input type="checkbox" name="pillar" value="New arrivals"><span>New arrivals</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">How many usable photos or videos do you already have?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="assets" value="Hundreds"><span>Hundreds</span></label>
+        <label class="chip"><input type="radio" name="assets" value="A decent handful"><span>A decent handful</span></label>
+        <label class="chip"><input type="radio" name="assets" value="Almost none"><span>Almost none</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">Could someone there snap a few phone photos each week?</span>
+      <span class="qh">Doesn't need to be good. Bad lighting is our problem, not yours.</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="shoot" value="Yes"><span>Yes</span></label>
+        <label class="chip"><input type="radio" name="shoot" value="Sometimes"><span>Sometimes</span></label>
+        <label class="chip"><input type="radio" name="shoot" value="No — you'd need to come shoot"><span>No — you'd need to come shoot</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">Short video — reels, TikToks, that kind of thing?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="video" value="Yes, that's the whole point"><span>Yes, that's the point</span></label>
+        <label class="chip"><input type="radio" name="video" value="Some would be nice"><span>Some would be nice</span></label>
+        <label class="chip"><input type="radio" name="video" value="Not interested"><span>Not interested</span></label>
+        <label class="chip"><input type="radio" name="video" value="No idea"><span>No idea — you tell me</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="qt" for="never">Anything we should never post?</label>
+      <span class="qh">Prices, a location, certain staff, a family member, a competitor's name — anything.</span>
+      <textarea id="never" name="never"></textarea>
+    </div>
+    <div class="q">
+      <label class="qt" for="likes">Two or three accounts whose vibe you like</label>
+      <span class="qh">Any industry. Easiest way to show us what you mean.</span>
+      <textarea id="likes" name="likes"></textarea>
+    </div>
+  </section>
+
+  <!-- 5 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">05 · Rhythm</div>
+    <h2>How often, and who signs off?</h2>
+    <div class="q">
+      <span class="qt">How often should something go out?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="cadence" value="2 a week"><span>2 a week</span></label>
+        <label class="chip"><input type="radio" name="cadence" value="4 a week"><span>4 a week</span></label>
+        <label class="chip"><input type="radio" name="cadence" value="Daily-ish"><span>Daily-ish</span></label>
+        <label class="chip"><input type="radio" name="cadence" value="Not sure — recommend one"><span>Not sure — recommend one</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">How many locations?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="locs" value="1"><span>Just one</span></label>
+        <label class="chip"><input type="radio" name="locs" value="2"><span>Two</span></label>
+        <label class="chip"><input type="radio" name="locs" value="3"><span>Three</span></label>
+        <label class="chip"><input type="radio" name="locs" value="4+"><span>Four or more</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">Who approves posts before they go out?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="approver" value="Me"><span>Me</span></label>
+        <label class="chip"><input type="radio" name="approver" value="Me + a partner"><span>Me and a partner</span></label>
+        <label class="chip"><input type="radio" name="approver" value="A manager"><span>A manager</span></label>
+        <label class="chip"><input type="radio" name="approver" value="Nobody — just post it"><span>Nobody — just post it</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">Realistically, how fast can that person look at a month of posts?</span>
+      <span class="qh">You'll get one link with everything on it — approve or comment, one tap each.</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="turn" value="Same day"><span>Same day</span></label>
+        <label class="chip"><input type="radio" name="turn" value="Two or three days"><span>Two or three days</span></label>
+        <label class="chip"><input type="radio" name="turn" value="A week, honestly"><span>A week, honestly</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">Who answers comments and DMs today?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="dms" value="Nobody, they pile up"><span>Nobody — they pile up</span></label>
+        <label class="chip"><input type="radio" name="dms" value="Me, eventually"><span>Me, eventually</span></label>
+        <label class="chip"><input type="radio" name="dms" value="Staff, same day"><span>Staff, same day</span></label>
+        <label class="chip"><input type="radio" name="dms" value="Want Veer to handle it"><span>I'd want you to handle it</span></label>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">06 · Paid ads</div>
+    <h2>Do you want to put money behind it?</h2>
+    <p class="lede">Completely optional and completely separate from the posting. Plenty of
+       businesses should start without it.</p>
+    <div class="q">
+      <span class="qt">Where are you on ads?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="ads" value="Yes, now"><span>Yes, now</span></label>
+        <label class="chip"><input type="radio" name="ads" value="Maybe in a few months"><span>Maybe in a few months</span></label>
+        <label class="chip"><input type="radio" name="ads" value="No"><span>No</span></label>
+        <label class="chip"><input type="radio" name="ads" value="Tell me if I should"><span>Tell me if I should</span></label>
+      </div>
+    </div>
+
+    <div class="cond" id="adsBlock" hidden>
+      <div class="q">
+        <span class="qt">Which platforms?</span>
+        <span class="qh">Facebook and Instagram run off one ad account, so they count as one.</span>
+        <div class="chips">
+          <label class="chip"><input type="checkbox" name="adplat" value="Meta"><span>Facebook + Instagram</span></label>
+          <label class="chip"><input type="checkbox" name="adplat" value="Google"><span>Google</span></label>
+          <label class="chip"><input type="checkbox" name="adplat" value="TikTok"><span>TikTok</span></label>
+          <label class="chip"><input type="checkbox" name="adplat" value="LinkedIn"><span>LinkedIn</span></label>
+          <label class="chip"><input type="checkbox" name="adplat" value="Not sure"><span>Not sure</span></label>
+        </div>
+      </div>
+      <div class="q">
+        <span class="qt">Monthly ad budget you'd be comfortable with</span>
+        <span class="qh">Total across everything. This is money you pay the platform, not Veer.</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="budget" value="Under $500"><span>Under $500</span></label>
+          <label class="chip"><input type="radio" name="budget" value="$500–999"><span>$500–999</span></label>
+          <label class="chip"><input type="radio" name="budget" value="$1,000–2,499"><span>$1,000–2,499</span></label>
+          <label class="chip"><input type="radio" name="budget" value="$2,500–9,999"><span>$2,500–9,999</span></label>
+          <label class="chip"><input type="radio" name="budget" value="$10,000+"><span>$10,000+</span></label>
+          <label class="chip"><input type="radio" name="budget" value="No idea yet"><span>No idea yet</span></label>
+        </div>
+      </div>
+      <div class="q">
+        <span class="qt">When someone clicks the ad, what's the one thing you want them to do?</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="adgoal" value="Call"><span>Call</span></label>
+          <label class="chip"><input type="radio" name="adgoal" value="Book / reserve"><span>Book or reserve</span></label>
+          <label class="chip"><input type="radio" name="adgoal" value="Order online"><span>Order online</span></label>
+          <label class="chip"><input type="radio" name="adgoal" value="Come to the shop"><span>Come to the shop</span></label>
+          <label class="chip"><input type="radio" name="adgoal" value="Fill out a form"><span>Fill out a form</span></label>
+        </div>
+      </div>
+      <div class="q">
+        <span class="qt">Run ads before?</span>
+        <div class="chips">
+          <label class="chip"><input type="radio" name="adpast" value="Never"><span>Never</span></label>
+          <label class="chip"><input type="radio" name="adpast" value="Boosted a post or two"><span>Boosted a post or two</span></label>
+          <label class="chip"><input type="radio" name="adpast" value="Yes, and it worked"><span>Yes, and it worked</span></label>
+          <label class="chip"><input type="radio" name="adpast" value="Yes, and it didn't"><span>Yes, and it didn't</span></label>
+        </div>
+      </div>
+      <div class="note" style="background:#fff">
+        <span class="lbl">Two things we say up front, always</span>
+        <p><b>The ad budget is paid on your card, to the platform.</b> It never runs through
+           Veer, so you can see every dollar and shut it off yourself at any hour.</p>
+        <p><b>We won't quote you a number we can't control.</b> Nobody can honestly promise
+           a cost-per-lead or a return before running anything — it depends on the auction
+           and on who else is bidding. What we promise is that it's built right, watched
+           weekly, and reported honestly, and that you see the real numbers every month.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 ------------------------------------------------------------------ -->
+  <section>
+    <div class="kicker">07 · Practical</div>
+    <h2>Last few</h2>
+    <div class="q">
+      <span class="qt">Roughly what feels right per month for the management side?</span>
+      <span class="qh">Not a commitment — it just tells us which plan to actually show you
+        instead of pitching you something that doesn't fit.</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="mgmt" value="Under $300"><span>Under $300</span></label>
+        <label class="chip"><input type="radio" name="mgmt" value="$300–600"><span>$300–600</span></label>
+        <label class="chip"><input type="radio" name="mgmt" value="$600–1,000"><span>$600–1,000</span></label>
+        <label class="chip"><input type="radio" name="mgmt" value="$1,000+"><span>$1,000+</span></label>
+        <label class="chip"><input type="radio" name="mgmt" value="Show me the options"><span>Just show me the options</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <span class="qt">When would you want to start?</span>
+      <div class="chips">
+        <label class="chip"><input type="radio" name="start" value="Yesterday"><span>Yesterday</span></label>
+        <label class="chip"><input type="radio" name="start" value="This month"><span>This month</span></label>
+        <label class="chip"><input type="radio" name="start" value="Next month or two"><span>Next month or two</span></label>
+        <label class="chip"><input type="radio" name="start" value="Just researching"><span>Just researching</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="qt" for="deadline">Anything with a date on it? <span class="opt">— optional</span></label>
+      <span class="qh">Grand opening, a season, an event, a lease renewal.</span>
+      <textarea id="deadline" name="deadline"></textarea>
+    </div>
+    <div class="q">
+      <span class="qt">Already working with Veer on anything?</span>
+      <div class="chips">
+        <label class="chip"><input type="checkbox" name="existing" value="Website"><span>Website</span></label>
+        <label class="chip"><input type="checkbox" name="existing" value="Google Business Profile"><span>Google profile</span></label>
+        <label class="chip"><input type="checkbox" name="existing" value="Print"><span>Print</span></label>
+        <label class="chip"><input type="checkbox" name="existing" value="Nothing yet"><span>Nothing yet</span></label>
+      </div>
+    </div>
+    <div class="q">
+      <label class="qt" for="anything">Anything else we should know?</label>
+      <textarea id="anything" name="anything"></textarea>
+    </div>
+  </section>
+
+  <div class="actions">
+    <button type="submit" class="btn btn-primary" id="submitBtn">Finish &amp; send to Veer</button>
+    <button type="button" class="btn btn-ghost" id="clearBtn">Clear and start over</button>
+    <p class="saved" id="savedNote">Your answers save on this device as you go — you can close this and come back.</p>
+  </div>
+
+</main>
+</form>
+
+<div class="wrap">
+  <div id="result" hidden>
+    <div class="res-card">
+      <h3>That's everything — thank you.</h3>
+      <p id="resMsg">Your answers are below. Copy them and text or email them over, and
+         you'll get a real quote back, not a &ldquo;packages start at&rdquo; page.</p>
+      <pre class="summary" id="summary"></pre>
+      <button type="button" class="btn btn-primary" id="copyBtn" style="margin-top:14px">Copy my answers</button>
+      <a class="btn btn-ghost" id="mailBtn" href="#" style="display:block;text-decoration:none">Open it in email instead</a>
+    </div>
+  </div>
+</div>
+
+<div class="closer">
+  <div class="wrap">
+    <h2>Questions before you send it?</h2>
+    <p>Call or text — it's a real person, and a fifteen-minute conversation usually beats
+       a form anyway.</p>
+    <p class="contact">
+      <b>Jessie Redmond</b> · <a href="tel:16513019307">(651) 301-9307</a><br>
+      <a href="mailto:info@veersolutions.com">info@veersolutions.com</a> ·
+      <a href="https://veersolutions.com">veersolutions.com</a>
+    </p>
+  </div>
+</div>
+<div class="foot">VEER LLC · DESIGN · PRINT · TECH</div>
+
+<script>
+(function () {
+  "use strict";
+
+  // Set this to a URL and the form POSTs JSON there instead of falling back to
+  // copy/email. Leave empty and the page works anywhere with no backend at all.
+  var ENDPOINT = "";
+
+  var TO = "info@veersolutions.com";
+  var KEY = "veer-social-intake-v1";
+
+  var PLATFORMS = [
+    { id: "instagram", name: "Instagram" },
+    { id: "facebook",  name: "Facebook" },
+    { id: "tiktok",    name: "TikTok" },
+    { id: "youtube",   name: "YouTube", note: "incl. Shorts" },
+    { id: "linkedin",  name: "LinkedIn" },
+    { id: "pinterest", name: "Pinterest" }
+  ];
+
+  var STATES = [
+    { v: "active",  label: "Active — we post" },
+    { v: "stale",   label: "Have it, it's been sitting" },
+    { v: "none",    label: "Don't have one — build it" },
+    { v: "skip",    label: "Not for us" }
+  ];
+
+  // ---- build the platform matrix -----------------------------------------
+  var host = document.getElementById("plats");
+  PLATFORMS.forEach(function (p) {
+    var card = document.createElement("div");
+    card.className = "plat";
+    card.dataset.plat = p.id;
+
+    var h = document.createElement("div");
+    h.className = "pname";
+    h.textContent = p.name;
+    if (p.note) {
+      var s = document.createElement("small");
+      s.textContent = "  " + p.note;
+      h.appendChild(s);
+    }
+    card.appendChild(h);
+
+    var chips = document.createElement("div");
+    chips.className = "chips";
+    STATES.forEach(function (st) {
+      var lab = document.createElement("label");
+      lab.className = "chip";
+      var inp = document.createElement("input");
+      inp.type = "radio";
+      inp.name = "plat_" + p.id;
+      inp.value = st.v;
+      var sp = document.createElement("span");
+      sp.textContent = st.label;
+      lab.appendChild(inp); lab.appendChild(sp);
+      chips.appendChild(lab);
+    });
+    card.appendChild(chips);
+    host.appendChild(card);
+  });
+
+  var form = document.getElementById("f");
+
+  function platState(id) {
+    var el = form.querySelector('input[name="plat_' + id + '"]:checked');
+    return el ? el.value : null;
+  }
+
+  // ---- conditional ads block ---------------------------------------------
+  function syncAds() {
+    var v = (form.querySelector('input[name="ads"]:checked') || {}).value;
+    document.getElementById("adsBlock").hidden = !(v === "Yes, now" || v === "Maybe in a few months");
+    PLATFORMS.forEach(function (p) {
+      var card = host.querySelector('[data-plat="' + p.id + '"]');
+      var s = platState(p.id);
+      card.classList.toggle("set", !!s && s !== "skip");
+    });
+  }
+
+  // ---- save / restore -----------------------------------------------------
+  function collect() {
+    var d = {};
+    new FormData(form).forEach(function (val, k) {
+      if (d[k] === undefined) d[k] = val;
+      else if (Array.isArray(d[k])) d[k].push(val);
+      else d[k] = [d[k], val];
+    });
+    return d;
+  }
+
+  function save() {
+    try { localStorage.setItem(KEY, JSON.stringify(collect())); } catch (e) { /* private mode */ }
+  }
+
+  function restore() {
+    var raw;
+    try { raw = localStorage.getItem(KEY); } catch (e) { return; }
+    if (!raw) return;
+    var d;
+    try { d = JSON.parse(raw); } catch (e) { return; }
+    Object.keys(d).forEach(function (k) {
+      var vals = [].concat(d[k]);
+      form.querySelectorAll('[name="' + CSS.escape(k) + '"]').forEach(function (el) {
+        if (el.type === "radio" || el.type === "checkbox") {
+          if (vals.indexOf(el.value) > -1) el.checked = true;
+        } else {
+          el.value = vals[0];
+        }
+      });
+    });
+  }
+
+  // ---- "pick one or two" soft cap ----------------------------------------
+  form.addEventListener("change", function (e) {
+    if (e.target.name === "goal") {
+      var on = form.querySelectorAll('input[name="goal"]:checked');
+      if (on.length > 2) e.target.checked = false;
+    }
+    syncAds(); save();
+  });
+  form.addEventListener("input", save);
+
+  // ---- summary ------------------------------------------------------------
+  var LABELS = {
+    biz: "Business", who: "Contact", phone: "Phone", email: "Email", city: "Area",
+    does: "What they do", site: "Website", gbp: "Google Business Profile",
+    logins: "Who has logins", goal: "Goals", good: "A good month looks like",
+    current: "Doing it now", pillar: "Post about", assets: "Photos on hand",
+    shoot: "Can shoot weekly", video: "Short video", never: "Never post",
+    likes: "Accounts they like", cadence: "Cadence", locs: "Locations",
+    approver: "Approver", turn: "Approval turnaround", dms: "Comments & DMs",
+    ads: "Paid ads", adplat: "Ad platforms", budget: "Ad budget/mo",
+    adgoal: "Ad should drive", adpast: "Ads history", mgmt: "Management budget",
+    start: "Start", deadline: "Deadline", existing: "Already with Veer",
+    anything: "Anything else"
+  };
+  var ORDER = Object.keys(LABELS);
+
+  function platLabel(v) {
+    for (var i = 0; i < STATES.length; i++) if (STATES[i].v === v) return STATES[i].label;
+    return v;
+  }
+
+  function clientSummary(d) {
+    var out = ["VEER — SOCIAL MEDIA QUESTIONNAIRE", ""];
+    var acct = [];
+    PLATFORMS.forEach(function (p) {
+      var s = platState(p.id);
+      if (s && s !== "skip") acct.push("  " + p.name + " — " + platLabel(s));
+    });
+    ORDER.forEach(function (k) {
+      if (k === "gbp") {
+        out.push("ACCOUNTS");
+        out.push(acct.length ? acct.join("\n") : "  (none marked)");
+        out.push("");
+      }
+      var v = d[k];
+      if (v === undefined || v === "" ) return;
+      if (Array.isArray(v)) v = v.join(", ");
+      out.push(LABELS[k] + ": " + String(v).replace(/\s*\n\s*/g, " / "));
+    });
+    return out.join("\n");
+  }
+
+  // ---- internal: map answers onto the pricing matrix ----------------------
+  // Foundation covers the first account, and absorbs the most expensive one
+  // (a from-scratch build) so the client gets the benefit of the doubt.
+  var TIER_SLOTS = { care: 2, plus: 3, studio: 4 };
+  var BUDGET_MID = {
+    "Under $500": 400, "$500–999": 750, "$1,000–2,499": 1500,
+    "$2,500–9,999": 5000, "$10,000+": 12000
+  };
+
+  function internalPrefill(d) {
+    var E = 0, N = 0, managed = 0;
+    PLATFORMS.forEach(function (p) {
+      var s = platState(p.id);
+      if (!s || s === "skip") return;
+      managed++;
+      if (s === "stale") E++;
+      else if (s === "none") N++;
+    });
+    var aExist = E, aNew = N;
+    if (N > 0) aNew = N - 1; else if (E > 0) aExist = E - 1;
+
+    var tier = { "2 a week": "care", "4 a week": "plus", "Daily-ish": "studio" }[d.cadence] || "plus";
+    var overflow = Math.max(managed - (TIER_SLOTS[tier] || 3), 0);
+    var locs = parseInt(d.locs, 10);
+    var extraLoc = (d.locs === "4+") ? 3 : (isFinite(locs) && locs > 1 ? locs - 1 : 0);
+
+    var q = ["tier=" + tier];
+    if (aExist) q.push("aExist=" + aExist);
+    if (aNew) q.push("aNew=" + aNew);
+    if (overflow) q.push("bMirror=" + overflow);
+    if (extraLoc) q.push("bLoc=" + extraLoc);
+
+    var plats = [].concat(d.adplat || []).filter(function (x) { return x !== "Not sure"; });
+    var wantsAds = d.ads === "Yes, now";
+    if (wantsAds && plats.length) {
+      var total = BUDGET_MID[d.budget];
+      if (total) {
+        var each = Math.round(total / plats.length);
+        q.push("ads=" + plats.map(function (p) { return p.toLowerCase() + ":" + each; }).join(","));
+      }
+    }
+    return q.join("&");
+  }
+
+  function fullPayload() {
+    var d = collect();
+    return {
+      submittedAt: new Date().toISOString(),
+      answers: d,
+      accounts: PLATFORMS.map(function (p) {
+        return { platform: p.name, state: platState(p.id) || "skip" };
+      }),
+      quotePrefill: internalPrefill(d),
+      clientSummary: clientSummary(d)
+    };
+  }
+
+  // ---- submit -------------------------------------------------------------
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var payload = fullPayload();
+    var text = payload.clientSummary;
+    document.getElementById("summary").textContent = text;
+
+    var mail = document.getElementById("mailBtn");
+    mail.href = "mailto:" + TO +
+      "?subject=" + encodeURIComponent("Social media questionnaire — " + (payload.answers.biz || "new enquiry")) +
+      "&body=" + encodeURIComponent(text);
+
+    var res = document.getElementById("result");
+    res.hidden = false;
+
+    if (ENDPOINT) {
+      fetch(ENDPOINT, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function (r) {
+        document.getElementById("resMsg").textContent = r.ok
+          ? "Sent. Jessie will come back to you within a business day — usually sooner. Your answers are below if you want a copy."
+          : "That didn't send, but nothing is lost. Copy your answers below and text or email them over.";
+      }).catch(function () {
+        document.getElementById("resMsg").textContent =
+          "That didn't send, but nothing is lost. Copy your answers below and text or email them over.";
+      });
+    }
+
+    res.scrollIntoView({ behavior: "smooth", block: "start" });
+  });
+
+  // ---- copy ---------------------------------------------------------------
+  document.getElementById("copyBtn").addEventListener("click", function () {
+    var btn = this, text = document.getElementById("summary").textContent;
+    var done = function () {
+      btn.textContent = "Copied — now paste it to Jessie";
+      btn.classList.add("done");
+      setTimeout(function () { btn.textContent = "Copy my answers"; btn.classList.remove("done"); }, 2400);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(text).then(done, function () { fallback(text, done); });
+    } else { fallback(text, done); }
+  });
+
+  function fallback(text, done) {
+    var ta = document.createElement("textarea");
+    ta.value = text; ta.setAttribute("readonly", "");
+    ta.style.cssText = "position:fixed;top:-1000px;left:0;opacity:0";
+    document.body.appendChild(ta); ta.select();
+    try { document.execCommand("copy"); done(); } catch (e) { window.prompt("Copy your answers:", text); }
+    document.body.removeChild(ta);
+  }
+
+  document.getElementById("clearBtn").addEventListener("click", function () {
+    if (!window.confirm("Clear every answer and start over?")) return;
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    form.reset();
+    document.getElementById("result").hidden = true;
+    syncAds();
+  });
+
+  // expose for the internal quote link, without putting it in front of a client
+  window.veerIntake = fullPayload;
+
+  restore();
+  syncAds();
+})();
+</script>
+
+</body>
+</html>
