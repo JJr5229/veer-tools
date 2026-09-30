@@ -23,14 +23,18 @@ photography — is a placeholder awaiting the client.
 `proposal.tpl.html` is the source; `build.py` inlines the Veer mark, the date, the DM Sans
 webfont and three screenshots of `site/` as base64, and writes `index.html`.
 
-Rebuild it after changing the template or re-shooting screenshots:
+Rebuild it after changing the template or the site:
 
 ```
-cd proposal && python3 build.py
+cd proposal
+python3 shoot.py     # screenshots site/ into proposal/shots/
+python3 build.py     # inlines them and writes index.html
 ```
 
-Screenshots are taken from `site/index.html` with headless Chromium at 1280x800
-(desktop + menu section) and 390x760 @2x (mobile).
+`shoot.py` needs Playwright (`pip install playwright && playwright install chromium`).
+
+**`site/img/` is empty — the site has no photography yet.** See `HANDOFF.md` for
+the image URLs, sizing and the rest of what is left to do.
 
 ### Notes for whoever picks this up
 - No measured site audit is in the proposal: this environment could not reach
