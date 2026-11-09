@@ -18,7 +18,7 @@ const fs = require("fs");
 const path = require("path");
 
 const root = path.join(__dirname, "..");
-const pages = ["nfc-studio/index.html"];
+const pages = ["nfc-studio/index.html", "vectorizer/index.html"];
 
 const { publicKey, privateKey } = crypto.generateKeyPairSync("ec", { namedCurve: "P-256" });
 const jwk = publicKey.export({ format: "jwk" });

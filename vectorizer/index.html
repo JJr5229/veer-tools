@@ -161,6 +161,67 @@ footer a:hover{text-decoration:underline}
   .sliders{grid-template-columns:1fr}
   #verdict .chips{margin-left:0}
 }
+
+/* ---- Pro ---- */
+.plan{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;cursor:pointer;
+  font:600 12px/1 "Segoe UI",system-ui,sans-serif;letter-spacing:.02em;border:1px solid var(--line);background:var(--panel2);color:var(--tx2)}
+.plan:hover{border-color:var(--orange);color:var(--tx)}
+.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--tx2)}
+.plan.pro{border-color:#6b4a1d;color:#ffd7a3;background:#2a1d0e}
+.plan.pro .pip{background:var(--orange)}
+.protag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--orange);border:1px solid #6b4a1d;border-radius:4px;padding:1px 5px;vertical-align:2px}
+.protag[hidden]{display:none}
+.maker{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
+.maker-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.maker-head b{font-size:15px}
+.maker-sub{font-size:13px;color:var(--tx2)}
+.maker-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--tx2)}
+.maker-row input[type=number]{width:84px;font:inherit;font-size:13px;color:var(--tx);background:var(--panel2);
+  border:1px solid var(--line);border-radius:7px;padding:6px 9px}
+.maker-row input:focus{outline:1px solid var(--orange)}
+.maker .actions{border-top:0;padding-top:0;margin-top:14px}
+#makerMsg{font-size:13px;color:var(--tx2);margin-top:10px;min-height:1.2em}
+#makerMsg.ok{color:var(--pass)} #makerMsg.err{color:var(--red)}
+
+dialog#pro{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line);
+  border-radius:16px;background:var(--panel);color:var(--tx);box-shadow:0 30px 80px #000a}
+dialog#pro::backdrop{background:#05070acc;backdrop-filter:blur(3px)}
+dialog#pro [hidden]{display:none!important}
+.pro-in{padding:28px 28px 24px;display:flex;flex-direction:column;gap:18px}
+.pro-head{display:flex;align-items:flex-start;gap:12px}
+.pro-head h2{margin:0;font-size:22px;letter-spacing:-.01em;line-height:1.2}
+.pro-head p{margin:4px 0 0;color:var(--tx2);font-size:14px;line-height:1.5}
+.pro-x{margin-left:auto;flex:none;width:32px;height:32px;padding:0;border-radius:8px;font-size:18px;line-height:1;
+  background:var(--panel2);border:1px solid var(--line);color:var(--tx);cursor:pointer}
+.pro-x:hover{border-color:var(--orange)}
+.tiers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+@media (max-width:560px){.tiers{grid-template-columns:minmax(0,1fr)}}
+.tier{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--panel2);min-width:0}
+.tier.hi{border-color:var(--orange);background:linear-gradient(180deg,#2a1d0e 0%,var(--panel2) 70%)}
+.tier .nm{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2)}
+.tier.hi .nm{color:var(--orange)}
+.tier .pr{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1}
+.tier .pr small{font-size:12px;font-weight:400;color:var(--tx2);letter-spacing:0}
+.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--tx2);flex:1}
+.tier li{padding-left:16px;position:relative;line-height:1.4}
+.tier li:before{content:"";position:absolute;left:2px;top:7px;width:6px;height:6px;border-radius:2px;background:#4a5058}
+.tier.hi li:before{background:var(--orange)}
+a.buy{display:block;text-align:center;text-decoration:none;font:600 14px/1 "Segoe UI",system-ui,sans-serif;border-radius:9px;
+  padding:11px 16px;background:var(--orange);border:1px solid var(--orange);color:#131313}
+a.buy:hover{background:#ffa63e}
+a.buy.off{opacity:.45;pointer-events:none}
+.keyrow{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.keyrow label{font-size:13px;color:var(--tx2)}
+.keyrow .in{display:flex;gap:8px}
+.keyrow input{flex:1;min-width:0;font:13px ui-monospace,Consolas,monospace;color:var(--tx);background:var(--panel2);
+  border:1px solid var(--line);border-radius:8px;padding:9px 11px}
+.keyrow input:focus{outline:1px solid var(--orange)}
+#proMsg{font-size:13px;min-height:1.2em;color:var(--tx2)}
+#proMsg.err{color:var(--red)} #proMsg.ok{color:var(--pass)}
+.owned dl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;margin:0;font-size:14px}
+.owned dt{color:var(--tx2)} .owned dd{margin:0;overflow-wrap:anywhere}
+.pro-foot{font-size:12px;color:var(--tx2);line-height:1.5}
 </style>
 </head>
 <body>
@@ -177,6 +238,7 @@ footer a:hover{text-decoration:underline}
       </svg>
       <b>Veer</b>
       <a class="back" href="../">← All tools</a>
+      <button type="button" class="plan" id="planChip" title="Plan and license"><span class="pip"></span><span id="planTxt">Free · Upgrade</span></button>
     </div>
     <div class="hero">
       <div class="titlerow">
@@ -266,12 +328,85 @@ footer a:hover{text-decoration:underline}
           <button class="btn" id="copy">Copy SVG code</button>
           <button class="btn" id="reset">Start over</button>
         </div>
+        <div class="maker">
+          <div class="maker-head"><b>Maker exports</b><span class="protag" id="makerTag">Pro</span>
+            <span class="maker-sub">Real-world size, layered by colour, ready for Cricut, laser cutters and Inkscape.</span></div>
+          <div class="maker-row">
+            <label for="mmW">Output width</label>
+            <input type="number" id="mmW" value="100" min="1" max="5000" step="1"> mm
+            <span id="mmH"></span>
+          </div>
+          <div class="actions">
+            <button class="btn" id="exSized">Sized SVG, layers grouped</button>
+            <button class="btn" id="exLayers">One SVG per colour (.zip)</button>
+            <button class="btn" id="exDxf">DXF for laser</button>
+            <button class="btn" id="exBatch">Batch convert files…</button>
+            <input type="file" id="batchFile" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp" multiple hidden>
+          </div>
+          <div id="makerMsg" role="status"></div>
+        </div>
       </div>
     </div>
 
   </div>
 </main>
 
+
+<dialog id="pro" aria-labelledby="proTitle">
+  <div class="pro-in">
+    <div class="pro-head">
+      <div>
+        <h2 id="proTitle">Vectorizer Pro</h2>
+        <p id="proSub">The free converter stays free. Pro adds the exports makers need.</p>
+      </div>
+      <button type="button" class="pro-x" id="proClose" aria-label="Close">&times;</button>
+    </div>
+    <div id="proBuy">
+      <div class="tiers">
+        <div class="tier">
+          <div class="nm">Free</div>
+          <div class="pr">$0</div>
+          <ul>
+            <li>Unlimited PNG/JPG to SVG</li>
+            <li>Background removal</li>
+            <li>Copy SVG code</li>
+            <li>Nothing uploaded, ever</li>
+          </ul>
+        </div>
+        <div class="tier hi">
+          <div class="nm">Pro</div>
+          <div class="pr"><span id="pricePro">$19</span> <small>one-time</small></div>
+          <ul>
+            <li>Exports at real size in mm</li>
+            <li>Colour layers grouped, or one file per colour</li>
+            <li>DXF for laser cutters</li>
+            <li>Batch convert a whole folder</li>
+            <li>All future Vectorizer updates</li>
+          </ul>
+          <a class="buy" id="buyPro" target="_blank" rel="noopener">Get Pro</a>
+        </div>
+      </div>
+    </div>
+    <div class="owned" id="proOwned" hidden>
+      <dl>
+        <dt>Plan</dt><dd id="ownTier"></dd>
+        <dt>Licensed to</dt><dd id="ownEmail"></dd>
+        <dt>Key</dt><dd id="ownKey"></dd>
+        <dt>Checked</dt><dd id="ownChecked"></dd>
+      </dl>
+    </div>
+    <div class="keyrow" id="proKeyRow">
+      <label for="proKey">Already bought it? Paste the license key from your receipt email.</label>
+      <div class="in">
+        <input type="text" id="proKey" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false">
+        <button type="button" class="btn primary" id="proActivate">Unlock</button>
+      </div>
+    </div>
+    <div id="proMsg" role="status"></div>
+    <div class="pro-foot" id="proFoot">Unlocking needs an internet connection once. After that, Vectorizer works offline and checks in now and then while you're online.</div>
+    <div id="proManage" hidden><button type="button" class="btn" id="proRemove">Remove from this browser</button></div>
+  </div>
+</dialog>
 <footer>
   <div class="wrap">
     Veer · <a href="https://veersolutions.com">veersolutions.com</a>
@@ -1509,7 +1644,7 @@ if(typeof define === 'function' && define.amd){
    ships: MINOR for a new capability, PATCH for a fix. The date is the ship
    date, so a glance at the badge tells you whether the page you're looking
    at is the current one or a stale cache. */
-var BUILD = 'v1.1.0 · 2026-08-06';
+var BUILD = 'v1.2.0 · 2026-11-09';
 
 var MAXDIM = 1600;
 
@@ -1712,6 +1847,11 @@ function retrace(){
         .replace(/ desc="[^"]*"/, '')
         /* fully transparent regions trace as invisible paths — pure bloat */
         .replace(/<path [^>]*opacity="0"[^>]*\/>/g, '');
+      /* Once the background is stripped, every pixel is either fully clear or
+         fully opaque, so a part-transparent path can only be the palette
+         averaging cleared pixels into a colour: a faint box over the backdrop.
+         It would also show up as a stray layer in maker exports. */
+      if(activeImgd() !== state.rawImgd) svg = dropGhosts(svg);
     }catch(err){
       ui.svgBox.classList.remove('tracing');
       ui.verdictMsg.textContent = 'Tracing failed: ' + err.message;
@@ -1724,6 +1864,9 @@ function retrace(){
     updateStats();
     ui.svgBox.classList.remove('tracing');
   }, 30);
+}
+function dropGhosts(svg){
+  return svg.replace(/<path [^>]*opacity="([\d.]+)"[^>]*\/>/g, function(m, op){ return +op < 0.5 ? '' : m; });
 }
 var debounceTimer = null;
 function retraceDebounced(){
@@ -1890,8 +2033,409 @@ $('build').textContent = BUILD;
 $('buildFoot').textContent = '· Vectorizer ' + BUILD;
 
 /* hook for automated testing */
-window.__veerVectorizer = { loadDataURL:loadDataURL, getState:function(){ return state; } };
+window.__veerVectorizer = { loadDataURL:loadDataURL, getState:function(){ return state; },
+  buildOpts:buildOpts, stripBackground:stripBackground, dropGhosts:dropGhosts, bgMode:function(){ return ui.removebg.value; },
+  MAXDIM:MAXDIM, BUILD:BUILD };
 })();
+</script>
+<script>
+/* ═══════════════════════════════════════════════════════════════════════════
+   Vectorizer Pro — maker exports + licensing.
+   Free: the converter (download / copy SVG) is unlimited and unchanged.
+   Pro: real-size SVG with colour layers, one SVG per colour, DXF for laser,
+   batch convert. Licensing is the same as NFC Studio: /api/license returns a
+   token signed with Veer's key, verified here with the public key below.
+   ═══════════════════════════════════════════════════════════════════════════ */
+(function(){
+'use strict';
+var V = window.__veerVectorizer;
+var $ = function(id){ return document.getElementById(id); };
+
+var PRO = {
+  product: 'vectorizer',
+  apiOrigin: '',          // full origin of the hosted tools site, for file:// copies
+  buyPro: '',             // checkout link, e.g. https://veer.lemonsqueezy.com/buy/…
+  pricePro: '$19',
+  publicKey: /*LICENSE_PUBLIC_KEY*/{"kty":"EC","crv":"P-256","x":"sr_eBjg_v3h7zakhjM-WbGFKfXWqc7yEwZdXDJq0RnU","y":"J-9R79HF6EG_ElknZ05epfUiGk_PQ3MZqaq5yDulaYU"}/*/LICENSE_PUBLIC_KEY*/,
+  storeKey: 'veerLicense:vectorizer',
+  refreshAfterDays: 3
+};
+
+/* ───────── licensing (same scheme as NFC Studio) ───────── */
+var LIC = { tier:'free', email:'', key:'', instance:'' };
+function isPro(){ return LIC.tier === 'pro' || LIC.tier === 'commercial'; }
+
+function b64urlBytes(s){
+  s = s.replace(/-/g,'+').replace(/_/g,'/'); while(s.length % 4) s += '=';
+  var bin = atob(s), u = new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) u[i] = bin.charCodeAt(i);
+  return u;
+}
+async function verifyToken(token){
+  if(!PRO.publicKey || !token || !(window.crypto && crypto.subtle)) return null;
+  var parts = String(token).split('.');
+  if(parts.length !== 2) return null;
+  try{
+    var key = await crypto.subtle.importKey('jwk', PRO.publicKey, {name:'ECDSA', namedCurve:'P-256'}, false, ['verify']);
+    var ok = await crypto.subtle.verify({name:'ECDSA', hash:'SHA-256'}, key, b64urlBytes(parts[1]), new TextEncoder().encode(parts[0]));
+    if(!ok) return null;
+    var pl = JSON.parse(new TextDecoder().decode(b64urlBytes(parts[0])));
+    if(pl.p !== PRO.product && pl.p !== 'veer-pro') return null;
+    if(!(pl.exp*1000 > Date.now())) return null;
+    return pl;
+  }catch(e){ return null; }
+}
+function licStored(){ try{ return JSON.parse(localStorage.getItem(PRO.storeKey) || 'null'); }catch(e){ return null; } }
+function licStore(o){ try{ o ? localStorage.setItem(PRO.storeKey, JSON.stringify(o)) : localStorage.removeItem(PRO.storeKey); }catch(e){} }
+function licApply(pl, stored){
+  LIC.tier = pl ? (pl.t === 'commercial' ? 'commercial' : 'pro') : 'free';
+  LIC.email = pl ? (pl.e || '') : '';
+  LIC.key = stored ? stored.key : ''; LIC.instance = stored ? stored.instance : '';
+  proUI();
+}
+async function licCall(action, key, instance){
+  if(location.protocol === 'file:' && !PRO.apiOrigin)
+    return {ok:false, error:'Unlocking works on the hosted version of Vectorizer. Open it from the Veer Tools site, unlock once, and you’re set.'};
+  try{
+    var r = await fetch(PRO.apiOrigin + '/api/license', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({action:action, product:PRO.product, key:key, instance:instance})
+    });
+    var j = await r.json().catch(function(){ return {}; });
+    return j && typeof j === 'object' ? j : {ok:false, error:'Unexpected reply from the license server.'};
+  }catch(e){
+    return {ok:false, offline:true, error:'Couldn’t reach the license server. Check your connection and try again.'};
+  }
+}
+async function licActivate(key){
+  var r = await licCall('activate', key, '');
+  if(!r.ok) return r;
+  var pl = await verifyToken(r.token);
+  if(!pl) return {ok:false, error:'The license server’s reply couldn’t be verified. Reload the page and try again.'};
+  var stored = {key:key, instance:r.instance || '', token:r.token, checked:Date.now()};
+  licStore(stored); licApply(pl, stored);
+  return {ok:true};
+}
+async function licInit(){
+  var stored = licStored();
+  if(!stored){ licApply(null); return; }
+  var pl = await verifyToken(stored.token);
+  licApply(pl, pl ? stored : null);
+  var stale = !pl || (Date.now() - (stored.checked || 0)) > PRO.refreshAfterDays*86400e3;
+  if(stale && navigator.onLine !== false){
+    var r = await licCall('refresh', stored.key, stored.instance);
+    if(r.ok){
+      var np = await verifyToken(r.token);
+      if(np){ var ns = Object.assign({}, stored, {token:r.token, instance:r.instance || stored.instance, checked:Date.now()}); licStore(ns); licApply(np, ns); }
+    }else if(!r.offline){
+      licStore(null); licApply(null);
+      makerMsg(r.error || 'Your Pro license is no longer active.', 'err');
+    }
+  }
+}
+
+/* ───────── dialog ───────── */
+function proUI(){
+  var pro = isPro();
+  $('planChip').classList.toggle('pro', pro);
+  $('planTxt').textContent = pro ? 'Pro' : 'Free · Upgrade';
+  $('makerTag').hidden = pro;
+  $('proBuy').hidden = pro; $('proOwned').hidden = !pro; $('proManage').hidden = !pro;
+  $('proKeyRow').hidden = pro; $('proFoot').hidden = pro;
+  $('proSub').textContent = pro ? 'Thanks for supporting Veer. Every maker export is unlocked in this browser.'
+                                : 'The free converter stays free. Pro adds the exports makers need.';
+  if(pro){
+    $('ownTier').textContent = 'Pro';
+    $('ownEmail').textContent = LIC.email || '—';
+    $('ownKey').textContent = LIC.key ? LIC.key.slice(0,4) + '••••••••' + LIC.key.slice(-4) : '—';
+    var st = licStored();
+    $('ownChecked').textContent = st && st.checked ? new Date(st.checked).toLocaleDateString(undefined,{year:'numeric',month:'short',day:'numeric'}) : '—';
+  }
+  $('pricePro').textContent = PRO.pricePro;
+  var b = $('buyPro');
+  if(PRO.buyPro){ b.href = PRO.buyPro; b.classList.remove('off'); b.removeAttribute('aria-disabled'); }
+  else { b.removeAttribute('href'); b.classList.add('off'); b.setAttribute('aria-disabled','true'); b.title = 'Checkout opens soon'; }
+}
+function proMsg(t, cls){ var m = $('proMsg'); m.textContent = t || ''; m.className = cls || ''; }
+function openPro(){
+  proMsg('');
+  if(!$('pro').open) $('pro').showModal();
+  if(!isPro()) setTimeout(function(){ $('proKey').focus(); }, 30);
+}
+function makerMsg(t, cls){ var m = $('makerMsg'); m.textContent = t || ''; m.className = cls || ''; }
+
+/* ───────── SVG → layers ───────── */
+function parseTrace(svg){
+  var vb = /viewBox="([\d.\s-]+)"/.exec(svg);
+  var n = vb ? vb[1].trim().split(/\s+/).map(Number) : [0,0,1,1];
+  var w = n[2] || 1, h = n[3] || 1;
+  var layers = [], byFill = {};
+  var re = /<path\b([^>]*)\/>/g, m;
+  while((m = re.exec(svg))){
+    var a = m[1];
+    var fill = (/fill="([^"]*)"/.exec(a) || [])[1];
+    var d = (/\sd="([^"]*)"/.exec(a) || [])[1];
+    var op = (/opacity="([^"]*)"/.exec(a) || [])[1];
+    if(!fill || !d || op === '0') continue;
+    if(!byFill[fill]){ byFill[fill] = {fill:fill, hex:toHex(fill), paths:[]}; layers.push(byFill[fill]); }
+    byFill[fill].paths.push(d.trim());
+  }
+  return {w:w, h:h, layers:layers};
+}
+function toHex(rgb){
+  var c = (/rgba?\(([^)]*)\)/.exec(rgb) || [,'0,0,0'])[1].split(',').map(function(v){ return Math.max(0,Math.min(255,Math.round(+v))); });
+  return '#' + c.slice(0,3).map(function(v){ return ('0' + v.toString(16)).slice(-2); }).join('');
+}
+function mmSize(t){
+  var mw = Math.max(1, +$('mmW').value || 100);
+  return {w:mw, h:+(mw * t.h / t.w).toFixed(2), s:mw / t.w};
+}
+var esc = function(s){ return String(s).replace(/[<>&"]/g, function(c){ return {'<':'&lt;','>':'&gt;','&':'&amp;','"':'&quot;'}[c]; }); };
+
+/* Physical size goes in width/height (mm); the viewBox keeps the traced
+   coordinates, so Inkscape, Cricut Design Space and LightBurn all import at
+   the right size. One <g> per colour, with an id and an Inkscape layer label. */
+function sizedSvg(t, layers, title){
+  var sz = mmSize(t);
+  var out = ['<?xml version="1.0" encoding="UTF-8"?>',
+    '<svg xmlns="http://www.w3.org/2000/svg" xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"' +
+    ' width="' + sz.w + 'mm" height="' + sz.h + 'mm" viewBox="0 0 ' + t.w + ' ' + t.h + '">',
+    '<title>' + esc(title) + '</title>'];
+  layers.forEach(function(L){
+    var i = t.layers.indexOf(L) + 1;
+    out.push('<g id="colour-' + i + '-' + L.hex.slice(1) + '" inkscape:groupmode="layer" inkscape:label="Colour ' + i + ' ' + L.hex + '" fill="' + L.hex + '">');
+    L.paths.forEach(function(d){ out.push('<path d="' + d + '"/>'); });
+    out.push('</g>');
+  });
+  out.push('</svg>');
+  return out.join('\n');
+}
+
+/* ───────── DXF (R12, the most widely readable flavour) ───────── */
+function flatten(d){
+  var tok = d.match(/[MLQCZmlqcz]|-?\d*\.?\d+(?:e[-+]?\d+)?/g) || [];
+  var rings = [], cur = null, i = 0, cmd = '', x = 0, y = 0;
+  var num = function(){ return parseFloat(tok[i++]); };
+  while(i < tok.length){
+    if(/[A-Za-z]/.test(tok[i])) cmd = tok[i++];
+    if(cmd === 'M'){ x = num(); y = num(); cur = [[x,y]]; rings.push(cur); cmd = 'L'; }
+    else if(cmd === 'L'){ x = num(); y = num(); cur && cur.push([x,y]); }
+    else if(cmd === 'Q'){
+      var qx = num(), qy = num(), ex = num(), ey = num();
+      for(var k=1;k<=8;k++){ var u = k/8, a = (1-u)*(1-u), b = 2*(1-u)*u, c = u*u;
+        cur && cur.push([a*x + b*qx + c*ex, a*y + b*qy + c*ey]); }
+      x = ex; y = ey;
+    }else if(cmd === 'C'){
+      var c1x = num(), c1y = num(), c2x = num(), c2y = num(), fx = num(), fy = num();
+      for(var q=1;q<=12;q++){ var v = q/12, mv = 1-v;
+        cur && cur.push([mv*mv*mv*x + 3*mv*mv*v*c1x + 3*mv*v*v*c2x + v*v*v*fx,
+                         mv*mv*mv*y + 3*mv*mv*v*c1y + 3*mv*v*v*c2y + v*v*v*fy]); }
+      x = fx; y = fy;
+    }else if(cmd === 'Z' || cmd === 'z'){ cmd = ''; }
+    else { i++; }   // relative or unknown command: skip safely (ImageTracer only writes absolute)
+  }
+  return rings.filter(function(r){ return r.length >= 3; }).map(function(r){
+    var a = r[0], b = r[r.length-1];
+    if(Math.abs(a[0]-b[0]) < 1e-9 && Math.abs(a[1]-b[1]) < 1e-9) r.pop();
+    return r;
+  });
+}
+function makeDxf(t){
+  var sz = mmSize(t), s = sz.s;
+  var L = [];
+  var g = function(code, val){ L.push(String(code)); L.push(String(val)); };
+  var f = function(n){ return (Math.round(n*10000)/10000).toString(); };
+  g(0,'SECTION'); g(2,'HEADER');
+  g(9,'$ACADVER'); g(1,'AC1009');
+  g(9,'$INSUNITS'); g(70,4);
+  g(9,'$EXTMIN'); g(10,0); g(20,0); g(30,0);
+  g(9,'$EXTMAX'); g(10,f(sz.w)); g(20,f(sz.h)); g(30,0);
+  g(0,'ENDSEC');
+  g(0,'SECTION'); g(2,'TABLES');
+  g(0,'TABLE'); g(2,'LAYER'); g(70,t.layers.length);
+  t.layers.forEach(function(Ly, i){
+    g(0,'LAYER'); g(2,'COLOUR_' + (i+1) + '_' + Ly.hex.slice(1).toUpperCase()); g(70,0); g(62,(i % 7) + 1); g(6,'CONTINUOUS');
+  });
+  g(0,'ENDTAB'); g(0,'ENDSEC');
+  g(0,'SECTION'); g(2,'ENTITIES');
+  var count = 0;
+  t.layers.forEach(function(Ly, i){
+    var name = 'COLOUR_' + (i+1) + '_' + Ly.hex.slice(1).toUpperCase();
+    Ly.paths.forEach(function(d){
+      flatten(d).forEach(function(r){
+        g(0,'POLYLINE'); g(8,name); g(66,1); g(70,1); g(10,0); g(20,0); g(30,0);
+        r.forEach(function(p){ g(0,'VERTEX'); g(8,name); g(10,f(p[0]*s)); g(20,f((t.h - p[1])*s)); g(30,0); });
+        g(0,'SEQEND'); g(8,name);
+        count++;
+      });
+    });
+  });
+  g(0,'ENDSEC'); g(0,'EOF');
+  return {text: L.join('\r\n') + '\r\n', count:count};
+}
+
+/* ───────── zip (stored) ───────── */
+var CRC_T = (function(){ var t = new Uint32Array(256);
+  for(var n=0;n<256;n++){ var c=n; for(var k=0;k<8;k++) c = c&1 ? 0xEDB88320^(c>>>1) : c>>>1; t[n]=c>>>0; }
+  return t; })();
+function crc32(b){ var c=0xFFFFFFFF; for(var i=0;i<b.length;i++) c=CRC_T[(c^b[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zipStore(files){
+  var enc = new TextEncoder(), parts = [], central = [], offset = 0, now = new Date();
+  var dtime = ((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1))&0xFFFF;
+  var ddate = (((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate())&0xFFFF;
+  files.forEach(function(f){
+    var nm = enc.encode(f.name), data = typeof f.data === 'string' ? enc.encode(f.data) : f.data;
+    var crc = crc32(data), sz = data.length;
+    var lh = new Uint8Array(30+nm.length), dv = new DataView(lh.buffer);
+    dv.setUint32(0,0x04034b50,true); dv.setUint16(4,20,true); dv.setUint16(6,0x0800,true);
+    dv.setUint16(10,dtime,true); dv.setUint16(12,ddate,true);
+    dv.setUint32(14,crc,true); dv.setUint32(18,sz,true); dv.setUint32(22,sz,true); dv.setUint16(26,nm.length,true);
+    lh.set(nm,30); parts.push(lh, data);
+    var ch = new Uint8Array(46+nm.length), cv = new DataView(ch.buffer);
+    cv.setUint32(0,0x02014b50,true); cv.setUint16(4,20,true); cv.setUint16(6,20,true); cv.setUint16(8,0x0800,true);
+    cv.setUint16(12,dtime,true); cv.setUint16(14,ddate,true);
+    cv.setUint32(16,crc,true); cv.setUint32(20,sz,true); cv.setUint32(24,sz,true);
+    cv.setUint16(28,nm.length,true); cv.setUint32(42,offset,true);
+    ch.set(nm,46); central.push(ch);
+    offset += lh.length + sz;
+  });
+  var cd = 0; central.forEach(function(c){ cd += c.length; });
+  var eo = new Uint8Array(22), ev = new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true); ev.setUint16(8,files.length,true); ev.setUint16(10,files.length,true);
+  ev.setUint32(12,cd,true); ev.setUint32(16,offset,true);
+  var all = parts.concat(central, [eo]), total = 0;
+  all.forEach(function(a){ total += a.length; });
+  var out = new Uint8Array(total), p = 0;
+  all.forEach(function(a){ out.set(a,p); p += a.length; });
+  return out;
+}
+
+function save(data, filename, mime){
+  var blob = new Blob([data], {type:mime});
+  var a = document.createElement('a');
+  a.href = URL.createObjectURL(blob); a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(function(){ URL.revokeObjectURL(a.href); }, 5000);
+}
+var base = function(n){ return String(n || 'image').replace(/\.[^.]+$/, '').replace(/[^\w\-]+/g, '_') || 'image'; };
+
+/* ───────── actions ───────── */
+function current(){
+  var st = V.getState();
+  if(!st.svg){ makerMsg('Load an image first.', 'err'); return null; }
+  var t = parseTrace(st.svg);
+  if(!t.layers.length){ makerMsg('The trace is empty. Try keeping the background or adding colours.', 'err'); return null; }
+  return {st:st, t:t};
+}
+function gate(){ if(isPro()) return true; openPro(); return false; }
+
+$('exSized').addEventListener('click', function(){
+  if(!gate()) return; var c = current(); if(!c) return;
+  var sz = mmSize(c.t), bn = base(c.st.name);
+  save(sizedSvg(c.t, c.t.layers, bn), bn + '_' + sz.w + 'mm.svg', 'image/svg+xml');
+  makerMsg('Saved ' + sz.w + ' × ' + sz.h + ' mm SVG with ' + c.t.layers.length + ' colour layers.', 'ok');
+});
+$('exLayers').addEventListener('click', function(){
+  if(!gate()) return; var c = current(); if(!c) return;
+  var sz = mmSize(c.t), bn = base(c.st.name);
+  var files = c.t.layers.map(function(L, i){
+    return {name: bn + '/' + (i+1) + '_' + L.hex.slice(1) + '.svg', data: sizedSvg(c.t, [L], bn + ' colour ' + (i+1) + ' ' + L.hex)};
+  });
+  files.push({name: bn + '/all_layers.svg', data: sizedSvg(c.t, c.t.layers, bn)});
+  save(zipStore(files), bn + '_layers.zip', 'application/zip');
+  makerMsg('Saved ' + c.t.layers.length + ' colour files plus a combined SVG, all at ' + sz.w + ' × ' + sz.h + ' mm.', 'ok');
+});
+$('exDxf').addEventListener('click', function(){
+  if(!gate()) return; var c = current(); if(!c) return;
+  var sz = mmSize(c.t), bn = base(c.st.name), dx = makeDxf(c.t);
+  save(dx.text, bn + '_' + sz.w + 'mm.dxf', 'application/dxf');
+  makerMsg('Saved DXF: ' + dx.count + ' closed shapes on ' + c.t.layers.length + ' layers, ' + sz.w + ' × ' + sz.h + ' mm.', 'ok');
+});
+$('exBatch').addEventListener('click', function(){ if(!gate()) return; $('batchFile').click(); });
+$('batchFile').addEventListener('change', async function(){
+  var list = Array.prototype.slice.call(this.files || []).filter(function(f){ return /^image\//.test(f.type) && f.type !== 'image/svg+xml'; });
+  this.value = '';
+  if(!list.length){ makerMsg('No images in that selection.', 'err'); return; }
+  var files = [], failed = 0;
+  for(var i=0;i<list.length;i++){
+    makerMsg('Tracing ' + (i+1) + ' of ' + list.length + ': ' + list[i].name + '…');
+    await new Promise(function(r){ setTimeout(r, 20); });   // let the message paint
+    try{
+      var svg = await traceFile(list[i]);
+      var t = parseTrace(svg), bn = base(list[i].name);
+      if(!t.layers.length){ failed++; continue; }
+      files.push({name: 'vectorized/' + bn + '.svg', data: sizedSvg(t, t.layers, bn)});
+      files.push({name: 'vectorized/' + bn + '.dxf', data: makeDxf(t).text});
+    }catch(e){ failed++; }
+  }
+  if(!files.length){ makerMsg('None of those images could be traced.', 'err'); return; }
+  save(zipStore(files), 'vectorized_' + list.length + '_files.zip', 'application/zip');
+  makerMsg('Done: ' + (list.length - failed) + ' of ' + list.length + ' images, each as a sized SVG and a DXF at ' +
+    (+$('mmW').value || 100) + ' mm wide.' + (failed ? ' ' + failed + ' couldn’t be traced.' : ''), failed ? 'err' : 'ok');
+});
+function traceFile(file){
+  return new Promise(function(resolve, reject){
+    var rd = new FileReader();
+    rd.onerror = reject;
+    rd.onload = function(){
+      var img = new Image();
+      img.onerror = reject;
+      img.onload = function(){
+        var sc = Math.min(1, V.MAXDIM / Math.max(img.naturalWidth, img.naturalHeight));
+        var w = Math.max(1, Math.round(img.naturalWidth*sc)), h = Math.max(1, Math.round(img.naturalHeight*sc));
+        var cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+        var cx = cv.getContext('2d', {willReadFrequently:true}); cx.drawImage(img, 0, 0, w, h);
+        var raw = cx.getImageData(0, 0, w, h), mode = V.bgMode();
+        var imgd = mode === 'off' ? raw : (V.stripBackground(raw, mode) || raw);
+        try{
+          var out = ImageTracer.imagedataToSVG(imgd, V.buildOpts())
+            .replace(/ desc="[^"]*"/, '').replace(/<path [^>]*opacity="0"[^>]*\/>/g, '');
+          resolve(imgd !== raw ? V.dropGhosts(out) : out);
+        }catch(e){ reject(e); }
+      };
+      img.src = rd.result;
+    };
+    rd.readAsDataURL(file);
+  });
+}
+
+function showMm(){
+  var st = V.getState();
+  if(!st.svg){ $('mmH').textContent = ''; return; }
+  var sz = mmSize(parseTrace(st.svg));
+  $('mmH').textContent = '× ' + sz.h + ' mm tall';
+}
+$('mmW').addEventListener('input', showMm);
+new MutationObserver(showMm).observe($('svgOut'), {childList:true});
+
+/* ───────── wiring ───────── */
+$('planChip').addEventListener('click', openPro);
+$('proClose').addEventListener('click', function(){ $('pro').close(); });
+$('pro').addEventListener('click', function(e){ if(e.target === $('pro')) $('pro').close(); });
+async function doActivate(){
+  var key = $('proKey').value.trim();
+  if(!key){ proMsg('Paste your license key first.', 'err'); return; }
+  $('proActivate').disabled = true; proMsg('Checking your key…');
+  var r = await licActivate(key);
+  $('proActivate').disabled = false;
+  if(!r.ok){ proMsg(r.error || 'That key didn’t work.', 'err'); return; }
+  $('proKey').value = '';
+  proMsg('Pro unlocked. You’re all set.', 'ok');
+  makerMsg('Pro unlocked. Maker exports are ready.', 'ok');
+}
+$('proActivate').addEventListener('click', doActivate);
+$('proKey').addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); doActivate(); } });
+$('proRemove').addEventListener('click', function(){
+  var st = licStored();
+  if(st) licCall('deactivate', st.key, st.instance);
+  licStore(null); licApply(null);
+  proMsg('Removed from this browser. Your key still works anywhere else.', 'ok');
+});
+proUI();
+licInit();
+window.__veerVectorizerPro = { parseTrace:parseTrace, makeDxf:makeDxf, sizedSvg:sizedSvg, isPro:isPro };
+})();
+
 </script>
 </body>
 </html>
