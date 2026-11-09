@@ -1,0 +1,1657 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Veer · Light Box Studio</title>
+<meta name="description" content="Turn a name, a logo or any photo into a 3D-printable light box. Multi-colour fronts for Bambu AMS, photo lithophanes, batch names.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Pacifico&family=Great+Vibes&family=Dancing+Script:wght@700&family=Lobster&family=Bebas+Neue&family=Baloo+2:wght@800&family=Fredoka:wght@600&family=Montserrat:wght@800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{
+  /* Veer palette — mark colours #ef4037 / #bd222f / #f69322 */
+  --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
+  --tx:#f2efe9; --tx2:#9b9a96; --acc:#f69322; --acc2:#a8541a;
+  --red:#ef4037; --bad:#ef4037; --pass:#41c777;
+}
+*{box-sizing:border-box}
+html,body{height:100%;margin:0}
+body{background:var(--bg);color:var(--tx);font:13px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;
+  display:flex;flex-direction:column;height:100vh;overflow:hidden}
+#app{display:flex;flex:1;min-height:0}
+@media (max-width:900px){ body{overflow:auto;height:auto} #app{flex-direction:column} #side{width:auto!important;min-width:0!important;max-height:none} #stage{min-height:420px} }
+
+#side{width:370px;min-width:370px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column}
+#brand{padding:14px 16px;border-bottom:1px solid var(--line)}
+#brand .top{display:flex;align-items:center;gap:9px}
+#brand h1{margin:0;font-size:15px;letter-spacing:.3px;flex:1;white-space:nowrap}
+#brand .sub{display:flex;align-items:center;gap:10px;margin-top:6px}
+#brand p{margin:0;font-size:11px;color:var(--tx2);flex:1}
+#build{font-size:10px;font-weight:400;color:var(--acc);border:1px solid var(--acc2);border-radius:4px;padding:1px 5px;vertical-align:2px}
+#ctrls{flex:1;overflow-y:auto;padding:6px 14px 24px}
+#ctrls::-webkit-scrollbar{width:10px}
+#ctrls::-webkit-scrollbar-thumb{background:#2a323d;border-radius:5px}
+
+details.sec{border-bottom:1px solid var(--line);padding:4px 0}
+details.sec>summary{cursor:pointer;padding:9px 2px;font-weight:600;font-size:12px;letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);list-style:none;user-select:none}
+details.sec>summary::-webkit-details-marker{display:none}
+details.sec>summary:before{content:"▸";display:inline-block;width:14px;color:var(--acc);transition:transform .15s}
+details.sec[open]>summary:before{transform:rotate(90deg)}
+details.sec>summary:hover{color:var(--tx)}
+.body{padding:4px 2px 12px}
+.row{display:flex;align-items:center;gap:8px;margin:7px 0}
+.row label{flex:1;color:var(--tx2);font-size:12px}
+input[type=number],input[type=text],select,textarea{background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:6px;padding:5px 7px;font:inherit;width:86px}
+input[type=text].wide,textarea{width:100%}
+textarea{min-height:90px;resize:vertical;font-family:ui-monospace,Consolas,monospace;font-size:12px}
+select{width:auto;min-width:120px}
+input[type=range]{flex:1;accent-color:var(--acc)}
+input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);border-radius:6px;background:var(--panel2);cursor:pointer}
+input:focus,select:focus,textarea:focus{outline:1px solid var(--acc)}
+.val{width:46px;text-align:right;color:var(--tx);font-variant-numeric:tabular-nums;font-size:11.5px}
+.chk{display:flex;align-items:center;gap:7px;margin:8px 0;color:var(--tx2);cursor:pointer;font-size:12px}
+.chk input{accent-color:var(--acc);width:15px;height:15px}
+button{background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:7px;padding:7px 11px;font:inherit;cursor:pointer}
+button:hover{border-color:var(--acc);color:#fff}
+button:disabled{opacity:.4;cursor:not-allowed}
+button.primary{background:var(--acc);border-color:var(--acc);color:#1a0f02;font-weight:600}
+button.primary:hover{background:#ffa53d;color:#1a0f02}
+.note{font-size:11px;color:var(--tx2);margin:6px 0 0;line-height:1.5}
+.warnbox{background:#2a1f0a;border:1px solid #6b4f10;color:#f3d089;border-radius:6px;padding:7px 9px;font-size:11px;margin:8px 0;line-height:1.5}
+.seg{display:flex;gap:3px;padding:3px;background:var(--bg);border:1px solid var(--line);border-radius:9px;margin:6px 0 10px}
+.seg button{flex:1;border:0;background:transparent;color:var(--tx2);font-weight:600;font-size:12px;padding:7px 6px;border-radius:7px}
+.seg button.on{background:var(--panel2);color:var(--acc);box-shadow:inset 0 0 0 1px var(--line)}
+.seg button:hover{color:var(--tx)}
+#drop{border:1.5px dashed #37414e;border-radius:10px;padding:16px 12px;text-align:center;color:var(--tx2);cursor:pointer;transition:.15s;margin:8px 0}
+#drop:hover,#drop.over{border-color:var(--acc);color:var(--tx);background:#1d1710}
+#drop b{color:var(--tx)}
+#drop .clear{margin-top:6px;padding:2px 8px;font-size:11px}
+.swatch{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 8px;margin:6px 0}
+.swatch .slot{font-size:10px;color:var(--tx2);width:62px;line-height:1.25}
+.swatch .slot b{display:block;color:var(--tx);font-size:11px}
+.swatch .name{flex:1;font-size:11.5px;color:var(--tx2)}
+[hidden]{display:none!important}
+.protag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--acc);border:1px solid #6b4a1d;border-radius:4px;padding:0 4px;margin-left:6px;vertical-align:1px}
+.plan{flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;font-size:11px;font-weight:600;letter-spacing:.02em;border:1px solid var(--line);background:var(--panel2);color:var(--tx2)}
+.plan:hover{border-color:var(--acc);color:var(--tx)}
+.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--tx2)}
+.plan.pro{border-color:#6b4a1d;color:#ffd7a3;background:#2a1d0e}
+.plan.pro .pip{background:var(--acc)}
+.freenote{background:#1c1712;border:1px solid #4a3418;color:#e9c99a;border-radius:6px;padding:7px 9px;font-size:11px;margin:8px 0;line-height:1.5}
+.freenote button{padding:2px 8px;font-size:11px;margin-left:4px}
+
+#main{flex:1;display:flex;flex-direction:column;min-width:0}
+#tabs{display:flex;gap:2px;padding:8px 14px 0;border-bottom:1px solid var(--line);background:var(--panel);align-items:flex-end}
+.tab{padding:7px 15px;border-radius:7px 7px 0 0;border:1px solid transparent;border-bottom:none;cursor:pointer;color:var(--tx2);font-size:12px}
+.tab.on{background:var(--bg);border-color:var(--line);color:var(--tx);margin-bottom:-1px}
+#tabs .spacer{flex:1}
+#tabs .chk{margin:0 0 8px}
+#stage{flex:1;position:relative;overflow:hidden;background:radial-gradient(circle at 50% 40%,#1b1712 0%,#0b0c0f 75%)}
+#lit,#gl{position:absolute;inset:0;width:100%;height:100%}
+#gl{display:none}
+#overlay{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--tx2);background:#0b0e13cc;border:1px solid var(--line);border-radius:7px;padding:6px 10px;pointer-events:none;max-width:70%}
+#partlist{padding:0 14px 10px;background:var(--panel);border-top:1px solid var(--line);display:none;max-height:170px;overflow:auto}
+#partlist table{width:100%;border-collapse:collapse;font-size:11.5px}
+#partlist th{text-align:left;color:var(--tx2);font-weight:600;padding:6px;position:sticky;top:0;background:var(--panel)}
+#partlist td{padding:4px 6px;border-top:1px solid var(--line);color:var(--tx2)}
+#partlist td.n{color:var(--tx)}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid #0006;vertical-align:-1px}
+#bar{border-top:1px solid var(--line);background:var(--panel);padding:10px 14px;display:flex;gap:9px;align-items:center;flex-wrap:wrap}
+#stat{flex:1;font-size:11.5px;color:var(--tx2);min-width:180px}
+#stat.err{color:var(--bad)} #stat.ok{color:var(--acc)}
+.powered{background:#131519;flex:none;padding:8px 0 9px;font-size:.72rem;letter-spacing:.05em;color:#6f6e6a;text-align:center;line-height:1.3}
+.powered a{color:#9b9a96;font-weight:600;text-decoration:none}
+.powered a:hover{color:#fff}
+
+dialog#pro{width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--panel);color:var(--tx);box-shadow:0 30px 80px #000a}
+dialog#pro::backdrop{background:#05070acc;backdrop-filter:blur(3px)}
+.pro-in{padding:26px 26px 22px;display:flex;flex-direction:column;gap:18px}
+.pro-head{display:flex;align-items:flex-start;gap:12px}
+.pro-head h2{margin:0;font-size:20px;letter-spacing:-.01em;line-height:1.2}
+.pro-head p{margin:4px 0 0;color:var(--tx2);font-size:12.5px;line-height:1.5}
+.pro-x{margin-left:auto;flex:none;width:30px;height:30px;padding:0;border-radius:8px;font-size:16px;line-height:1}
+.pro-uses{background:#1c1712;border:1px solid #4a3418;border-radius:9px;padding:10px 12px;font-size:12px;color:#e9c99a;line-height:1.55}
+.pro-uses b{color:#ffd7a3}
+.pro-uses .sw{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.tiers{grid-template-columns:minmax(0,1fr)}}
+.tier{border:1px solid var(--line);border-radius:11px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;background:var(--panel2);min-width:0}
+.tier.hi{border-color:var(--acc);background:linear-gradient(180deg,#2a1d0e 0%,var(--panel2) 70%)}
+.tier .nm{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2)}
+.tier.hi .nm{color:var(--acc)}
+.tier .pr{font-size:22px;font-weight:700;letter-spacing:-.02em}
+.tier .pr small{font-size:11px;font-weight:400;color:var(--tx2);letter-spacing:0}
+.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--tx2);flex:1}
+.tier li{padding-left:15px;position:relative;line-height:1.4}
+.tier li:before{content:"";position:absolute;left:2px;top:6px;width:6px;height:6px;border-radius:2px;background:#4a5058}
+.tier.hi li:before,.tier.co li:before{background:var(--acc)}
+a.buy{display:block;text-align:center;text-decoration:none;font-weight:600;background:var(--panel);border:1px solid var(--line);color:var(--tx);border-radius:7px;padding:7px 11px}
+a.buy:hover{border-color:var(--acc)}
+.tier.hi a.buy{background:var(--acc);border-color:var(--acc);color:#1a0f02}
+a.buy.off{opacity:.45;pointer-events:none}
+.keyrow{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.keyrow label{font-size:12px;color:var(--tx2)}
+.keyrow .in{display:flex;gap:8px}
+.keyrow input{flex:1;width:auto;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;padding:8px 10px}
+#proMsg{font-size:12px;min-height:1.2em;color:var(--tx2)}
+#proMsg.err{color:var(--bad)} #proMsg.ok{color:#7fe0a8}
+.owned dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 12px;margin:0;font-size:12.5px}
+.owned dt{color:var(--tx2)} .owned dd{margin:0;overflow-wrap:anywhere}
+.pro-foot{font-size:11px;color:var(--tx2);line-height:1.5}
+</style>
+</head>
+<body>
+<div id="app">
+<div id="side">
+  <div id="brand">
+    <div class="top">
+      <svg viewBox="0 0 79.9 66.6" width="26" height="22" aria-label="Veer"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      <h1>Light Box Studio <span id="build"></span></h1>
+    </div>
+    <div class="sub">
+      <p>Veer · names, logos &amp; photos → printable light boxes</p>
+      <button type="button" class="plan" id="planChip" title="Plan and license"><span class="pip"></span><span id="planTxt">Free · Upgrade</span></button>
+    </div>
+  </div>
+  <div id="ctrls">
+
+    <details class="sec" open><summary>1 · Front</summary><div class="body">
+      <div class="seg" id="modeSeg">
+        <button type="button" data-m="inlay" class="on">Name &amp; graphics</button>
+        <button type="button" data-m="litho">Photo lithophane<span class="protag" id="lithoTag">Pro</span></button>
+      </div>
+      <div class="note" id="modeNote"></div>
+
+      <div class="row"><label for="l1">Line 1</label></div>
+      <input type="text" class="wide" id="l1" value="Olivia" maxlength="40">
+      <div class="row"><label for="l2">Line 2 (optional)</label></div>
+      <input type="text" class="wide" id="l2" value="" maxlength="60" placeholder="e.g. Est. 2024">
+      <div class="row"><label for="font">Font</label>
+        <select id="font">
+          <option value="Pacifico">Pacifico (script)</option>
+          <option value="Great Vibes">Great Vibes (elegant script)</option>
+          <option value="Dancing Script">Dancing Script</option>
+          <option value="Lobster">Lobster</option>
+          <option value="Baloo 2">Baloo (rounded, kids)</option>
+          <option value="Fredoka">Fredoka (soft)</option>
+          <option value="Bebas Neue">Bebas Neue (tall caps)</option>
+          <option value="Montserrat">Montserrat (bold)</option>
+          <option value="Playfair Display">Playfair (serif)</option>
+        </select></div>
+      <div class="row"><label for="tSize">Text size</label><input type="range" id="tSize" min="20" max="100" value="70"><span class="val" id="tSizeV">70%</span></div>
+      <div class="row"><label for="tL2">Line 2 size</label><input type="range" id="tL2" min="25" max="100" value="45"><span class="val" id="tL2V">45%</span></div>
+      <div class="row"><label for="tBold">Thicken</label><input type="range" id="tBold" min="0" max="10" value="3"><span class="val" id="tBoldV">0.3</span></div>
+      <div class="row"><label>Text offset X / Y (mm)</label><input type="number" id="tX" value="0" step="1" style="width:58px"><input type="number" id="tY" value="0" step="1" style="width:58px"></div>
+
+      <div id="drop"><b>Add an image</b> <span class="protag">Pro</span><br>
+        <span id="dropTxt">Logo, drawing or photo · PNG · JPG · WEBP</span>
+        <div><button type="button" class="clear" id="imgClear" hidden>Remove image</button></div></div>
+      <input type="file" id="file" accept="image/*" hidden>
+      <div id="imgCtrls" hidden>
+        <div class="row" id="iScaleRow"><label for="iScale">Image size</label><input type="range" id="iScale" min="10" max="100" value="60"><span class="val" id="iScaleV">60%</span></div>
+        <div class="row"><label>Image offset X / Y (mm)</label><input type="number" id="iX" value="0" step="1" style="width:58px"><input type="number" id="iY" value="0" step="1" style="width:58px"></div>
+        <div id="inlayImg">
+          <div class="row"><label for="k">Image colours</label><select id="k"><option>1</option><option selected>2</option><option>3</option></select></div>
+          <div class="chk"><input type="checkbox" id="rmBg" checked><label for="rmBg">Drop the background colour</label></div>
+          <div class="row"><label for="bgTol">Background tolerance</label><input type="range" id="bgTol" min="1" max="40" value="14"><span class="val" id="bgTolV">14</span></div>
+        </div>
+        <div id="lithoImg">
+          <div class="row"><label for="lZoom">Photo zoom</label><input type="range" id="lZoom" min="100" max="300" value="100"><span class="val" id="lZoomV">100%</span></div>
+          <div class="row"><label for="lBright">Brightness</label><input type="range" id="lBright" min="-50" max="50" value="0"><span class="val" id="lBrightV">0</span></div>
+          <div class="row"><label for="lContrast">Contrast</label><input type="range" id="lContrast" min="-50" max="80" value="15"><span class="val" id="lContrastV">15</span></div>
+          <div class="row"><label for="lMin">Thinnest / thickest (mm)</label><input type="number" id="lMin" value="0.8" step="0.1" min="0.4" style="width:58px"><input type="number" id="lMax" value="3" step="0.1" min="1" style="width:58px"></div>
+        </div>
+      </div>
+      <div id="colours"></div>
+      <div id="frontWarn"></div>
+    </div></details>
+
+    <details class="sec" open><summary>2 · Box</summary><div class="body">
+      <div class="row"><label for="preset">Size</label>
+        <select id="preset">
+          <option value="name">Name sign · 180 × 80</option>
+          <option value="square">Square · 120 × 120</option>
+          <option value="wide">Wide · 220 × 90</option>
+          <option value="photo">Photo 6 × 4 in · 162 × 112</option>
+          <option value="photoP">Photo portrait · 112 × 162</option>
+          <option value="custom">Custom</option>
+        </select></div>
+      <div class="row"><label>Width × height (mm)</label><input type="number" id="W" value="180" step="1" min="40" style="width:62px"><input type="number" id="H" value="80" step="1" min="40" style="width:62px"></div>
+      <div class="row"><label for="D">Depth (mm)</label><input type="number" id="D" value="40" step="1" min="15"></div>
+      <div class="row"><label for="wall">Wall (mm)</label><input type="number" id="wall" value="2.4" step="0.2" min="1.2"></div>
+      <div class="row"><label for="rad">Corner radius (mm)</label><input type="number" id="rad" value="5" step="0.5" min="0"></div>
+      <div class="row"><label for="faceT">Front thickness (mm)</label><input type="number" id="faceT" value="1.2" step="0.2" min="0.6"></div>
+      <div class="row"><label for="colD">Colour depth (mm)</label><input type="number" id="colD" value="0.6" step="0.2" min="0.2"></div>
+      <div class="swatch"><div class="slot"><b>Frame</b>box + back</div><input type="color" id="frameCol" value="#1b1b1f"><div class="name">Opaque, blocks light</div></div>
+      <div class="swatch"><div class="slot"><b>Front</b>diffuser</div><input type="color" id="faceCol" value="#f4f1ea"><div class="name">White PLA glows best</div></div>
+      <div class="note">Light passes through the thin white front. Coloured filament glows tinted; black blocks it, so black text reads as a crisp silhouette.</div>
+    </div></details>
+
+    <details class="sec"><summary>3 · Back panel &amp; light</summary><div class="body">
+      <div class="chk"><input type="checkbox" id="backOn" checked><label for="backOn">Make a back panel</label></div>
+      <div class="chk"><input type="checkbox" id="keyholes" checked><label for="keyholes">Keyhole slots for wall hanging</label></div>
+      <div class="chk"><input type="checkbox" id="cable" checked><label for="cable">Cable hole for USB LED strip</label></div>
+      <div class="row"><label for="fit">Back panel fit</label><select id="fit"><option value="0.2">Snug (0.2 mm)</option><option value="0.3" selected>Standard (0.3 mm)</option><option value="0.45">Loose (0.45 mm)</option></select></div>
+      <div class="note"><b style="color:var(--tx)">Lighting:</b> a 5 V USB LED strip (warm white, about 50 cm) stuck around the inside walls lights evenly. A battery puck light on the back panel works too. At least 30 mm of depth avoids hot spots.</div>
+    </div></details>
+
+    <details class="sec"><summary>4 · Batch names<span class="protag" id="batchTag">Pro</span></summary><div class="body">
+      <div class="note" style="margin-top:0">One name per line. Each becomes its own front with the settings above, sharing one frame and back. Paste the names from your Etsy orders.</div>
+      <textarea id="batch" placeholder="Olivia&#10;Mason&#10;The Johnsons"></textarea>
+    </div></details>
+
+  </div>
+</div>
+
+<div id="main">
+  <div id="tabs">
+    <div class="tab on" data-v="lit">Lit preview</div>
+    <div class="tab" data-v="3d">3D preview</div>
+    <div class="spacer"></div>
+    <label class="chk"><input type="checkbox" id="lightsOn" checked> Lights on</label>
+  </div>
+  <div id="stage">
+    <canvas id="lit"></canvas>
+    <canvas id="gl"></canvas>
+    <div id="overlay"></div>
+  </div>
+  <div id="partlist"></div>
+  <div id="bar">
+    <div id="stat">Type a name to start.</div>
+    <button type="button" id="btnProof">Proof image (PNG)</button>
+    <button type="button" id="btnBuild">Build 3D</button>
+    <button type="button" class="primary" id="btnDl">Download STL set (.zip)</button>
+  </div>
+</div>
+</div>
+
+<dialog id="pro" aria-labelledby="proTitle">
+  <div class="pro-in">
+    <div class="pro-head">
+      <div><h2 id="proTitle">Light Box Studio Pro</h2>
+        <p id="proSub">Logos, photos, batch names and clean files.</p></div>
+      <button type="button" class="pro-x" id="proClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="pro-uses" id="proUses" hidden></div>
+    <div id="proBuy">
+      <div class="tiers">
+        <div class="tier"><div class="nm">Free</div><div class="pr">$0</div>
+          <ul><li>Names in 9 fonts</li><li>Any box size</li><li>Back panel with cable hole</li><li>Small VEER mark on the back</li><li>Personal use</li></ul></div>
+        <div class="tier hi"><div class="nm">Pro</div><div class="pr"><span id="pricePro">$29</span> <small>one-time</small></div>
+          <ul><li>Any logo or image, multi-colour</li><li>Photo lithophane light boxes</li><li>Batch names in one go</li><li>No mark on the back</li></ul>
+          <a class="buy" id="buyPro" target="_blank" rel="noopener">Get Pro</a></div>
+        <div class="tier co"><div class="nm">Commercial</div><div class="pr"><span id="priceCom">$79</span> <small>one-time</small></div>
+          <ul><li>Everything in Pro</li><li>Sell the light boxes you print</li><li>Etsy-ready batch workflow</li></ul>
+          <a class="buy" id="buyCom" target="_blank" rel="noopener">Get Commercial</a></div>
+      </div>
+    </div>
+    <div class="owned" id="proOwned" hidden><dl>
+      <dt>Plan</dt><dd id="ownTier"></dd><dt>Licensed to</dt><dd id="ownEmail"></dd>
+      <dt>Key</dt><dd id="ownKey"></dd><dt>Checked</dt><dd id="ownChecked"></dd></dl></div>
+    <div class="keyrow" id="proKeyRow">
+      <label for="proKey">Already bought it? Paste the license key from your receipt email.</label>
+      <div class="in"><input type="text" id="proKey" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false">
+        <button type="button" class="primary" id="proActivate">Unlock</button></div>
+    </div>
+    <div id="proMsg" role="status"></div>
+    <div class="pro-foot" id="proFoot">Unlocking needs an internet connection once. After that, Light Box Studio works offline and checks in now and then while you're online.</div>
+    <div id="proManage" hidden><button type="button" id="proRemove">Remove from this browser</button></div>
+  </div>
+</dialog>
+
+<div class="powered">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
+<script>
+"use strict";
+/* ═══════════════════════════════════════════════════════════════════════════
+   Veer · Light Box Studio
+   Name / logo / photo → a 3D-printable light box: a frame, a light-diffusing
+   front and a back panel. Two front styles:
+     • Inlay — coloured text and artwork set flush into a thin white front
+       (multi-colour, for an AMS). White glows, colour glows tinted, black
+       blocks light.
+     • Lithophane — any photo as a variable-thickness front; thick = dark.
+   Coordinates: authored in FRONT VIEW (as you look at the finished box), X
+   right, Y up, Z = 0 at the front face (on the build plate). Frame + front
+   are mirrored into print space at the end; the back panel is authored in
+   print space directly (its outside face is on the plate).
+   ═══════════════════════════════════════════════════════════════════════════ */
+const BUILD = "v1.0.0 · 2026-11-09";
+const $ = id => document.getElementById(id);
+const clamp = (v,a,b) => v<a?a:v>b?b:v;
+
+/* ───────────────────────── geometry helpers ───────────────────────── */
+
+function roundRectLoop(w,h,r,seg){
+  // CCW, centred on origin
+  const hw=w/2, hh=h/2;
+  r = clamp(r, 0, Math.min(hw,hh)-0.001);
+  if(r<=0.001) return [{x:-hw,y:-hh},{x:hw,y:-hh},{x:hw,y:hh},{x:-hw,y:hh}];
+  const pts=[], n=Math.max(4, seg||Math.ceil(r*6));
+  const corners=[[ hw-r,-hh+r,-Math.PI/2],[ hw-r, hh-r,0],[-hw+r, hh-r,Math.PI/2],[-hw+r,-hh+r,Math.PI]];
+  for(const [cx,cy,a0] of corners)
+    for(let i=0;i<=n;i++){ const a=a0+(Math.PI/2)*(i/n); pts.push({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)}); }
+  return dedupeLoop(pts);
+}
+function circleLoop(cx,cy,r,seg){
+  const n=Math.max(24, seg||Math.ceil(r*8)), pts=[];
+  for(let i=0;i<n;i++){ const a=2*Math.PI*i/n; pts.push({x:cx+r*Math.cos(a), y:cy+r*Math.sin(a)}); }
+  return pts; // CCW
+}
+function rectLoop(cx,cy,w,h,r){
+  const L=roundRectLoop(w,h,r||0);
+  return L.map(p=>({x:p.x+cx, y:p.y+cy}));
+}
+function dedupeLoop(p){
+  const out=[];
+  for(const q of p){ const l=out[out.length-1]; if(!l || Math.hypot(l.x-q.x,l.y-q.y)>1e-6) out.push(q); }
+  if(out.length>1){ const a=out[0], b=out[out.length-1]; if(Math.hypot(a.x-b.x,a.y-b.y)<1e-6) out.pop(); }
+  return out;
+}
+function loopArea(L){ let s=0; for(let i=0;i<L.length;i++){ const p=L[i], q=L[(i+1)%L.length]; s+=p.x*q.y-q.x*p.y; } return s/2; }
+const revLoop = L => L.slice().reverse();
+
+/* Triangle sink -------------------------------------------------------- */
+function tri(t,ax,ay,az,bx,by,bz,cx,cy,cz){ t.push(ax,ay,az,bx,by,bz,cx,cy,cz); }
+
+/* ── Ear-clipping triangulator with hole support ──────────────────────────
+   Algorithm after Mapbox's earcut (ISC licence), reimplemented here so this
+   file stays dependency-free. Crucially, the cap triangles use only the
+   polygon's OWN vertices, so every cap boundary edge matches a wall edge
+   exactly — no T-junctions, and the solids come out watertight. */
+function ecNode(i,x,y){ return {i,x,y,prev:null,next:null,z:0,prevZ:null,nextZ:null,steiner:false}; }
+function ecIns(i,x,y,last){
+  const p=ecNode(i,x,y);
+  if(!last){ p.prev=p; p.next=p; }
+  else { p.next=last.next; p.prev=last; last.next.prev=p; last.next=p; }
+  return p;
+}
+function ecRem(p){
+  p.next.prev=p.prev; p.prev.next=p.next;
+  if(p.prevZ) p.prevZ.nextZ=p.nextZ;
+  if(p.nextZ) p.nextZ.prevZ=p.prevZ;
+}
+function ecArea(p,q,r){ return (q.y-p.y)*(r.x-q.x)-(q.x-p.x)*(r.y-q.y); }
+function ecEq(a,b){ return a.x===b.x && a.y===b.y; }
+function ecSignedArea(d,s,e){ let sum=0; for(let i=s,j=e-2;i<e;i+=2){ sum+=(d[j]-d[i])*(d[i+1]+d[j+1]); j=i; } return sum; }
+function ecList(d,s,e,cw){
+  let last=null;
+  if(cw === (ecSignedArea(d,s,e)>0)){ for(let i=s;i<e;i+=2) last=ecIns(i,d[i],d[i+1],last); }
+  else { for(let i=e-2;i>=s;i-=2) last=ecIns(i,d[i],d[i+1],last); }
+  if(last && ecEq(last,last.next)){ ecRem(last); last=last.next; }
+  return last;
+}
+function ecFilter(start,end){
+  if(!start) return start;
+  if(!end) end=start;
+  let p=start, again;
+  do{
+    again=false;
+    if(!p.steiner && (ecEq(p,p.next) || ecArea(p.prev,p,p.next)===0)){
+      ecRem(p); p=end=p.prev;
+      if(p===p.next) break;
+      again=true;
+    } else p=p.next;
+  } while(again || p!==end);
+  return end;
+}
+function ecInTri(ax,ay,bx,by,cx,cy,px,py){
+  return (cx-px)*(ay-py)>=(ax-px)*(cy-py) &&
+         (ax-px)*(by-py)>=(bx-px)*(ay-py) &&
+         (bx-px)*(cy-py)>=(cx-px)*(by-py);
+}
+function ecIsEar(ear){
+  const a=ear.prev,b=ear,c=ear.next;
+  if(ecArea(a,b,c)>=0) return false;
+  const ax=a.x,ay=a.y,bx=b.x,by=b.y,cx=c.x,cy=c.y;
+  const x0=Math.min(ax,bx,cx), y0=Math.min(ay,by,cy), x1=Math.max(ax,bx,cx), y1=Math.max(ay,by,cy);
+  let p=c.next;
+  while(p!==a){
+    if(p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1 &&
+       ecInTri(ax,ay,bx,by,cx,cy,p.x,p.y) && ecArea(p.prev,p,p.next)>=0) return false;
+    p=p.next;
+  }
+  return true;
+}
+function ecZ(x,y){
+  x=(x|0)&0xFFFF; y=(y|0)&0xFFFF;
+  x=(x|(x<<8))&0x00FF00FF; x=(x|(x<<4))&0x0F0F0F0F; x=(x|(x<<2))&0x33333333; x=(x|(x<<1))&0x55555555;
+  y=(y|(y<<8))&0x00FF00FF; y=(y|(y<<4))&0x0F0F0F0F; y=(y|(y<<2))&0x33333333; y=(y|(y<<1))&0x55555555;
+  return x|(y<<1);
+}
+function ecSortLinked(list){
+  let numMerges, inSize=1, p,q,e,tail,pSize,qSize;
+  do{
+    p=list; list=null; tail=null; numMerges=0;
+    while(p){
+      numMerges++; q=p; pSize=0;
+      for(let i=0;i<inSize;i++){ pSize++; q=q.nextZ; if(!q) break; }
+      qSize=inSize;
+      while(pSize>0 || (qSize>0 && q)){
+        if(pSize!==0 && (qSize===0 || !q || p.z<=q.z)){ e=p; p=p.nextZ; pSize--; }
+        else { e=q; q=q.nextZ; qSize--; }
+        if(tail) tail.nextZ=e; else list=e;
+        e.prevZ=tail; tail=e;
+      }
+      p=q;
+    }
+    tail.nextZ=null; inSize*=2;
+  } while(numMerges>1);
+  return list;
+}
+function ecIndexCurve(start,minX,minY,invSize){
+  let p=start;
+  do{
+    if(p.z===0) p.z=ecZ((p.x-minX)*invSize,(p.y-minY)*invSize);
+    p.prevZ=p.prev; p.nextZ=p.next; p=p.next;
+  } while(p!==start);
+  p.prevZ.nextZ=null; p.prevZ=null;
+  ecSortLinked(p);
+}
+function ecIsEarHashed(ear,minX,minY,invSize){
+  const a=ear.prev,b=ear,c=ear.next;
+  if(ecArea(a,b,c)>=0) return false;
+  const ax=a.x,ay=a.y,bx=b.x,by=b.y,cx=c.x,cy=c.y;
+  const x0=Math.min(ax,bx,cx), y0=Math.min(ay,by,cy), x1=Math.max(ax,bx,cx), y1=Math.max(ay,by,cy);
+  const minZ=ecZ((x0-minX)*invSize,(y0-minY)*invSize), maxZ=ecZ((x1-minX)*invSize,(y1-minY)*invSize);
+  let p=ear.prevZ, n=ear.nextZ;
+  while(p && p.z>=minZ && n && n.z<=maxZ){
+    if(p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1&&p!==a&&p!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,p.x,p.y)&&ecArea(p.prev,p,p.next)>=0) return false;
+    p=p.prevZ;
+    if(n.x>=x0&&n.x<=x1&&n.y>=y0&&n.y<=y1&&n!==a&&n!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,n.x,n.y)&&ecArea(n.prev,n,n.next)>=0) return false;
+    n=n.nextZ;
+  }
+  while(p && p.z>=minZ){
+    if(p.x>=x0&&p.x<=x1&&p.y>=y0&&p.y<=y1&&p!==a&&p!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,p.x,p.y)&&ecArea(p.prev,p,p.next)>=0) return false;
+    p=p.prevZ;
+  }
+  while(n && n.z<=maxZ){
+    if(n.x>=x0&&n.x<=x1&&n.y>=y0&&n.y<=y1&&n!==a&&n!==c&&
+       ecInTri(ax,ay,bx,by,cx,cy,n.x,n.y)&&ecArea(n.prev,n,n.next)>=0) return false;
+    n=n.nextZ;
+  }
+  return true;
+}
+const ecSign = n => n>0?1:n<0?-1:0;
+function ecOnSeg(p,q,r){
+  return q.x<=Math.max(p.x,r.x)&&q.x>=Math.min(p.x,r.x)&&q.y<=Math.max(p.y,r.y)&&q.y>=Math.min(p.y,r.y);
+}
+function ecIntersects(p1,q1,p2,q2){
+  const o1=ecSign(ecArea(p1,q1,p2)), o2=ecSign(ecArea(p1,q1,q2));
+  const o3=ecSign(ecArea(p2,q2,p1)), o4=ecSign(ecArea(p2,q2,q1));
+  if(o1!==o2 && o3!==o4) return true;
+  if(o1===0 && ecOnSeg(p1,p2,q1)) return true;
+  if(o2===0 && ecOnSeg(p1,q2,q1)) return true;
+  if(o3===0 && ecOnSeg(p2,p1,q2)) return true;
+  if(o4===0 && ecOnSeg(p2,q1,q2)) return true;
+  return false;
+}
+function ecIntersectsPoly(a,b){
+  let p=a;
+  do{
+    if(p.i!==a.i && p.next.i!==a.i && p.i!==b.i && p.next.i!==b.i && ecIntersects(p,p.next,a,b)) return true;
+    p=p.next;
+  } while(p!==a);
+  return false;
+}
+function ecLocallyInside(a,b){
+  return ecArea(a.prev,a,a.next)<0
+    ? ecArea(a,b,a.next)>=0 && ecArea(a,a.prev,b)>=0
+    : ecArea(a,b,a.prev)<0 || ecArea(a,a.next,b)<0;
+}
+function ecMiddleInside(a,b){
+  let p=a, inside=false;
+  const px=(a.x+b.x)/2, py=(a.y+b.y)/2;
+  do{
+    if(((p.y>py)!==(p.next.y>py)) && p.next.y!==p.y &&
+       (px < (p.next.x-p.x)*(py-p.y)/(p.next.y-p.y)+p.x)) inside=!inside;
+    p=p.next;
+  } while(p!==a);
+  return inside;
+}
+function ecValidDiagonal(a,b){
+  return a.next.i!==b.i && a.prev.i!==b.i && !ecIntersectsPoly(a,b) &&
+    (ecLocallyInside(a,b) && ecLocallyInside(b,a) && ecMiddleInside(a,b) &&
+     (ecArea(a.prev,a,b.prev)||ecArea(a,b.prev,b)) ||
+     ecEq(a,b) && ecArea(a.prev,a,a.next)>0 && ecArea(b.prev,b,b.next)>0);
+}
+function ecSplitPoly(a,b){
+  const a2=ecNode(a.i,a.x,a.y), b2=ecNode(b.i,b.x,b.y), an=a.next, bp=b.prev;
+  a.next=b; b.prev=a;
+  a2.next=an; an.prev=a2;
+  b2.next=a2; a2.prev=b2;
+  bp.next=b2; b2.prev=bp;
+  return b2;
+}
+function ecCure(start,tris){
+  let p=start;
+  do{
+    const a=p.prev, b=p.next.next;
+    if(!ecEq(a,b) && ecIntersects(a,p,p.next,b) && ecLocallyInside(a,b) && ecLocallyInside(b,a)){
+      tris.push(a.i/2, p.i/2, b.i/2);
+      ecRem(p); ecRem(p.next);
+      p=start=b;
+    }
+    p=p.next;
+  } while(p!==start);
+  return ecFilter(p);
+}
+function ecSplitEarcut(start,tris,minX,minY,invSize){
+  let a=start;
+  do{
+    let b=a.next.next;
+    while(b!==a.prev){
+      if(a.i!==b.i && ecValidDiagonal(a,b)){
+        let c=ecSplitPoly(a,b);
+        a=ecFilter(a,a.next); c=ecFilter(c,c.next);
+        ecLinked(a,tris,minX,minY,invSize,0);
+        ecLinked(c,tris,minX,minY,invSize,0);
+        return;
+      }
+      b=b.next;
+    }
+    a=a.next;
+  } while(a!==start);
+}
+function ecGetLeftmost(start){
+  let p=start, leftmost=start;
+  do{
+    if(p.x<leftmost.x || (p.x===leftmost.x && p.y<leftmost.y)) leftmost=p;
+    p=p.next;
+  } while(p!==start);
+  return leftmost;
+}
+function ecSectorContains(m,p){ return ecArea(m.prev,m,p.prev)<0 && ecArea(p.next,m,m.next)<0; }
+function ecFindBridge(hole,outerNode){
+  let p=outerNode, qx=-Infinity, m=null;
+  const hx=hole.x, hy=hole.y;
+  do{
+    if(hy<=p.y && hy>=p.next.y && p.next.y!==p.y){
+      const x=p.x+(hy-p.y)/(p.next.y-p.y)*(p.next.x-p.x);
+      if(x<=hx && x>qx){ qx=x; m = p.x<p.next.x ? p : p.next; if(x===hx) return m; }
+    }
+    p=p.next;
+  } while(p!==outerNode);
+  if(!m) return null;
+  const stop=m, mx=m.x, my=m.y;
+  let tanMin=Infinity;
+  p=m;
+  do{
+    if(hx>=p.x && p.x>=mx && hx!==p.x &&
+       ecInTri(hy<my?hx:qx, hy, mx, my, hy<my?qx:hx, hy, p.x, p.y)){
+      const tan=Math.abs(hy-p.y)/(hx-p.x);
+      if(ecLocallyInside(p,hole) &&
+         (tan<tanMin || (tan===tanMin && (p.x>m.x || (p.x===m.x && ecSectorContains(m,p)))))){
+        m=p; tanMin=tan;
+      }
+    }
+    p=p.next;
+  } while(p!==stop);
+  return m;
+}
+function ecEliminateHoles(d,holeIdx,outerNode){
+  const queue=[];
+  for(let i=0,len=holeIdx.length;i<len;i++){
+    const s=holeIdx[i]*2, e = i<len-1 ? holeIdx[i+1]*2 : d.length;
+    const list=ecList(d,s,e,false);
+    if(list===list.next) list.steiner=true;
+    queue.push(ecGetLeftmost(list));
+  }
+  queue.sort((a,b)=>a.x-b.x);
+  for(const q of queue){
+    const bridge=ecFindBridge(q,outerNode);
+    if(!bridge) continue;
+    const br=ecSplitPoly(bridge,q);
+    ecFilter(br,br.next);
+    outerNode=ecFilter(bridge,bridge.next);
+  }
+  return outerNode;
+}
+function ecLinked(ear,tris,minX,minY,invSize,pass){
+  if(!ear) return;
+  if(!pass && invSize) ecIndexCurve(ear,minX,minY,invSize);
+  let stop=ear, prev, next, guard=0;
+  while(ear.prev!==ear.next){
+    if(guard++ > 3e6) break;
+    prev=ear.prev; next=ear.next;
+    if(invSize ? ecIsEarHashed(ear,minX,minY,invSize) : ecIsEar(ear)){
+      tris.push(prev.i/2, ear.i/2, next.i/2);
+      ecRem(ear);
+      ear=next.next; stop=next.next;
+      continue;
+    }
+    ear=next;
+    if(ear===stop){
+      if(!pass) ecLinked(ecFilter(ear),tris,minX,minY,invSize,1);
+      else if(pass===1){ ear=ecCure(ecFilter(ear),tris); ecLinked(ear,tris,minX,minY,invSize,2); }
+      else if(pass===2) ecSplitEarcut(ear,tris,minX,minY,invSize);
+      break;
+    }
+  }
+}
+function earcut(d, holeIdx){
+  const hasHoles = holeIdx && holeIdx.length;
+  const outerLen = hasHoles ? holeIdx[0]*2 : d.length;
+  let outerNode = ecList(d,0,outerLen,true);
+  const tris=[];
+  if(!outerNode || outerNode.next===outerNode.prev) return tris;
+  let minX,minY,maxX,maxY,invSize;
+  if(hasHoles) outerNode = ecEliminateHoles(d,holeIdx,outerNode);
+  if(d.length>160){
+    minX=maxX=d[0]; minY=maxY=d[1];
+    for(let i=2;i<outerLen;i+=2){
+      const x=d[i], y=d[i+1];
+      if(x<minX)minX=x; if(y<minY)minY=y; if(x>maxX)maxX=x; if(y>maxY)maxY=y;
+    }
+    invSize=Math.max(maxX-minX,maxY-minY);
+    invSize = invSize!==0 ? 32767/invSize : 0;
+  }
+  ecLinked(outerNode,tris,minX,minY,invSize,0);
+  return tris;
+}
+
+/* Caps. `loops` must be correctly oriented: CCW for solid boundaries, CW for
+   holes. Holes are matched to the innermost outer loop that contains them, so
+   nested art (a dot inside the counter of an "O") comes out right. */
+function pointInLoop(px,py,L){
+  let inside=false;
+  for(let i=0,j=L.length-1;i<L.length;j=i++){
+    if(((L[i].y>py)!==(L[j].y>py)) &&
+       (px < (L[j].x-L[i].x)*(py-L[i].y)/(L[j].y-L[i].y)+L[i].x)) inside=!inside;
+  }
+  return inside;
+}
+function addCaps(out, loops, z, faceUp){
+  const outers=[], holes=[];
+  for(const L of loops){
+    if(!L || L.length<3) continue;
+    const a=loopArea(L);
+    if(Math.abs(a)<1e-12) continue;
+    (a>0 ? outers : holes).push({L, a:Math.abs(a)});
+  }
+  if(!outers.length) return;
+  // assign each hole to the smallest outer that contains it
+  for(const h of holes){
+    let best=null;
+    for(const o of outers)
+      if(o.a>h.a && pointInLoop(h.L[0].x,h.L[0].y,o.L) && (!best || o.a<best.a)) best=o;
+    if(best) (best.holes || (best.holes=[])).push(h.L);
+  }
+  for(const o of outers){
+    const coords=[], holeIdx=[];
+    for(const p of o.L) coords.push(p.x,p.y);
+    if(o.holes) for(const H of o.holes){
+      holeIdx.push(coords.length/2);
+      for(const p of H) coords.push(p.x,p.y);
+    }
+    const idx = earcut(coords, holeIdx.length?holeIdx:null);
+    for(let i=0;i<idx.length;i+=3){
+      const a=idx[i]*2, b=idx[i+1]*2, c=idx[i+2]*2;
+      const ax=coords[a],ay=coords[a+1], bx=coords[b],by=coords[b+1], cx=coords[c],cy=coords[c+1];
+      // force winding to match the requested facing, whatever earcut handed back
+      const cross=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax);
+      if((cross>=0)===faceUp) tri(out, ax,ay,z, bx,by,z, cx,cy,z);
+      else                    tri(out, ax,ay,z, cx,cy,z, bx,by,z);
+    }
+  }
+}
+
+/* Walls: loops wound CCW for outer boundaries, CW for holes → normals face out */
+function addWalls(out, loops, zb, zt){
+  for(const L of loops){
+    if(!L || L.length<3) continue;
+    for(let i=0;i<L.length;i++){
+      const p=L[i], q=L[(i+1)%L.length];
+      if(Math.hypot(p.x-q.x,p.y-q.y)<1e-9) continue;
+      tri(out, p.x,p.y,zb, q.x,q.y,zb, q.x,q.y,zt);
+      tri(out, p.x,p.y,zb, q.x,q.y,zt, p.x,p.y,zt);
+    }
+  }
+}
+function extrude(out, loops, zb, zt){
+  addCaps(out, loops, zb, false);
+  addCaps(out, loops, zt, true);
+  addWalls(out, loops, zb, zt);
+}
+
+/* ─────────────── marching squares: binary mask → closed loops ───────────────
+   Segment orientation keeps material on the LEFT, so outer loops come out CCW
+   and holes CW — exactly what addWalls() needs. */
+const MS_CASES = [
+  [],[[0,3]],[[1,0]],[[1,3]],[[2,1]],[[0,3],[2,1]],[[2,0]],[[2,3]],
+  [[3,2]],[[0,2]],[[3,2],[1,0]],[[1,2]],[[3,1]],[[0,1]],[[3,0]],[]
+];
+function traceMask(mask, gw, gh, ox, oy, res){
+  const STR = 2*gh+4;
+  const next = new Map();
+  const ekey=(gx,gy,e)=>{ // doubled-integer coords of edge midpoints
+    switch(e){
+      case 0: return (2*gx+1)*STR + (2*gy);
+      case 1: return (2*gx+2)*STR + (2*gy+1);
+      case 2: return (2*gx+1)*STR + (2*gy+2);
+      default:return (2*gx  )*STR + (2*gy+1);
+    }
+  };
+  for(let gy=0; gy<gh-1; gy++){
+    const r0=gy*gw, r1=r0+gw;
+    for(let gx=0; gx<gw-1; gx++){
+      const idx = (mask[r0+gx]?1:0) | (mask[r0+gx+1]?2:0) | (mask[r1+gx+1]?4:0) | (mask[r1+gx]?8:0);
+      const segs = MS_CASES[idx];
+      for(let s=0;s<segs.length;s++) next.set(ekey(gx,gy,segs[s][0]), ekey(gx,gy,segs[s][1]));
+    }
+  }
+  const loops=[];
+  const toMM = k => { const dx=Math.floor(k/STR), dy=k-dx*STR; return {x:ox+(dx/2)/res, y:oy+(dy/2)/res}; };
+  while(next.size){
+    const start = next.keys().next().value;
+    const L=[]; let k=start, guard=0;
+    while(k!==undefined && guard++ < 4e6){
+      const nk = next.get(k);
+      if(nk===undefined) break;
+      next.delete(k);
+      L.push(toMM(k));
+      k = nk;
+      if(k===start) break;
+    }
+    if(L.length>=3) loops.push(L);
+  }
+  return loops;
+}
+
+/* loop clean-up: corner-preserving smoothing, then Douglas-Peucker */
+function smoothLoop(L, passes){
+  let P=L;
+  for(let p=0;p<passes;p++){
+    const n=P.length, Q=new Array(n);
+    for(let i=0;i<n;i++){
+      const a=P[(i-1+n)%n], b=P[i], c=P[(i+1)%n];
+      Q[i]={x:0.25*a.x+0.5*b.x+0.25*c.x, y:0.25*a.y+0.5*b.y+0.25*c.y};
+    }
+    P=Q;
+  }
+  return P;
+}
+function dp(pts, i, j, tol, keep){
+  if(j<=i+1) return;
+  const a=pts[i], b=pts[j];
+  const dx=b.x-a.x, dy=b.y-a.y, len=Math.hypot(dx,dy);
+  let best=-1, bi=-1;
+  for(let k=i+1;k<j;k++){
+    const p=pts[k];
+    const d = len<1e-12 ? Math.hypot(p.x-a.x,p.y-a.y)
+                        : Math.abs(dy*(p.x-a.x)-dx*(p.y-a.y))/len;
+    if(d>best){ best=d; bi=k; }
+  }
+  if(best>tol){ keep[bi]=1; dp(pts,i,bi,tol,keep); dp(pts,bi,j,tol,keep); }
+}
+function simplifyLoop(L, tol){
+  if(tol<=0 || L.length<8) return L;
+  const n=L.length;
+  // split the closed loop at two far-apart anchors so DP behaves
+  let far=0, fd=-1;
+  for(let i=1;i<n;i++){ const d=Math.hypot(L[i].x-L[0].x, L[i].y-L[0].y); if(d>fd){fd=d;far=i;} }
+  const keep=new Uint8Array(n); keep[0]=1; keep[far]=1;
+  dp(L,0,far,tol,keep); dp(L,far,n-1,tol,keep); keep[n-1]=1;
+  const out=[]; for(let i=0;i<n;i++) if(keep[i]) out.push(L[i]);
+  return out.length>=3 ? out : L;
+}
+function maskToLoops(mask, gw, gh, ox, oy, res, smoothPasses, tol, minArea){
+  let loops = traceMask(mask, gw, gh, ox, oy, res);
+  const out=[];
+  for(let L of loops){
+    if(smoothPasses>0) L = smoothLoop(L, smoothPasses);
+    L = simplifyLoop(L, tol);
+    L = dedupeLoop(L);
+    if(L.length<3) continue;
+    if(Math.abs(loopArea(L)) < minArea) continue;
+    out.push(L);
+  }
+  return out;
+}
+
+
+
+/* ───────── shared mesh helpers ───────── */
+function jitterLoops(loops){
+  let seed=1;
+  const j=()=>{ seed=(seed*16807)%2147483647; return (seed/2147483647-0.5)*0.0016; };
+  return loops.map(L=>L.map(q=>({x:q.x+j(), y:q.y+j()})));
+}
+function mirrorX(parts){
+  for(const p of parts){
+    const t=p.tris;
+    for(let i=0;i<t.length;i+=9){
+      t[i]=-t[i]; t[i+3]=-t[i+3]; t[i+6]=-t[i+6];
+      const x=t[i+3], y=t[i+4], z=t[i+5];
+      t[i+3]=t[i+6]; t[i+4]=t[i+7]; t[i+5]=t[i+8];
+      t[i+6]=x; t[i+7]=y; t[i+8]=z;
+    }
+  }
+}
+function stlBinary(tris, name){
+  const n=tris.length/9, buf=new ArrayBuffer(84+n*50), dv=new DataView(buf), u8=new Uint8Array(buf);
+  const hdr=("Veer Light Box Studio "+BUILD+" - "+name).replace(/[^\x20-\x7E]/g,"-").slice(0,79);
+  for(let i=0;i<hdr.length;i++) u8[i]=hdr.charCodeAt(i);
+  dv.setUint32(80,n,true);
+  let o=84;
+  for(let k=0;k<n;k++){
+    const b=k*9;
+    const ax=tris[b],ay=tris[b+1],az=tris[b+2],bx=tris[b+3],by=tris[b+4],bz=tris[b+5],cx=tris[b+6],cy=tris[b+7],cz=tris[b+8];
+    let nx=(by-ay)*(cz-az)-(bz-az)*(cy-ay), ny=(bz-az)*(cx-ax)-(bx-ax)*(cz-az), nz=(bx-ax)*(cy-ay)-(by-ay)*(cx-ax);
+    const L=Math.hypot(nx,ny,nz)||1;
+    dv.setFloat32(o,nx/L,true); dv.setFloat32(o+4,ny/L,true); dv.setFloat32(o+8,nz/L,true);
+    for(let v=0;v<9;v++) dv.setFloat32(o+12+v*4,tris[b+v],true);
+    dv.setUint16(o+48,0,true); o+=50;
+  }
+  return new Uint8Array(buf);
+}
+const CRC_T=(()=>{ const t=new Uint32Array(256); for(let n=0;n<256;n++){ let c=n; for(let k=0;k<8;k++) c=c&1?0xEDB88320^(c>>>1):c>>>1; t[n]=c>>>0; } return t; })();
+function crc32(b){ let c=0xFFFFFFFF; for(let i=0;i<b.length;i++) c=CRC_T[(c^b[i])&255]^(c>>>8); return (c^0xFFFFFFFF)>>>0; }
+function zipStore(files){
+  const enc=new TextEncoder(), parts=[], central=[]; let offset=0; const now=new Date();
+  const dtime=((now.getHours()<<11)|(now.getMinutes()<<5)|(now.getSeconds()>>1))&0xFFFF;
+  const ddate=(((now.getFullYear()-1980)<<9)|((now.getMonth()+1)<<5)|now.getDate())&0xFFFF;
+  for(const f of files){
+    const nm=enc.encode(f.name), data=typeof f.data==="string"?enc.encode(f.data):f.data, crc=crc32(data), sz=data.length;
+    const lh=new Uint8Array(30+nm.length), dv=new DataView(lh.buffer);
+    dv.setUint32(0,0x04034b50,true); dv.setUint16(4,20,true); dv.setUint16(6,0x0800,true);
+    dv.setUint16(10,dtime,true); dv.setUint16(12,ddate,true); dv.setUint32(14,crc,true);
+    dv.setUint32(18,sz,true); dv.setUint32(22,sz,true); dv.setUint16(26,nm.length,true);
+    lh.set(nm,30); parts.push(lh,data);
+    const ch=new Uint8Array(46+nm.length), cv=new DataView(ch.buffer);
+    cv.setUint32(0,0x02014b50,true); cv.setUint16(4,20,true); cv.setUint16(6,20,true); cv.setUint16(8,0x0800,true);
+    cv.setUint16(12,dtime,true); cv.setUint16(14,ddate,true); cv.setUint32(16,crc,true);
+    cv.setUint32(20,sz,true); cv.setUint32(24,sz,true); cv.setUint16(28,nm.length,true); cv.setUint32(42,offset,true);
+    ch.set(nm,46); central.push(ch); offset+=lh.length+sz;
+  }
+  let cd=0; for(const c of central) cd+=c.length;
+  const eo=new Uint8Array(22), ev=new DataView(eo.buffer);
+  ev.setUint32(0,0x06054b50,true); ev.setUint16(8,files.length,true); ev.setUint16(10,files.length,true);
+  ev.setUint32(12,cd,true); ev.setUint32(16,offset,true);
+  const all=[...parts,...central,eo]; let total=0; for(const a of all) total+=a.length;
+  const out=new Uint8Array(total); let p=0; for(const a of all){ out.set(a,p); p+=a.length; }
+  return out;
+}
+function download(bytes, filename, mime){
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(new Blob([bytes],{type:mime})); a.download=filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href),5000);
+}
+const hex2rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];
+const rgb2hex=(r,g,b)=>"#"+[r,g,b].map(v=>clamp(Math.round(v),0,255).toString(16).padStart(2,"0")).join("");
+const luma=c=>(0.299*c[0]+0.587*c[1]+0.114*c[2])/255;
+const slug=s=>(String(s||"").trim().replace(/[^\w\- ]+/g,"").replace(/\s+/g,"_").slice(0,40))||"lightbox";
+
+/* deterministic k-means (seeded from the darkest/most distant colours) */
+function kmeans(samples, k, iters){
+  const n=samples.length/3; if(!n) return [];
+  const C=[[samples[0],samples[1],samples[2]]];
+  while(C.length<k){
+    let bi=0,bd=-1;
+    for(let i=0;i<n;i++){
+      let best=Infinity;
+      for(const c of C){ const dr=samples[i*3]-c[0],dg=samples[i*3+1]-c[1],db=samples[i*3+2]-c[2]; best=Math.min(best,dr*dr+dg*dg+db*db); }
+      if(best>bd){ bd=best; bi=i; }
+    }
+    C.push([samples[bi*3],samples[bi*3+1],samples[bi*3+2]]);
+  }
+  const sum=new Float64Array(k*3), cnt=new Float64Array(k);
+  for(let it=0;it<iters;it++){
+    sum.fill(0); cnt.fill(0);
+    for(let i=0;i<n;i++){
+      const r=samples[i*3],g=samples[i*3+1],b=samples[i*3+2]; let bi=0,bd=Infinity;
+      for(let c=0;c<k;c++){ const dr=r-C[c][0],dg=g-C[c][1],db=b-C[c][2],d=dr*dr+dg*dg+db*db; if(d<bd){bd=d;bi=c;} }
+      sum[bi*3]+=r; sum[bi*3+1]+=g; sum[bi*3+2]+=b; cnt[bi]++;
+    }
+    for(let c=0;c<k;c++) if(cnt[c]) C[c]=[sum[c*3]/cnt[c],sum[c*3+1]/cnt[c],sum[c*3+2]/cnt[c]];
+  }
+  return C;
+}
+
+/* ───────────────────────── Pro licensing ───────────────────────── */
+const PRO = {
+  product:"lightbox", apiOrigin:"",
+  buyPro:"", buyCommercial:"", pricePro:"$29", priceCommercial:"$79",
+  publicKey:/*LICENSE_PUBLIC_KEY*/{"kty":"EC","crv":"P-256","x":"sr_eBjg_v3h7zakhjM-WbGFKfXWqc7yEwZdXDJq0RnU","y":"J-9R79HF6EG_ElknZ05epfUiGk_PQ3MZqaq5yDulaYU"}/*/LICENSE_PUBLIC_KEY*/,
+  storeKey:"veerLicense:lightbox", refreshAfterDays:3
+};
+const LIC={tier:"free",email:"",key:"",instance:""};
+const isPro=()=>LIC.tier==="pro"||LIC.tier==="commercial";
+const b64urlBytes=s=>{ s=s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="="; const bin=atob(s),u=new Uint8Array(bin.length); for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i); return u; };
+async function verifyToken(token){
+  if(!PRO.publicKey||!token||!(window.crypto&&crypto.subtle)) return null;
+  const [body,sig]=String(token).split("."); if(!body||!sig) return null;
+  try{
+    const key=await crypto.subtle.importKey("jwk",PRO.publicKey,{name:"ECDSA",namedCurve:"P-256"},false,["verify"]);
+    if(!await crypto.subtle.verify({name:"ECDSA",hash:"SHA-256"},key,b64urlBytes(sig),new TextEncoder().encode(body))) return null;
+    const pl=JSON.parse(new TextDecoder().decode(b64urlBytes(body)));
+    if(pl.p!==PRO.product&&pl.p!=="veer-pro") return null;
+    return pl.exp*1000>Date.now()?pl:null;
+  }catch(e){ return null; }
+}
+const licStored=()=>{ try{ return JSON.parse(localStorage.getItem(PRO.storeKey)||"null"); }catch(e){ return null; } };
+const licStore=o=>{ try{ o?localStorage.setItem(PRO.storeKey,JSON.stringify(o)):localStorage.removeItem(PRO.storeKey); }catch(e){} };
+function licApply(pl,stored){
+  LIC.tier=pl?(pl.t==="commercial"?"commercial":"pro"):"free"; LIC.email=pl?(pl.e||""):"";
+  LIC.key=stored?stored.key:""; LIC.instance=stored?stored.instance:""; proUI();
+}
+async function licCall(action,key,instance){
+  if(location.protocol==="file:"&&!PRO.apiOrigin) return {ok:false,error:"Unlocking works on the hosted version of Light Box Studio. Open it from the Veer Tools site, unlock once, and you're set."};
+  try{
+    const r=await fetch(PRO.apiOrigin+"/api/license",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({action,product:PRO.product,key,instance})});
+    const j=await r.json().catch(()=>({}));
+    return j&&typeof j==="object"?j:{ok:false,error:"Unexpected reply from the license server."};
+  }catch(e){ return {ok:false,offline:true,error:"Couldn't reach the license server. Check your connection and try again."}; }
+}
+async function licActivate(key){
+  const r=await licCall("activate",key,""); if(!r.ok) return r;
+  const pl=await verifyToken(r.token);
+  if(!pl) return {ok:false,error:"The license server's reply couldn't be verified. Reload the page and try again."};
+  const stored={key,instance:r.instance||"",token:r.token,checked:Date.now()};
+  licStore(stored); licApply(pl,stored); return {ok:true};
+}
+async function licInit(){
+  const stored=licStored(); if(!stored){ licApply(null); return; }
+  const pl=await verifyToken(stored.token); licApply(pl,pl?stored:null);
+  if((!pl||(Date.now()-(stored.checked||0))>PRO.refreshAfterDays*86400e3)&&navigator.onLine!==false){
+    const r=await licCall("refresh",stored.key,stored.instance);
+    if(r.ok){ const np=await verifyToken(r.token); if(np){ const ns={...stored,token:r.token,instance:r.instance||stored.instance,checked:Date.now()}; licStore(ns); licApply(np,ns); } }
+    else if(!r.offline){ licStore(null); licApply(null); setStatus(r.error||"Your Pro license is no longer active.","err"); }
+  }
+  refresh();
+}
+function proNeeds(st){
+  const n=[];
+  if(st.mode==="litho") n.push("photo lithophane");
+  else if(S.img) n.push("an image");
+  if(st.batch.length) n.push("batch names");
+  return n;
+}
+function proUI(){
+  const pro=isPro();
+  $("planChip").classList.toggle("pro",pro);
+  $("planTxt").textContent=LIC.tier==="commercial"?"Commercial":pro?"Pro":"Free · Upgrade";
+  document.querySelectorAll(".protag").forEach(t=>t.hidden=pro);
+  $("proBuy").hidden=pro; $("proOwned").hidden=!pro; $("proManage").hidden=!pro; $("proKeyRow").hidden=pro; $("proFoot").hidden=pro;
+  $("proTitle").textContent=LIC.tier==="commercial"?"Light Box Studio Commercial":"Light Box Studio Pro";
+  $("proSub").textContent=pro?"Thanks for supporting Veer. Everything is unlocked in this browser.":"Logos, photos, batch names and clean files.";
+  if(pro){
+    $("ownTier").textContent=LIC.tier==="commercial"?"Commercial (you may sell what you print)":"Pro (personal use)";
+    $("ownEmail").textContent=LIC.email||"—";
+    $("ownKey").textContent=LIC.key?LIC.key.slice(0,4)+"••••••••"+LIC.key.slice(-4):"—";
+    const st=licStored(); $("ownChecked").textContent=st&&st.checked?new Date(st.checked).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}):"—";
+  }
+  const setBuy=(el,url,price,pe)=>{ $(pe).textContent=price;
+    if(url){ el.href=url; el.classList.remove("off"); } else { el.removeAttribute("href"); el.classList.add("off"); el.title="Checkout opens soon"; } };
+  setBuy($("buyPro"),PRO.buyPro,PRO.pricePro,"pricePro"); setBuy($("buyCom"),PRO.buyCommercial,PRO.priceCommercial,"priceCom");
+}
+const proMsg=(t,c)=>{ const m=$("proMsg"); m.textContent=t||""; m.className=c||""; };
+function openPro(needs){
+  const u=$("proUses");
+  if(needs&&needs.length&&!isPro()){
+    u.hidden=false;
+    u.innerHTML=`This design uses <b>${needs.join("</b> and <b>")}</b>, which ${needs.length>1?"are":"is"} part of Pro. You can keep designing and previewing for free; the download needs Pro.`;
+  }else u.hidden=true;
+  proMsg(""); if(!$("pro").open) $("pro").showModal();
+  if(!isPro()) setTimeout(()=>$("proKey").focus(),30);
+}
+
+/* ───────────────────────── state & settings ───────────────────────── */
+const S={ mode:"inlay", img:null, imgName:"", src:null, palette:[], textCol:"#1b1b1f", raster:null, litho:null, parts:[], fontsReady:false };
+const FONT_WEIGHT={"Montserrat":800,"Baloo 2":800,"Fredoka":600,"Dancing Script":700,"Playfair Display":700};
+function readSettings(){
+  const g=id=>{ const v=parseFloat($(id).value); return isFinite(v)?v:0; };
+  const st={
+    mode:S.mode, l1:$("l1").value, l2:$("l2").value, font:$("font").value,
+    tSize:g("tSize")/100, tL2:g("tL2")/100, tBold:g("tBold")/10, tX:g("tX"), tY:g("tY"),
+    iScale:g("iScale")/100, iX:g("iX"), iY:g("iY"), k:parseInt($("k").value,10)||2, rmBg:$("rmBg").checked, bgTol:g("bgTol"),
+    lZoom:g("lZoom")/100, lBright:g("lBright")/100, lContrast:g("lContrast")/100,
+    lMin:Math.max(0.4,g("lMin")), lMax:Math.max(0.8,g("lMax")),
+    W:Math.max(40,g("W")), H:Math.max(40,g("H")), D:Math.max(15,g("D")), wall:Math.max(1.2,g("wall")),
+    rad:Math.max(0,g("rad")), faceT:Math.max(0.6,g("faceT")), colD:Math.max(0.2,g("colD")),
+    frameCol:$("frameCol").value, faceCol:$("faceCol").value,
+    backOn:$("backOn").checked, keyholes:$("keyholes").checked, cable:$("cable").checked, fit:parseFloat($("fit").value)||0.3,
+    batch:$("batch").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,200)
+  };
+  if(st.lMax<=st.lMin+0.4) st.lMax=st.lMin+0.4;
+  st.colD=Math.min(st.colD, st.faceT-0.4);
+  st.rad=Math.min(st.rad, Math.min(st.W,st.H)/2-0.5);
+  st.iw=st.W-2*st.wall; st.ih=st.H-2*st.wall;
+  st.ri=st.mode==="litho"?0:Math.max(0,Math.min(st.rad-st.wall, Math.min(st.iw,st.ih)/2-0.5));
+  st.margin=2;
+  return st;
+}
+
+/* ───────────────────────── text ───────────────────────── */
+/* Draws the text block into ctx. px(xmm,ymm) maps front-view mm → canvas px. */
+function drawText(ctx, st, line1, line2, px, res){
+  const l1=(line1||"").trim(), l2=(line2||"").trim();
+  if(!l1 && !l2) return false;
+  const w=FONT_WEIGHT[st.font]||400, fam=`"${st.font}", "Segoe UI", sans-serif`;
+  const aw=(st.iw-2*st.margin-2)*res, ah=(st.ih-2*st.margin-2)*res;
+  const share = l1&&l2 ? 1/(1+st.tL2*1.05) : 1;
+  const lines=[];
+  const fit=(txt, frac)=>{
+    let f=ah*st.tSize*frac*1.25;
+    ctx.font=`${w} ${f}px ${fam}`;
+    let m=ctx.measureText(txt);
+    const wd=m.width + st.tBold*res;
+    const lim=aw*0.9;   // leave breathing room either side
+    if(wd>lim) { f*=lim/wd; ctx.font=`${w} ${f}px ${fam}`; m=ctx.measureText(txt); }
+    const asc=m.actualBoundingBoxAscent||f*0.72, desc=m.actualBoundingBoxDescent||f*0.2;
+    lines.push({txt,f,asc,desc});
+  };
+  if(l1) fit(l1, share);
+  if(l2) fit(l2, l1?share*st.tL2:1);
+  const gap = lines.length>1 ? lines[0].f*0.12 : 0;
+  const total = lines.reduce((a,L)=>a+L.asc+L.desc,0)+gap;
+  const [cx,cy]=px(st.tX, st.tY);
+  let y=cy-total/2;
+  ctx.textAlign="center"; ctx.textBaseline="alphabetic";
+  ctx.lineJoin="round"; ctx.lineWidth=st.tBold*res;
+  for(const L of lines){
+    ctx.font=`${w} ${L.f}px ${fam}`;
+    y+=L.asc;
+    if(st.tBold>0) ctx.strokeText(L.txt,cx,y);
+    ctx.fillText(L.txt,cx,y);
+    y+=L.desc+gap;
+  }
+  return true;
+}
+
+/* ───────────────────────── image prep ───────────────────────── */
+/* Palette + background analysis run once per image/k/bg settings, on a
+   downscaled copy, so the colours don't jump around while you drag sliders. */
+function analyseImage(st){
+  if(!S.img){ S.src=null; S.palette=[]; return; }
+  const key=[S.imgName,st.k,st.rmBg,st.bgTol].join("|");
+  if(S.src&&S.src.key===key) return;
+  const c=document.createElement("canvas"), sc=Math.min(1,220/Math.max(S.img.naturalWidth,S.img.naturalHeight));
+  c.width=Math.max(1,Math.round(S.img.naturalWidth*sc)); c.height=Math.max(1,Math.round(S.img.naturalHeight*sc));
+  const g=c.getContext("2d",{willReadFrequently:true}); g.drawImage(S.img,0,0,c.width,c.height);
+  const d=g.getImageData(0,0,c.width,c.height).data, N=c.width*c.height;
+  let hasAlpha=false; for(let i=0;i<N;i++) if(d[i*4+3]<250){ hasAlpha=true; break; }
+  const corners=[[0,0],[c.width-1,0],[0,c.height-1],[c.width-1,c.height-1]].map(([x,y])=>{ const o=(y*c.width+x)*4; return [d[o],d[o+1],d[o+2]]; });
+  const bg=corners[0], tol2=(st.bgTol*2.55)**2*3;
+  const keep=(r,g2,b,a)=>{ if(a<128) return false; if(st.rmBg&&!hasAlpha){ const dr=r-bg[0],dg=g2-bg[1],db=b-bg[2]; if(dr*dr+dg*dg+db*db<tol2) return false; } return true; };
+  const samples=[];
+  for(let i=0;i<N;i++) if(keep(d[i*4],d[i*4+1],d[i*4+2],d[i*4+3])) samples.push(d[i*4],d[i*4+1],d[i*4+2]);
+  const C=samples.length?kmeans(new Float64Array(samples),Math.min(st.k,samples.length/3),12):[];
+  const old=S.palette;
+  S.palette=C.map((c2,i)=>({hex:(old[i]&&old[i].locked)?old[i].hex:rgb2hex(...c2), src:c2, locked:!!(old[i]&&old[i].locked)}));
+  S.src={key,hasAlpha,bg,tol2,keep};
+}
+
+/* ───────────────────────── inlay raster ───────────────────────── */
+function rasterInlay(st, line1, line2){
+  const res=Math.min(10,1400/Math.max(st.iw,st.ih));
+  const gw=Math.round(st.iw*res)+1, gh=Math.round(st.ih*res)+1, N=gw*gh;
+  const ox=-st.iw/2, oy=-st.ih/2;
+  const px=(x,y)=>[(x-ox)*res, (gh-1)-(y-oy)*res];
+  const labels=new Uint8Array(N);
+  const c=document.createElement("canvas"); c.width=gw; c.height=gh;
+  const g=c.getContext("2d",{willReadFrequently:true});
+  const slots=[];
+  if(S.img && S.src){
+    const aw=st.iw-2*st.margin, ah=st.ih-2*st.margin;
+    const iw=S.img.naturalWidth, ih=S.img.naturalHeight;
+    const f=Math.min(aw/iw, ah/ih)*st.iScale, dw=iw*f, dh=ih*f;
+    const [x0,y0]=px(st.iX-dw/2, st.iY+dh/2);
+    g.imageSmoothingQuality="high"; g.drawImage(S.img,x0,y0,dw*res,dh*res);
+    const d=g.getImageData(0,0,gw,gh).data;
+    const P=S.palette.map(p=>p.src);
+    for(let i=0;i<N;i++){
+      const r=d[i*4],gg=d[i*4+1],b=d[i*4+2],a=d[i*4+3];
+      if(!S.src.keep(r,gg,b,a)) continue;
+      let bi=0,bd=Infinity;
+      for(let k=0;k<P.length;k++){ const dr=r-P[k][0],dg=gg-P[k][1],db=b-P[k][2],dd=dr*dr+dg*dg+db*db; if(dd<bd){bd=dd;bi=k;} }
+      labels[i]=bi+1;
+    }
+    // 3×3 majority clean-up of anti-aliasing speckle
+    const src=labels.slice(), hist=new Uint8Array(P.length+1);
+    for(let y=1;y<gh-1;y++) for(let x=1;x<gw-1;x++){
+      hist.fill(0);
+      for(let dy=-1;dy<=1;dy++) for(let dx=-1;dx<=1;dx++) hist[src[(y+dy)*gw+x+dx]]++;
+      let bi=0,bc=-1; for(let v=0;v<=P.length;v++) if(hist[v]>bc){bc=hist[v];bi=v;}
+      if(bc>=6) labels[y*gw+x]=bi;
+    }
+    S.palette.forEach((p,i)=>slots.push({hex:p.hex,label:"Image colour "+(i+1)}));
+  }
+  g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,gw,gh); g.fillStyle="#fff"; g.strokeStyle="#fff";
+  if(drawText(g, st, line1, line2, px, res)){
+    const td=g.getImageData(0,0,gw,gh).data, ts=slots.length+1;
+    for(let i=0;i<N;i++) if(td[i*4+3]>128) labels[i]=ts;
+    slots.push({hex:S.textCol,label:"Text"});
+  }
+  // keep everything inside the opening, clear of the frame
+  const hw=st.iw/2-st.margin, hh=st.ih/2-st.margin, rr=Math.max(0,st.ri-st.margin);
+  for(let y=0;y<gh;y++) for(let x=0;x<gw;x++){
+    const i=y*gw+x; if(!labels[i]) continue;
+    const mx=ox+x/res, my=oy+((gh-1)-y)/res;
+    if(!insideRR(mx,my,hw,hh,rr)) labels[i]=0;
+  }
+  return {gw,gh,res,ox,oy,labels,slots};
+}
+function insideRR(x,y,hw,hh,r){
+  const ax=Math.abs(x), ay=Math.abs(y);
+  if(ax>hw||ay>hh) return false;
+  if(ax>hw-r && ay>hh-r) return Math.hypot(ax-(hw-r), ay-(hh-r))<=r;
+  return true;
+}
+function slotMask(R, slot){
+  const m=new Uint8Array(R.gw*R.gh);
+  for(let y=0;y<R.gh;y++){ const s=y*R.gw, d=(R.gh-1-y)*R.gw; for(let x=0;x<R.gw;x++) if(slot?R.labels[s+x]===slot:R.labels[s+x]) m[d+x]=1; }
+  return m;
+}
+
+/* ───────────────────────── lithophane map ───────────────────────── */
+function lithoMap(st, line1, line2){
+  const step=Math.max(0.3, Math.max(st.iw,st.ih)/400);
+  const nx=Math.max(3,Math.round(st.iw/step)), ny=Math.max(3,Math.round(st.ih/step));
+  const sx=st.iw/nx, sy=st.ih/ny, W=nx+1, H=ny+1;
+  const c=document.createElement("canvas"); c.width=W; c.height=H;
+  const g=c.getContext("2d",{willReadFrequently:true});
+  g.fillStyle="#fff"; g.fillRect(0,0,W,H);
+  if(S.img){
+    const iw=S.img.naturalWidth, ih=S.img.naturalHeight;
+    const f=Math.max(W/iw, H/ih)*st.lZoom, dw=iw*f, dh=ih*f;
+    const ox=(W-dw)/2 - st.iX/sx, oy=(H-dh)/2 + st.iY/sy;
+    g.imageSmoothingQuality="high"; g.drawImage(S.img,ox,oy,dw,dh);
+  }
+  const d=g.getImageData(0,0,W,H).data;
+  const L=new Float32Array(W*H);
+  for(let i=0;i<W*H;i++){
+    let v=(0.299*d[i*4]+0.587*d[i*4+1]+0.114*d[i*4+2])/255;
+    v+=st.lBright; v=(v-0.5)*(1+st.lContrast)+0.5;
+    L[i]=clamp(v,0,1);
+  }
+  // text darkens (prints thick)
+  g.clearRect(0,0,W,H); g.fillStyle="#000"; g.strokeStyle="#000";
+  const res=1/sx;
+  if(drawText(g, st, line1, line2, (x,y)=>[(x+st.iw/2)/sx, (st.ih/2-y)/sy], res)){
+    const td=g.getImageData(0,0,W,H).data;
+    for(let i=0;i<W*H;i++) if(td[i*4+3]>100) L[i]=Math.min(L[i], 1-td[i*4+3]/255);
+  }
+  const thick=new Float32Array(W*H);
+  for(let i=0;i<W*H;i++) thick[i]=st.lMin+(1-L[i])*(st.lMax-st.lMin);
+  return {nx,ny,sx,sy,thick};
+}
+
+/* ───────────────────────── geometry ───────────────────────── */
+function capTri(t,a,b,c,z,faceUp){
+  const cross=(b.x-a.x)*(c.y-a.y)-(b.y-a.y)*(c.x-a.x);
+  if((cross>=0)===faceUp) t.push(a.x,a.y,z,b.x,b.y,z,c.x,c.y,z); else t.push(a.x,a.y,z,c.x,c.y,z,b.x,b.y,z);
+}
+/* Watertight heightfield over the opening: varying top, flat bottom built from
+   strips that use every boundary vertex (no T-junctions), and side walls. */
+function heightfield(M, st){
+  const {nx,ny,sx,sy,thick}=M, W=nx+1, t=[];
+  const x0=-st.iw/2, y0=st.ih/2;
+  const V=(i,j)=>({x:x0+i*sx, y:y0-j*sy}), Z=(i,j)=>thick[j*W+i];
+  for(let j=0;j<ny;j++) for(let i=0;i<nx;i++){
+    const a=V(i,j),b=V(i+1,j),c=V(i+1,j+1),d=V(i,j+1);
+    const za=Z(i,j),zb=Z(i+1,j),zc=Z(i+1,j+1),zd=Z(i,j+1);
+    t.push(a.x,a.y,za, c.x,c.y,zc, b.x,b.y,zb);
+    t.push(a.x,a.y,za, d.x,d.y,zd, c.x,c.y,zc);
+  }
+  // bottom (z=0, facing down)
+  for(let i=1;i<nx-1;i++){ capTri(t,V(i,ny),V(i+1,ny),V(i+1,0),0,false); capTri(t,V(i,ny),V(i+1,0),V(i,0),0,false); }
+  const A=V(1,ny); capTri(t,A,V(1,0),V(0,0),0,false);
+  for(let j=0;j<ny;j++) capTri(t,A,V(0,j),V(0,j+1),0,false);
+  const B=V(nx-1,0); capTri(t,B,V(nx-1,ny),V(nx,ny),0,false);
+  for(let j=ny;j>0;j--) capTri(t,B,V(nx,j),V(nx,j-1),0,false);
+  // sides, walking the boundary counter-clockwise (viewed from +z)
+  const ring=[];
+  for(let i=0;i<nx;i++) ring.push([i,ny]);
+  for(let j=ny;j>0;j--) ring.push([nx,j]);
+  for(let i=nx;i>0;i--) ring.push([i,0]);
+  for(let j=0;j<ny;j++) ring.push([0,j]);
+  for(let k=0;k<ring.length;k++){
+    const [pi,pj]=ring[k], [qi,qj]=ring[(k+1)%ring.length];
+    const p=V(pi,pj), q=V(qi,qj), zp=Z(pi,pj), zq=Z(qi,qj);
+    t.push(p.x,p.y,0, q.x,q.y,0, q.x,q.y,zq);
+    t.push(p.x,p.y,0, q.x,q.y,zq, p.x,p.y,zp);
+  }
+  return t;
+}
+function openingLoop(st){
+  return st.mode==="litho"
+    ? [{x:-st.iw/2,y:-st.ih/2},{x:st.iw/2,y:-st.ih/2},{x:st.iw/2,y:st.ih/2},{x:-st.iw/2,y:st.ih/2}]
+    : roundRectLoop(st.iw, st.ih, st.ri);
+}
+/* frame + front (+ colour parts), mirrored into print space */
+function buildFront(st, line1, line2){
+  const parts=[];
+  const outer=jitterLoops([roundRectLoop(st.W,st.H,st.rad)])[0];
+  const inner=st.mode==="litho" ? openingLoop(st) : jitterLoops([openingLoop(st)])[0];
+  const fr=[]; extrude(fr,[outer,revLoop(inner)],0,st.D);
+  parts.push({name:"frame",label:"Frame",tris:fr,color:st.frameCol,z:[0,st.D]});
+  if(st.mode==="litho"){
+    const M=lithoMap(st,line1,line2);
+    parts.push({name:"front",label:"Lithophane front",tris:heightfield(M,st),color:st.faceCol,z:[0,st.lMax]});
+  }else{
+    const R=rasterInlay(st,line1,line2), h=st.colD, F=st.faceT;
+    const U=jitterLoops(maskToLoops(slotMask(R,0),R.gw,R.gh,R.ox,R.oy,R.res,1,0.03,0.08));
+    const holes=U.map(revLoop), t=[];
+    addCaps(t,[inner,...holes],0,false);      // front face, artwork cut out
+    addWalls(t,holes,0,h);                    // sides of the artwork recess
+    addCaps(t,U,h,false);                     // floor of the recess
+    addWalls(t,[inner],0,F);
+    addCaps(t,[inner],F,true);
+    parts.push({name:"front",label:"Front (diffuser)",tris:t,color:st.faceCol,z:[0,F]});
+    R.slots.forEach((s,i)=>{
+      const L=jitterLoops(maskToLoops(slotMask(R,i+1),R.gw,R.gh,R.ox,R.oy,R.res,1,0.03,0.08));
+      if(!L.length) return;
+      const tt=[]; extrude(tt,L,0,h);
+      parts.push({name:"colour"+(i+1),label:s.label,tris:tt,color:s.hex,z:[0,h]});
+    });
+  }
+  mirrorX(parts);   // the front prints face-down: mirror so it reads right
+  return parts;
+}
+/* keyhole: Ø8 head clearance with a 4.4 mm slot rising 8 mm (CCW) */
+function keyholeLoop(cx,cy){
+  const R=4, a=2.2, L=8, yi=Math.sqrt(R*R-a*a), pts=[];
+  for(let k=0;k<=10;k++){ const th=Math.PI*k/10; pts.push({x:cx+a*Math.cos(th), y:cy+yi+L+a*Math.sin(th)}); }
+  const t0=Math.atan2(yi,-a), t1=Math.atan2(yi,a)+2*Math.PI;
+  for(let k=0;k<=40;k++){ const th=t0+(t1-t0)*k/40; pts.push({x:cx+R*Math.cos(th), y:cy+R*Math.sin(th)}); }
+  return dedupeLoop(pts);
+}
+/* back panel, in print space: outside face on the plate, locating rim up */
+function buildBack(st){
+  const bt=2.4, rh=4, rimT=1.6, c=st.fit;
+  const outer=roundRectLoop(st.W,st.H,st.rad);
+  const rw=st.iw-2*c, rhh=st.ih-2*c, rr=Math.max(0.5,st.ri-c);
+  const rimO=roundRectLoop(rw,rhh,rr), rimI=roundRectLoop(rw-2*rimT,rhh-2*rimT,Math.max(0.3,rr-rimT));
+  const inHW=rw/2-rimT, inHH=rhh/2-rimT, holes=[];
+  if(st.cable && inHH>12) holes.push(rectLoop(0,-inHH+6.5,13,8,3.5));
+  if(st.keyholes && inHH>18){
+    const xs = st.iw>90 ? [-st.iw/4, st.iw/4] : [0];
+    xs.forEach(x=>holes.push(keyholeLoop(x, inHH-17)));
+  }
+  let wm=null;
+  if(!isPro()) wm=backMark(st, inHW, inHH, holes);
+  const parts=[], t=[];
+  const hr=holes.map(revLoop), wr=wm?wm.map(revLoop):[];
+  addCaps(t,[outer,...hr,...wr],0,false);
+  addWalls(t,[outer],0,bt);
+  addWalls(t,hr,0,bt);
+  if(wm){ addWalls(t,wr,0,0.4); addCaps(t,wm,0.4,false); }
+  addCaps(t,[outer,revLoop(rimO),rimI,...hr],bt,true);
+  addWalls(t,[rimO,revLoop(rimI)],bt,bt+rh);
+  addCaps(t,[rimO,revLoop(rimI)],bt+rh,true);
+  parts.push({name:"back",label:"Back panel",tris:t,color:st.frameCol,z:[0,bt+rh]});
+  return parts;
+}
+/* free plan: "MADE WITH VEER" debossed into the outside of the back panel.
+   That face is read from below, so it's drawn mirrored. */
+function backMark(st, hw, hh, holes){
+  const res=10, gw=Math.round(st.W*res)+1, gh=Math.round(st.H*res)+1, ox=-st.W/2, oy=-st.H/2;
+  const c=document.createElement("canvas"); c.width=gw; c.height=gh;
+  const g=c.getContext("2d",{willReadFrequently:true});
+  const cap=Math.min(3.2, hh/4), fpx=cap*res/0.716;
+  g.setTransform(-1,0,0,1,gw-1,0);
+  g.font=`800 ${fpx}px "Segoe UI","Helvetica Neue",Arial,sans-serif`;
+  try{ g.letterSpacing=(0.5*res)+"px"; }catch(e){}
+  g.textAlign="center"; g.textBaseline="middle"; g.fillStyle="#fff"; g.strokeStyle="#fff"; g.lineJoin="round"; g.lineWidth=0.25*res;
+  g.strokeText("MADE WITH VEER",(gw-1)/2,(gh-1)/2); g.fillText("MADE WITH VEER",(gw-1)/2,(gh-1)/2);
+  const d=g.getImageData(0,0,gw,gh).data, m=new Uint8Array(gw*gh);
+  const bad=(x,y)=>Math.abs(x)>hw-2||Math.abs(y)>hh-2||holes.some(L=>{ let xmin=1e9,xmax=-1e9,ymin=1e9,ymax=-1e9; for(const p of L){ xmin=Math.min(xmin,p.x);xmax=Math.max(xmax,p.x);ymin=Math.min(ymin,p.y);ymax=Math.max(ymax,p.y);} return x>xmin-1.5&&x<xmax+1.5&&y>ymin-1.5&&y<ymax+1.5; });
+  for(let y=0;y<gh;y++) for(let x=0;x<gw;x++){
+    if(d[(y*gw+x)*4+3]<=128) continue;
+    const mx=ox+x/res, my=oy+((gh-1)-y)/res;
+    if(bad(mx,my)) return null;
+    m[((gh-1)-y)*gw+x]=1;
+  }
+  const L=maskToLoops(m,gw,gh,ox,oy,res,1,0.03,0.01);
+  return L.length?jitterLoops(L):null;
+}
+
+/* ───────────────────────── lit preview ───────────────────────── */
+const GLOW=[255,238,206];
+function paintBox(ctx, Wc, Hc, st, lit, view){
+  const pad=Math.max(28, Math.min(Wc,Hc)*0.09);
+  const sc=Math.min((Wc-2*pad)/st.W, (Hc-2*pad)/st.H);
+  const bw=st.W*sc, bh=st.H*sc, x0=(Wc-bw)/2, y0=(Hc-bh)/2;
+  if(lit){
+    const gr=ctx.createRadialGradient(Wc/2,Hc/2,Math.min(bw,bh)*0.3,Wc/2,Hc/2,Math.max(bw,bh)*0.95);
+    gr.addColorStop(0,"rgba(255,214,150,0.22)"); gr.addColorStop(1,"rgba(255,214,150,0)");
+    ctx.fillStyle=gr; ctx.fillRect(0,0,Wc,Hc);
+  }
+  const rr=(x,y,w,h,r)=>{ ctx.beginPath(); ctx.moveTo(x+r,y); ctx.arcTo(x+w,y,x+w,y+h,r); ctx.arcTo(x+w,y+h,x,y+h,r); ctx.arcTo(x,y+h,x,y,r); ctx.arcTo(x,y,x+w,y,r); ctx.closePath(); };
+  ctx.save(); ctx.shadowColor="rgba(0,0,0,0.55)"; ctx.shadowBlur=30; ctx.shadowOffsetY=14;
+  rr(x0,y0,bw,bh,st.rad*sc); const fc=hex2rgb(st.frameCol);
+  ctx.fillStyle=lit?`rgb(${fc.map(v=>v*0.8).join(",")})`:st.frameCol; ctx.fill(); ctx.restore();
+  // frame highlight
+  ctx.save(); rr(x0+0.5,y0+0.5,bw-1,bh-1,st.rad*sc); ctx.strokeStyle="rgba(255,255,255,0.08)"; ctx.lineWidth=1; ctx.stroke(); ctx.restore();
+  const ix=x0+st.wall*sc, iy=y0+st.wall*sc, iw=st.iw*sc, ih=st.ih*sc;
+  ctx.save(); rr(ix,iy,iw,ih,st.ri*sc); ctx.clip();
+  if(view){
+    ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+    ctx.drawImage(view,ix,iy,iw,ih);
+    if(lit){
+      ctx.globalCompositeOperation="screen"; ctx.globalAlpha=0.35; ctx.filter=`blur(${Math.max(4,iw/60)}px)`;
+      ctx.drawImage(view,ix,iy,iw,ih);
+      ctx.filter="none"; ctx.globalAlpha=1; ctx.globalCompositeOperation="source-over";
+      const v=ctx.createRadialGradient(ix+iw/2,iy+ih/2,Math.min(iw,ih)*0.2,ix+iw/2,iy+ih/2,Math.max(iw,ih)*0.75);
+      v.addColorStop(0,"rgba(0,0,0,0)"); v.addColorStop(1,"rgba(40,20,0,0.28)");
+      ctx.fillStyle=v; ctx.fillRect(ix,iy,iw,ih);
+    }
+  }
+  ctx.restore();
+  return {sc,x0,y0,bw,bh};
+}
+/* the front as an image: what you see looking at the box */
+function frontViews(st, line1, line2){
+  if(st.mode==="litho"){ const M=lithoMap(st,line1,line2); return {lit:frontView(st,true,line1,line2,M), unlit:frontView(st,false,line1,line2,M)}; }
+  const R=rasterInlay(st,line1,line2);
+  return {lit:frontView(st,true,line1,line2,R), unlit:frontView(st,false,line1,line2,R)};
+}
+function frontView(st, lit, line1, line2, pre){
+  if(st.mode==="litho"){
+    const M=pre||lithoMap(st,line1,line2), W=M.nx+1, H=M.ny+1, img=new ImageData(W,H), d=img.data;
+    const mu=1.7, tmax=Math.exp(-mu*st.lMin), tmin=Math.exp(-mu*st.lMax), fc=hex2rgb(st.faceCol);
+    for(let i=0;i<W*H;i++){
+      const T=(Math.exp(-mu*M.thick[i])-tmin)/(tmax-tmin);
+      if(lit){ const v=Math.pow(clamp(T,0,1),0.9); d[i*4]=GLOW[0]*v; d[i*4+1]=GLOW[1]*v; d[i*4+2]=GLOW[2]*v; }
+      else { const v=0.86+0.14*T; d[i*4]=fc[0]*v; d[i*4+1]=fc[1]*v; d[i*4+2]=fc[2]*v; }
+      d[i*4+3]=255;
+    }
+    const c=document.createElement("canvas"); c.width=W; c.height=H; c.getContext("2d").putImageData(img,0,0); return c;
+  }
+  const R=pre||rasterInlay(st,line1,line2), img=new ImageData(R.gw,R.gh), d=img.data;
+  const face=hex2rgb(st.faceCol), cols=R.slots.map(s=>hex2rgb(s.hex));
+  const faceLit=GLOW.map((g,i)=>g*(0.55+0.45*face[i]/255));
+  const colLit=cols.map(c=>{ const l=luma(c); return c.map((v,i)=>clamp(v*(0.25+1.1*l)+GLOW[i]*0.12*l,0,255)); });
+  for(let i=0;i<R.gw*R.gh;i++){
+    const s=R.labels[i], c=s ? (lit?colLit[s-1]:cols[s-1]) : (lit?faceLit:face);
+    d[i*4]=c[0]; d[i*4+1]=c[1]; d[i*4+2]=c[2]; d[i*4+3]=255;
+  }
+  const c=document.createElement("canvas"); c.width=R.gw; c.height=R.gh; c.getContext("2d").putImageData(img,0,0);
+  S.raster=R; return c;
+}
+let viewCache=null;
+function drawLit(){
+  const cv=$("lit"), box=$("stage"), dpr=window.devicePixelRatio||1;
+  const Wc=box.clientWidth, Hc=box.clientHeight;
+  cv.width=Wc*dpr; cv.height=Hc*dpr;
+  const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,Wc,Hc);
+  if(!viewCache) return;
+  paintBox(ctx,Wc,Hc,viewCache.st,$("lightsOn").checked,$("lightsOn").checked?viewCache.lit:viewCache.unlit);
+}
+function proofPNG(st, line1, line2){
+  const W=1600, H=1200, c=document.createElement("canvas"); c.width=W; c.height=H;
+  const ctx=c.getContext("2d");
+  const bg=ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#2a241d"); bg.addColorStop(1,"#14110e");
+  ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+  paintBox(ctx,W,H,st,true,frontView(st,true,line1,line2));
+  return new Promise(res=>c.toBlob(b=>b.arrayBuffer().then(a=>res(new Uint8Array(a))),"image/png"));
+}
+
+/* ───────────────────────── 3D preview ───────────────────────── */
+const glc=$("gl");
+let gl=null, prog=null, buffers=[], cam={az:0.45, el:0.28, dist:320}, camZ=20;
+function initGL(){
+  if(gl) return true;
+  gl=glc.getContext("webgl",{antialias:true,alpha:false}); if(!gl) return false;
+  const vs=`attribute vec3 p; attribute vec3 n; uniform mat4 mvp; varying vec3 vn; void main(){ vn=n; gl_Position=mvp*vec4(p,1.0); }`;
+  const fs=`precision mediump float; varying vec3 vn; uniform vec3 col;
+    void main(){ vec3 n=normalize(vn);
+      float k=0.32+0.6*max(dot(n,normalize(vec3(0.35,0.55,-0.76))),0.0)+0.25*max(dot(n,normalize(vec3(-0.7,0.2,0.4))),0.0);
+      gl_FragColor=vec4(pow(col*k,vec3(0.85)),1.0); }`;
+  const sh=(t,s)=>{ const o=gl.createShader(t); gl.shaderSource(o,s); gl.compileShader(o); return o; };
+  prog=gl.createProgram(); gl.attachShader(prog,sh(gl.VERTEX_SHADER,vs)); gl.attachShader(prog,sh(gl.FRAGMENT_SHADER,fs));
+  gl.bindAttribLocation(prog,0,"p"); gl.bindAttribLocation(prog,1,"n"); gl.linkProgram(prog); gl.useProgram(prog);
+  gl.enable(gl.DEPTH_TEST); gl.enable(gl.CULL_FACE); gl.cullFace(gl.BACK);
+  return true;
+}
+function mul(a,b){ const o=new Float32Array(16); for(let i=0;i<4;i++)for(let j=0;j<4;j++){ let s=0; for(let k=0;k<4;k++) s+=a[k*4+j]*b[i*4+k]; o[i*4+j]=s; } return o; }
+function persp(f,ar,n,fa){ const t=1/Math.tan(f/2); return new Float32Array([t/ar,0,0,0,0,t,0,0,0,0,(fa+n)/(n-fa),-1,0,0,2*fa*n/(n-fa),0]); }
+function lookAt(e,c,u){
+  const z=[e[0]-c[0],e[1]-c[1],e[2]-c[2]]; let l=Math.hypot(...z); z.forEach((v,i)=>z[i]=v/l);
+  const x=[u[1]*z[2]-u[2]*z[1],u[2]*z[0]-u[0]*z[2],u[0]*z[1]-u[1]*z[0]]; l=Math.hypot(...x)||1; x.forEach((v,i)=>x[i]=v/l);
+  const y=[z[1]*x[2]-z[2]*x[1],z[2]*x[0]-z[0]*x[2],z[0]*x[1]-z[1]*x[0]];
+  return new Float32Array([x[0],y[0],z[0],0,x[1],y[1],z[1],0,x[2],y[2],z[2],0,-(x[0]*e[0]+x[1]*e[1]+x[2]*e[2]),-(y[0]*e[0]+y[1]*e[1]+y[2]*e[2]),-(z[0]*e[0]+z[1]*e[1]+z[2]*e[2]),1]);
+}
+function uploadGL(parts){
+  if(!initGL()) return;
+  for(const b of buffers){ gl.deleteBuffer(b.pb); gl.deleteBuffer(b.nb); }
+  buffers=[];
+  for(const p of parts){
+    const n=p.tris.length/9; if(!n) continue;
+    const pos=new Float32Array(p.tris), nor=new Float32Array(p.tris.length);
+    for(let i=0;i<n;i++){ const b=i*9;
+      const ux=pos[b+3]-pos[b],uy=pos[b+4]-pos[b+1],uz=pos[b+5]-pos[b+2],vx=pos[b+6]-pos[b],vy=pos[b+7]-pos[b+1],vz=pos[b+8]-pos[b+2];
+      let nx=uy*vz-uz*vy,ny=uz*vx-ux*vz,nz=ux*vy-uy*vx; const L=Math.hypot(nx,ny,nz)||1;
+      for(let k=0;k<3;k++){ nor[b+k*3]=nx/L; nor[b+k*3+1]=ny/L; nor[b+k*3+2]=nz/L; } }
+    const pb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,pb); gl.bufferData(gl.ARRAY_BUFFER,pos,gl.STATIC_DRAW);
+    const nb=gl.createBuffer(); gl.bindBuffer(gl.ARRAY_BUFFER,nb); gl.bufferData(gl.ARRAY_BUFFER,nor,gl.STATIC_DRAW);
+    buffers.push({pb,nb,count:n*3,color:hex2rgb(p.color).map(v=>v/255)});
+  }
+  drawGL();
+}
+function drawGL(){
+  if(!gl||!buffers.length) return;
+  const dpr=window.devicePixelRatio||1; glc.width=glc.clientWidth*dpr; glc.height=glc.clientHeight*dpr;
+  gl.viewport(0,0,glc.width,glc.height); gl.clearColor(0.06,0.055,0.05,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  // the box stands upright: Y is up, the front (z = 0) faces the camera at -z
+  const d=cam.dist, eye=[d*Math.cos(cam.el)*Math.sin(cam.az), d*Math.sin(cam.el), camZ-d*Math.cos(cam.el)*Math.cos(cam.az)];
+  const mvp=mul(persp(0.6,glc.width/glc.height,1,3000),lookAt(eye,[0,0,camZ],[0,1,0]));
+  gl.useProgram(prog); gl.uniformMatrix4fv(gl.getUniformLocation(prog,"mvp"),false,mvp);
+  gl.enableVertexAttribArray(0); gl.enableVertexAttribArray(1);
+  const cl=gl.getUniformLocation(prog,"col");
+  for(const b of buffers){ gl.uniform3fv(cl,new Float32Array(b.color));
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.pb); gl.vertexAttribPointer(0,3,gl.FLOAT,false,0,0);
+    gl.bindBuffer(gl.ARRAY_BUFFER,b.nb); gl.vertexAttribPointer(1,3,gl.FLOAT,false,0,0);
+    gl.drawArrays(gl.TRIANGLES,0,b.count); }
+}
+(function orbit(){
+  let down=false,lx=0,ly=0;
+  glc.addEventListener("pointerdown",e=>{down=true;lx=e.clientX;ly=e.clientY;glc.setPointerCapture(e.pointerId);});
+  glc.addEventListener("pointerup",()=>down=false);
+  glc.addEventListener("pointermove",e=>{ if(!down) return; cam.az-=(e.clientX-lx)*0.008; cam.el=clamp(cam.el+(e.clientY-ly)*0.008,-1.45,1.45); lx=e.clientX; ly=e.clientY; drawGL(); });
+  glc.addEventListener("wheel",e=>{ e.preventDefault(); cam.dist=clamp(cam.dist*(1+e.deltaY*0.0012),40,1500); drawGL(); },{passive:false});
+})();
+
+/* ───────────────────────── UI ───────────────────────── */
+function setStatus(msg,cls){ const s=$("stat"); s.textContent=msg; s.className=cls||""; }
+function renderColours(st){
+  const box=$("colours"); box.innerHTML="";
+  if(st.mode==="litho") return;
+  const mk=(title,sub,hex,on)=>{
+    const d=document.createElement("div"); d.className="swatch";
+    d.innerHTML=`<div class="slot"><b>${title}</b>${sub}</div>`;
+    const ci=document.createElement("input"); ci.type="color"; ci.value=hex; ci.oninput=()=>on(ci.value);
+    const nm=document.createElement("div"); nm.className="name"; nm.textContent=hex.toUpperCase();
+    d.append(ci,nm); box.appendChild(d);
+  };
+  if((st.l1+st.l2).trim()) mk("Text","filament",S.textCol,v=>{ S.textCol=v; refresh(); });
+  S.palette.forEach((p,i)=>mk("Image "+(i+1),"filament",p.hex,v=>{ p.hex=v; p.locked=true; refresh(); }));
+  const n=new Set([st.frameCol,st.faceCol,...(st.l1+st.l2).trim()?[S.textCol]:[],...S.palette.map(p=>p.hex)].map(s=>s.toLowerCase())).size;
+  $("frontWarn").innerHTML = n>4 ? `<div class="warnbox">${n} filaments: an AMS holds 4. Use the same colour for frame and text, or fewer image colours.</div>` : "";
+}
+let raf=false;
+function refresh(){
+  if(raf) return; raf=true;
+  requestAnimationFrame(()=>{
+    raf=false;
+    const st=readSettings();
+    try{
+      analyseImage(st);
+      renderColours(st);
+      const t0=performance.now();
+      viewCache={st, ...frontViews(st,st.l1,st.l2)};
+      drawLit();
+      const needs=isPro()?[]:proNeeds(st);
+      $("overlay").textContent=`${st.W} × ${st.H} × ${st.D} mm · opening ${st.iw.toFixed(0)} × ${st.ih.toFixed(0)} mm · ${st.mode==="litho"?"lithophane":"multi-colour front"} · ${(performance.now()-t0).toFixed(0)} ms`;
+      if(needs.length) setStatus(`Previewing Pro features (${needs.join(", ")}). Download needs Pro.`);
+      else if(!$("stat").classList.contains("ok")) setStatus(st.batch.length?`${st.batch.length} names ready for batch export.`:"Ready.");
+      S.parts=[]; $("partlist").style.display="none";
+    }catch(e){ console.error(e); setStatus("Preview error: "+e.message,"err"); }
+    save();
+  });
+}
+function showParts(parts, back){
+  const box=$("partlist"); box.style.display="block";
+  const all=[...parts.map((p,i)=>({...p,file:`1_box/${i+1}_${p.name}.stl`,ams:"AMS "+(i+1)})), ...back.map(p=>({...p,file:"2_back/back.stl",ams:"separate print"}))];
+  const mark=(!isPro()&&back.length)?`<div class="freenote">Free plan: a small "MADE WITH VEER" is debossed on the outside of the back panel. <button type="button" onclick="openPro()">Remove it with Pro</button></div>`:"";
+  box.innerHTML=mark+`<table><thead><tr><th>File</th><th>Part</th><th>Filament</th><th>Height</th><th>Triangles</th></tr></thead><tbody>`+
+    all.map(p=>`<tr><td class="n">${p.file}</td><td>${p.label}</td><td><span class="dot" style="background:${p.color}"></span> ${p.ams}</td><td>${p.z[1].toFixed(1)} mm</td><td>${(p.tris.length/9).toLocaleString()}</td></tr>`).join("")+`</tbody></table>`;
+}
+function doBuild(){
+  const st=readSettings();
+  if(!(st.l1+st.l2).trim()&&!S.img&&!st.batch.length){ setStatus("Type a name or add an image first.","err"); return null; }
+  const t0=performance.now();
+  const front=buildFront(st,st.batch[0]||st.l1,st.l2), back=st.backOn?buildBack(st):[];
+  S.parts=front; camZ=st.D/2; cam.dist=Math.max(st.W,st.H)*1.9;
+  uploadGL(front); showParts(front,back);
+  setStatus(`Built ${front.length+back.length} parts · ${(front.concat(back).reduce((a,p)=>a+p.tris.length/9,0)).toLocaleString()} triangles · ${(performance.now()-t0).toFixed(0)} ms`,"ok");
+  return {st,front,back};
+}
+function readme(st, names){
+  const L=[`Light box ${st.W} x ${st.H} x ${st.D} mm  ·  made with Veer Light Box Studio ${BUILD}`,""];
+  L.push(isPro()?(LIC.tier==="commercial"?"Licence: Commercial - you may sell what you print.":"Licence: Pro - personal use."):"Licence: Free - personal use.","");
+  L.push("PRINT 1: THE BOX  (folder 1_box)",
+    "  Bambu Studio / OrcaSlicer: select ALL the .stl files in the folder and drag them",
+    "  onto the plate together. Answer YES to 'load as a single object with multiple parts'.",
+    "  Set each part's filament. Do not rotate: the front prints face-down on the plate.",
+    "  0.2 mm layers. Use a smooth plate for a clean front.",
+    st.mode==="litho"
+      ? "  Lithophane: print the front in WHITE PLA, 100% infill, 0.12-0.16 mm layers look best."
+      : "  The front is the diffuser: white PLA. Black text blocks light; other colours glow tinted.","");
+  if(names.length) L.push("BATCH: the frame is shared. For each name, load 1_box/frame.stl together with the",
+    "files in names/<name>/ as one object.","");
+  if(st.backOn) L.push("PRINT 2: THE BACK PANEL  (folder 2_back)",
+    "  Print flat, rim up. The rim presses into the back of the frame.",
+    "  Too tight or too loose? Change 'Back panel fit' and re-export.","");
+  L.push("LIGHT","  Stick a 5 V USB LED strip (warm white) around the inside walls, or use a battery puck",
+    "  light on the back panel. Run the USB cable out through the hole in the back panel.");
+  return L.join("\r\n")+"\r\n";
+}
+async function doDownload(){
+  const st=readSettings();
+  const needs=isPro()?[]:proNeeds(st);
+  if(needs.length){ openPro(needs); return; }
+  setStatus("Building files…");
+  await new Promise(r=>setTimeout(r,20));
+  try{
+    const files=[], bn=slug(st.batch.length?"batch_"+st.batch.length:st.l1||S.imgName.replace(/\.[^.]+$/,""));
+    if(st.batch.length){
+      const frame=buildFront(st,st.batch[0],st.l2)[0];
+      files.push({name:`${bn}/1_box/frame.stl`,data:stlBinary(frame.tris,"Frame")});
+      for(let i=0;i<st.batch.length;i++){
+        const name=st.batch[i]; setStatus(`Building ${i+1} of ${st.batch.length}: ${name}…`);
+        await new Promise(r=>setTimeout(r,0));
+        const parts=buildFront(st,name,st.l2).slice(1), dir=`${bn}/names/${String(i+1).padStart(3,"0")}_${slug(name)}`;
+        parts.forEach((p,k)=>files.push({name:`${dir}/${k+2}_${p.name}.stl`,data:stlBinary(p.tris,p.label+" "+name)}));
+        files.push({name:`${dir}/proof.png`,data:await proofPNG(st,name,st.l2)});
+      }
+    }else{
+      const parts=buildFront(st,st.l1,st.l2);
+      parts.forEach((p,i)=>files.push({name:`${bn}/1_box/${i+1}_${p.name}.stl`,data:stlBinary(p.tris,p.label)}));
+      files.push({name:`${bn}/proof.png`,data:await proofPNG(st,st.l1,st.l2)});
+    }
+    if(st.backOn){ const b=buildBack(st)[0]; files.push({name:`${bn}/2_back/back.stl`,data:stlBinary(b.tris,"Back panel")}); }
+    files.push({name:`${bn}/README.txt`,data:readme(st,st.batch)});
+    download(zipStore(files),bn+"_lightbox.zip","application/zip");
+    setStatus(st.batch.length?`Saved ${st.batch.length} light boxes with proofs.`:"Saved. Import everything in 1_box together; print the back separately.","ok");
+  }catch(e){ console.error(e); setStatus("Export failed: "+e.message,"err"); }
+}
+
+/* mode + inputs */
+function setMode(m){
+  S.mode=m;
+  document.querySelectorAll("#modeSeg button").forEach(b=>b.classList.toggle("on",b.dataset.m===m));
+  $("inlayImg").hidden=m==="litho"; $("lithoImg").hidden=m!=="litho"; $("iScaleRow").hidden=m==="litho";
+  $("colD").closest(".row").hidden=m==="litho"; $("faceT").closest(".row").hidden=m==="litho";
+  $("modeNote").textContent=m==="litho"
+    ? "Any photo becomes the front: thin where it's bright, thick where it's dark. Text prints dark over the photo. Print the front in white."
+    : "Text and artwork are set flush into a thin white front. White glows, colours glow tinted, black blocks light.";
+  if(m==="litho"&&$("preset").value==="name"){ $("preset").value="photo"; applyPreset(); }
+  $("imgCtrls").hidden=!S.img;
+  refresh();
+}
+document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
+const PRESETS={name:[180,80],square:[120,120],wide:[220,90],photo:[162,112],photoP:[112,162]};
+function applyPreset(){ const p=PRESETS[$("preset").value]; if(p){ $("W").value=p[0]; $("H").value=p[1]; } }
+$("preset").onchange=()=>{ applyPreset(); refresh(); };
+["W","H"].forEach(id=>$(id).addEventListener("input",()=>{ $("preset").value="custom"; }));
+function loadFile(f){
+  if(!f||!/^image\//.test(f.type)) return;
+  const rd=new FileReader();
+  rd.onload=()=>{ const img=new Image(); img.onload=()=>{
+      S.img=img; S.imgName=f.name; S.src=null; S.palette=[];
+      $("dropTxt").textContent=`${f.name} · ${img.naturalWidth}×${img.naturalHeight}px · click to replace`;
+      $("imgClear").hidden=false; $("imgCtrls").hidden=false; refresh(); };
+    img.src=rd.result; };
+  rd.readAsDataURL(f);
+}
+$("drop").onclick=e=>{ if(e.target.id!=="imgClear") $("file").click(); };
+$("file").onchange=e=>loadFile(e.target.files[0]);
+$("imgClear").onclick=e=>{ e.stopPropagation(); S.img=null; S.src=null; S.palette=[]; $("file").value=""; $("dropTxt").textContent="Logo, drawing or photo · PNG · JPG · WEBP"; $("imgClear").hidden=true; $("imgCtrls").hidden=true; refresh(); };
+["dragenter","dragover"].forEach(ev=>window.addEventListener(ev,e=>{ e.preventDefault(); $("drop").classList.add("over"); }));
+["dragleave","drop"].forEach(ev=>window.addEventListener(ev,e=>{ e.preventDefault(); $("drop").classList.remove("over"); }));
+window.addEventListener("drop",e=>{ if(e.dataTransfer&&e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+const LIVE=["l1","l2","font","tSize","tL2","tBold","tX","tY","iScale","iX","iY","k","rmBg","bgTol","lZoom","lBright","lContrast","lMin","lMax",
+  "W","H","D","wall","rad","faceT","colD","frameCol","faceCol","backOn","keyholes","cable","fit","batch","preset"];
+LIVE.forEach(id=>{ const el=$(id); if(!el) return;
+  el.addEventListener("input",()=>{ syncLabels(); $("stat").classList.remove("ok"); refresh(); });
+  el.addEventListener("change",()=>{ syncLabels(); refresh(); }); });
+$("font").addEventListener("change",()=>{ const f=$("font").value; document.fonts.load(`${FONT_WEIGHT[f]||400} 64px "${f}"`).then(refresh,refresh); });
+$("lightsOn").onchange=drawLit;
+function syncLabels(){
+  $("tSizeV").textContent=$("tSize").value+"%"; $("tL2V").textContent=$("tL2").value+"%";
+  $("tBoldV").textContent=(+$("tBold").value/10).toFixed(1); $("iScaleV").textContent=$("iScale").value+"%";
+  $("bgTolV").textContent=$("bgTol").value; $("lZoomV").textContent=$("lZoom").value+"%";
+  $("lBrightV").textContent=$("lBright").value; $("lContrastV").textContent=$("lContrast").value;
+}
+function switchView(v){
+  document.querySelectorAll(".tab").forEach(t=>t.classList.toggle("on",t.dataset.v===v));
+  $("lit").style.display=v==="lit"?"block":"none"; $("gl").style.display=v==="3d"?"block":"none";
+  if(v==="3d"){ if(!S.parts.length) doBuild(); else { initGL(); drawGL(); } } else drawLit();
+}
+document.querySelectorAll(".tab").forEach(t=>t.onclick=()=>switchView(t.dataset.v));
+$("btnBuild").onclick=()=>{ if(doBuild()) switchView("3d"); };
+$("btnDl").onclick=doDownload;
+$("btnProof").onclick=async()=>{ const st=readSettings(); download(await proofPNG(st,st.batch[0]||st.l1,st.l2), slug(st.batch[0]||st.l1)+"_proof.png","image/png"); setStatus("Proof image saved. Send it to your customer to approve.","ok"); };
+window.addEventListener("resize",()=>{ drawLit(); drawGL(); });
+
+/* Pro dialog */
+$("planChip").onclick=()=>openPro();
+$("proClose").onclick=()=>$("pro").close();
+$("pro").addEventListener("click",e=>{ if(e.target===$("pro")) $("pro").close(); });
+async function doActivate(){
+  const key=$("proKey").value.trim(); if(!key){ proMsg("Paste your license key first.","err"); return; }
+  $("proActivate").disabled=true; proMsg("Checking your key…");
+  const r=await licActivate(key); $("proActivate").disabled=false;
+  if(!r.ok){ proMsg(r.error||"That key didn't work.","err"); return; }
+  $("proKey").value=""; $("proUses").hidden=true;
+  proMsg(LIC.tier==="commercial"?"Commercial unlocked. You're all set.":"Pro unlocked. You're all set.","ok"); refresh();
+}
+$("proActivate").onclick=doActivate;
+$("proKey").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doActivate(); } });
+$("proRemove").onclick=()=>{ const st=licStored(); if(st) licCall("deactivate",st.key,st.instance); licStore(null); licApply(null); proMsg("Removed from this browser. Your key still works anywhere else.","ok"); refresh(); };
+
+/* persistence */
+function save(){
+  const o={mode:S.mode,textCol:S.textCol}; LIVE.forEach(id=>{ const e=$(id); if(e) o[id]=e.type==="checkbox"?e.checked:e.value; });
+  try{ localStorage.setItem("veerLightBox",JSON.stringify(o)); }catch(e){}
+}
+(function restore(){
+  try{ const o=JSON.parse(localStorage.getItem("veerLightBox")||"null");
+    if(o){ LIVE.forEach(id=>{ const e=$(id); if(e&&o[id]!==undefined){ if(e.type==="checkbox") e.checked=o[id]; else e.value=o[id]; } });
+      if(o.textCol) S.textCol=o.textCol; if(o.mode) S.mode=o.mode; } }catch(e){}
+  $("build").textContent=BUILD; syncLabels(); proUI();
+  setMode(S.mode);
+  document.fonts.ready.then(()=>Promise.all([...$("font").options].map(o=>document.fonts.load(`${FONT_WEIGHT[o.value]||400} 64px "${o.value}"`).catch(()=>{})))).then(refresh,refresh);
+  licInit();
+})();
+window.__veerLightBox={readSettings,buildFront,buildBack,lithoMap,rasterInlay,S,isPro};
+
+</script>
+</body>
+</html>

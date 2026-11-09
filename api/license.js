@@ -39,7 +39,7 @@
 const crypto = require("crypto");
 
 const TOKEN_DAYS = 14;              // tools refresh well before this runs out
-const KNOWN_TOOLS = ["nfc-studio", "vectorizer"];
+const KNOWN_TOOLS = ["nfc-studio", "vectorizer", "lightbox"];
 
 /* ───────── helpers ───────── */
 const b64url = buf => Buffer.from(buf).toString("base64")
