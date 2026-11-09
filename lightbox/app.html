@@ -1114,8 +1114,15 @@ async function verifyToken(token){
     return pl.exp*1000>Date.now()?pl:null;
   }catch(e){ return null; }
 }
-const licStored=()=>{ try{ return JSON.parse(localStorage.getItem(PRO.storeKey)||"null"); }catch(e){ return null; } };
-const licStore=o=>{ try{ o?localStorage.setItem(PRO.storeKey,JSON.stringify(o)):localStorage.removeItem(PRO.storeKey); }catch(e){} };
+/* A Veer Pro bundle key is stored once under a shared key, so every Veer
+   tool on this site picks it up without spending another activation. */
+const BUNDLE_KEY="veerLicense:veer-pro";
+const licStored=()=>{ try{ return JSON.parse(localStorage.getItem(PRO.storeKey)||localStorage.getItem(BUNDLE_KEY)||"null"); }catch(e){ return null; } };
+const licStore=o=>{ try{
+  if(o){ localStorage.setItem(PRO.storeKey,JSON.stringify(o)); if(o.bundle) localStorage.setItem(BUNDLE_KEY,JSON.stringify(o)); }
+  else { const cur=licStored(); localStorage.removeItem(PRO.storeKey);
+    if(cur&&cur.bundle) Object.keys(localStorage).forEach(k=>{ if(k.startsWith("veerLicense:")) localStorage.removeItem(k); }); }
+}catch(e){} };
 function licApply(pl,stored){
   LIC.tier=pl?(pl.t==="commercial"?"commercial":"pro"):"free"; LIC.email=pl?(pl.e||""):"";
   LIC.key=stored?stored.key:""; LIC.instance=stored?stored.instance:""; proUI();
@@ -1133,7 +1140,7 @@ async function licActivate(key){
   const pl=await verifyToken(r.token);
   if(!pl) return {ok:false,error:"The license server's reply couldn't be verified. Reload the page and try again."};
   const stored={key,instance:r.instance||"",token:r.token,checked:Date.now()};
-  licStore(stored); licApply(pl,stored); return {ok:true};
+  stored.bundle=pl.p==="veer-pro"; licStore(stored); licApply(pl,stored); return {ok:true};
 }
 async function licInit(){
   const stored=licStored(); if(!stored){ licApply(null); return; }

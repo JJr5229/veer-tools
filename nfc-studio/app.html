@@ -3,230 +3,418 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Veer · NFC Studio</title>
+<title>NFC Studio · Veer Tools</title>
+<meta name="description" content="Drop in a logo. Get a multi-colour STL set for an NFC business card or keychain, ready for Bambu Studio and the AMS. Runs in your browser.">
+<meta name="theme-color" content="#0f1114">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* Tokens copied from /assets/site.css (the app stays single-file and works offline). */
 :root{
-  /* Veer palette — mark colours #ef4037 / #bd222f / #f69322 */
-  --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
-  --tx:#f2efe9; --tx2:#9b9a96; --acc:#f69322; --acc2:#a8541a;
-  --red:#ef4037; --red2:#bd222f; --warn:#f69322; --bad:#ef4037;
+  --bg:#0f1114; --bg-2:#131519; --panel:#17191d; --panel-2:#1e2126; --line:#2c3037; --line-2:#3a3f47;
+  --tx:#f2efe9; --tx-2:#a5a39e; --tx-3:#6f6e6a;
+  --red:#ef4037; --red-2:#bd222f; --orange:#f69322; --orange-hi:#ffa53d; --cream:#ffd9a1;
+  --ok:#41c777; --warn:#f3d089;
+  --display:"Archivo","Helvetica Neue","Segoe UI",system-ui,sans-serif;
+  --body:"Figtree","Segoe UI",system-ui,-apple-system,"Helvetica Neue",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+  --r-sm:6px; --r:10px; --r-lg:14px;
+  /* legacy aliases (kept so nothing that refers to them breaks) */
+  --panel2:var(--panel-2); --tx2:var(--tx-2); --acc:var(--orange); --acc2:#a8541a; --bad:var(--red);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
 html,body{height:100%;margin:0}
-body{background:var(--bg);color:var(--tx);font:13px/1.45 "Segoe UI",system-ui,-apple-system,sans-serif;
-  overflow:hidden;display:flex;flex-direction:column;height:100vh}
+body{background:var(--bg);color:var(--tx);font:13.5px/1.5 var(--body);-webkit-font-smoothing:antialiased;
+  overflow:hidden;display:flex;flex-direction:column;height:100vh;height:100dvh}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+::selection{background:#f6932244}
+a{color:inherit}
+.u{font:500 .78em var(--mono);color:var(--tx-3);letter-spacing:.02em;margin-left:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+/* ---------- header ---------- */
+#brand{flex:none;display:flex;align-items:center;gap:14px;height:56px;padding:0 16px 0 18px;
+  background:var(--bg-2);border-bottom:1px solid var(--line);min-width:0}
+.mark{display:flex;align-items:center;gap:10px;text-decoration:none;min-width:0}
+.mark svg{width:26px;height:22px;flex:none}
+#brand h1{margin:0;font:800 16px/1 var(--display);font-stretch:112%;letter-spacing:-.01em;white-space:nowrap}
+#build{font:500 10.5px/1 var(--mono);color:var(--tx-3);border:1px solid var(--line);border-radius:4px;
+  padding:4px 6px;white-space:nowrap;letter-spacing:.01em}
+.tagline{color:var(--tx-2);font-size:12.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;
+  padding-left:14px;border-left:1px solid var(--line);margin-left:2px}
+.appnav{margin-left:auto;display:flex;align-items:center;gap:2px;flex:none}
+.appnav a{color:var(--tx-2);text-decoration:none;font-size:13px;font-weight:500;padding:7px 10px;border-radius:var(--r-sm);white-space:nowrap}
+.appnav a:hover{color:var(--tx);background:var(--panel)}
+.appnav .sep{width:1px;height:20px;background:var(--line);margin:0 8px}
+
+/* plan chip */
+.plan{flex:none;display:inline-flex;align-items:center;gap:7px;height:30px;padding:0 12px;border-radius:999px;
+  font:600 12px/1 var(--body);letter-spacing:.01em;border:1px solid #6b4a1d;background:#1f1710;color:var(--cream);cursor:pointer}
+.plan:hover{border-color:var(--orange);color:var(--tx);background:#2a1d0e}
+.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--orange)}
+.plan.pro{border-color:#6b4a1d;color:#ffd7a3;background:#2a1d0e}
+.plan.pro .pip{background:var(--ok)}
+
 #app{display:flex;flex:1;min-height:0}
-.powered{
-  background:#131519;                /* panel is #17191d — a shade darker, no more */
-  flex:none;padding:8px 0 9px;
-  font-size:.72rem;letter-spacing:.05em;color:#6f6e6a;text-align:center;line-height:1.3;
-}
-.powered a{color:#9b9a96;font-weight:600;text-decoration:none}
-.powered a:hover{color:#fff}
 
 /* ---------- sidebar ---------- */
-#side{width:360px;min-width:360px;background:var(--panel);border-right:1px solid var(--line);
-      display:flex;flex-direction:column}
-#brand{padding:14px 16px;border-bottom:1px solid var(--line)}
-#brand h1{margin:0;font-size:15px;letter-spacing:.3px}
-#brand p{margin:2px 0 0;font-size:11px;color:var(--tx2)}
-#ctrls{flex:1;overflow-y:auto;padding:6px 14px 24px}
+#side{width:372px;min-width:372px;background:var(--panel);border-right:1px solid var(--line);display:flex;flex-direction:column;min-height:0}
+#ctrls{flex:1;overflow-y:auto;padding:4px 18px 28px;scrollbar-width:thin;scrollbar-color:var(--line-2) transparent}
 #ctrls::-webkit-scrollbar{width:10px}
-#ctrls::-webkit-scrollbar-thumb{background:#2a323d;border-radius:5px}
+#ctrls::-webkit-scrollbar-thumb{background:var(--line-2);border-radius:5px;border:3px solid var(--panel)}
 
-details.sec{border-bottom:1px solid var(--line);padding:4px 0}
-details.sec>summary{cursor:pointer;padding:9px 2px;font-weight:600;font-size:12px;
-  letter-spacing:.5px;text-transform:uppercase;color:var(--tx2);list-style:none;user-select:none}
+details.sec{border-bottom:1px solid var(--line)}
+details.sec>summary{cursor:pointer;display:flex;align-items:center;gap:10px;padding:15px 0 14px;list-style:none;user-select:none;
+  font:700 13.5px/1.2 var(--display);font-stretch:108%;letter-spacing:0;color:var(--tx)}
 details.sec>summary::-webkit-details-marker{display:none}
-details.sec>summary:before{content:"▸";display:inline-block;width:14px;color:var(--acc);
-  transition:transform .15s}
-details.sec[open]>summary:before{transform:rotate(90deg)}
-details.sec>summary:hover{color:var(--tx)}
-.body{padding:4px 2px 12px}
+details.sec>summary .n{font:500 11px/1 var(--mono);color:var(--tx-3);width:14px;flex:none}
+details.sec>summary .opt{font:400 12px var(--body);color:var(--tx-3);font-stretch:100%}
+details.sec>summary::after{content:"";margin-left:auto;width:7px;height:7px;flex:none;border-right:1.5px solid var(--tx-3);
+  border-bottom:1.5px solid var(--tx-3);transform:translateY(-2px) rotate(45deg);transition:transform .15s}
+details.sec[open]>summary::after{transform:translateY(1px) rotate(-135deg)}
+details.sec>summary:hover::after{border-color:var(--orange)}
+details.sec>summary:hover .n{color:var(--orange)}
+details.sec>summary:focus-visible{outline-offset:-2px;border-radius:4px}
+#colCount{font:500 11px/1 var(--mono);color:var(--tx-3)}
+.body{padding:0 0 18px}
 
-.row{display:flex;align-items:center;gap:8px;margin:7px 0}
-.row label{flex:1;color:var(--tx2);font-size:12px}
-.row .hint{font-size:10.5px;color:#6b7embed}
+.row{display:flex;align-items:center;gap:8px;margin:0;min-height:40px}
+.row label{flex:1;color:var(--tx-2);font-size:13px;min-width:0}
+.row .hint{font-size:11px;color:var(--tx-3)}
 input[type=number],input[type=text],select{
-  background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:6px;
-  padding:5px 7px;font:inherit;width:86px}
-input[type=text].wide{width:100%}
-select{width:auto;min-width:110px}
-input[type=range]{flex:1;accent-color:var(--acc)}
-input[type=color]{width:34px;height:26px;padding:0;border:1px solid var(--line);
-  border-radius:6px;background:var(--panel2);cursor:pointer}
-input:focus,select:focus{outline:1px solid var(--acc)}
-.val{width:46px;text-align:right;color:var(--tx);font-variant-numeric:tabular-nums;font-size:11.5px}
-.chk{display:flex;align-items:center;gap:7px;margin:8px 0;color:var(--tx2);cursor:pointer;font-size:12px}
-.chk input{accent-color:var(--acc);width:15px;height:15px}
-button{background:var(--panel2);border:1px solid var(--line);color:var(--tx);border-radius:7px;
-  padding:7px 11px;font:inherit;cursor:pointer}
-button:hover{border-color:var(--acc);color:#fff}
+  height:32px;background:var(--bg-2);border:1px solid var(--line);color:var(--tx);border-radius:var(--r-sm);
+  padding:0 9px;font:inherit;width:86px;transition:border-color .12s,background .12s}
+input[type=number]{font:500 12.5px var(--mono);text-align:right;padding-right:6px;font-variant-numeric:tabular-nums}
+input[type=text].wide{width:100%;margin:0 0 8px!important}
+input[type=number]:hover,input[type=text]:hover,select:hover{border-color:var(--line-2)}
+input[type=number]:focus,input[type=text]:focus,select:focus{outline:none;border-color:var(--orange);background:var(--bg)}
+input:disabled,select:disabled{opacity:.42;cursor:not-allowed}
+input::placeholder{color:var(--tx-3)}
+select{width:auto;min-width:110px;max-width:220px;appearance:none;-webkit-appearance:none;padding-right:28px;cursor:pointer;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23a5a39e' stroke-width='1.5'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 10px center;text-overflow:ellipsis}
+select option,select optgroup{background:var(--panel-2);color:var(--tx)}
+
+/* range */
+input[type=range]{flex:1;min-width:0;-webkit-appearance:none;appearance:none;background:transparent;height:22px;margin:0;cursor:pointer}
+input[type=range]::-webkit-slider-runnable-track{height:3px;border-radius:2px;background:var(--line-2)}
+input[type=range]::-moz-range-track{height:3px;border-radius:2px;background:var(--line-2)}
+input[type=range]::-moz-range-progress{height:3px;border-radius:2px;background:var(--orange)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;border-radius:50%;margin-top:-5.5px;
+  background:var(--tx);border:3px solid var(--orange);box-shadow:0 0 0 3px var(--panel)}
+input[type=range]::-moz-range-thumb{width:8px;height:8px;border-radius:50%;background:var(--tx);border:3px solid var(--orange);box-shadow:0 0 0 3px var(--panel)}
+input[type=range]:focus{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 3px var(--panel),0 0 0 5px #f6932266}
+.val{min-width:44px;text-align:right;color:var(--tx);font:500 12px var(--mono);font-variant-numeric:tabular-nums}
+
+/* checkbox */
+.chk{display:flex;align-items:flex-start;gap:10px;margin:0;padding:9px 0;color:var(--tx);cursor:pointer;font-size:13px;line-height:1.4}
+.chk span{padding-top:0}
+.chk input,input[type=checkbox]{-webkit-appearance:none;appearance:none;flex:none;width:16px;height:16px;margin:1px 0 0;border-radius:4px;
+  border:1.5px solid var(--line-2);background:var(--bg-2);cursor:pointer;display:grid;place-content:center;transition:background .12s,border-color .12s}
+input[type=checkbox]:hover{border-color:var(--tx-3)}
+input[type=checkbox]:checked{background:var(--orange);border-color:var(--orange)}
+input[type=checkbox]:checked::after{content:"";width:8px;height:4px;border-left:2px solid #1a0f02;border-bottom:2px solid #1a0f02;transform:translateY(-1px) rotate(-45deg)}
+input[type=checkbox]:focus-visible{outline:2px solid var(--orange);outline-offset:2px}
+
+/* segmented control (drives the real <select>, which stays in the DOM) */
+.seg{display:inline-flex;background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-sm);padding:2px;gap:2px}
+.seg button{all:unset;box-sizing:border-box;min-width:34px;height:26px;padding:0 8px;border-radius:4px;cursor:pointer;
+  font:500 12.5px/26px var(--mono);color:var(--tx-2);text-align:center;position:relative}
+.seg button:hover{color:var(--tx);background:var(--panel-2)}
+.seg button[aria-pressed="true"]{background:var(--panel-2);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line-2)}
+.seg button:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+.seg button .p{position:absolute;top:2px;right:3px;width:4px;height:4px;border-radius:50%;background:var(--orange)}
+.sr{position:absolute!important;width:1px!important;height:1px!important;min-width:0!important;padding:0!important;margin:-1px!important;
+  overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap;border:0!important}
+
+/* buttons */
+button{background:var(--panel-2);border:1px solid var(--line-2);color:var(--tx);border-radius:var(--r-sm);
+  padding:7px 12px;font:500 13px/1.2 var(--body);cursor:pointer;transition:background .12s,border-color .12s,color .12s}
+button:hover{border-color:var(--orange)}
 button:disabled{opacity:.4;cursor:not-allowed}
-button.primary{background:var(--acc2);border-color:var(--acc);color:#eafffb;font-weight:600}
-button.primary:hover{background:var(--acc);color:#05201d}
-.note{font-size:11px;color:var(--tx2);margin:6px 0 0;line-height:1.5}
-.warnbox{background:#2a1f0a;border:1px solid #6b4f10;color:#f3d089;border-radius:6px;
-  padding:7px 9px;font-size:11px;margin:8px 0}
+button:disabled:hover{border-color:var(--line-2)}
+button.primary{background:var(--orange);border-color:var(--orange);color:#1a0f02;font-weight:600}
+button.primary:hover{background:var(--orange-hi);border-color:var(--orange-hi);color:#1a0f02}
 
-#drop{border:1.5px dashed #37414e;border-radius:10px;padding:20px 12px;text-align:center;
-  color:var(--tx2);cursor:pointer;transition:.15s;margin:8px 0}
-#drop:hover,#drop.over{border-color:var(--acc);color:var(--tx);background:#12201f}
-#drop b{color:var(--tx)}
+.note{font-size:12px;color:var(--tx-2);margin:6px 0 4px;line-height:1.55}
+.note b{color:var(--tx);font-weight:600}
+.warnbox{background:#211a0f;border:1px solid #4d3a17;border-left:3px solid var(--warn);color:#efdcb4;border-radius:var(--r-sm);
+  padding:9px 11px;font-size:12px;line-height:1.55;margin:10px 0}
+.warnbox b{color:var(--warn);font-weight:600}
+.sub{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
 
-.swatch{display:flex;align-items:center;gap:8px;background:var(--panel2);border:1px solid var(--line);
-  border-radius:7px;padding:6px 8px;margin:6px 0}
-.swatch .slot{font-size:10px;color:var(--tx2);width:52px;line-height:1.25}
-.swatch .slot b{display:block;color:var(--tx);font-size:11px}
-.swatch .name{flex:1;font-size:11.5px;color:var(--tx2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.swatch .pct{font-size:10.5px;color:var(--tx2);font-variant-numeric:tabular-nums}
-.pickbtn{padding:3px 6px;font-size:10.5px}
-.pickbtn.on{background:var(--acc);color:#05201d;border-color:var(--acc)}
+/* drop zone */
+#drop{display:flex;flex-direction:column;align-items:center;gap:3px;border:1.5px dashed var(--line-2);border-radius:var(--r);
+  padding:20px 14px 18px;text-align:center;color:var(--tx-2);cursor:pointer;transition:border-color .15s,background .15s,color .15s;margin:2px 0 10px;
+  background:var(--bg-2);font-size:12.5px;overflow-wrap:anywhere}
+#drop:hover,#drop.over{border-color:var(--orange);color:var(--tx);background:#1f1710}
+#drop b{color:var(--tx);font-weight:600;font-size:13.5px}
+#drop br{display:none}
+#drop .ic{width:26px;height:26px;color:var(--orange);margin-bottom:6px}
+#drop .fmt{font:500 11px var(--mono);color:var(--tx-3);letter-spacing:.04em;margin-top:4px}
+
+/* colour swatches (built by JS) */
+.swatch{display:flex;align-items:center;gap:10px;background:var(--bg-2);border:1px solid var(--line);
+  border-radius:var(--r-sm);padding:7px 9px;margin:6px 0}
+.swatch .slot{font-size:11px;color:var(--tx-3);width:62px;line-height:1.3;flex:none}
+.swatch .slot b{display:block;color:var(--tx);font:600 11.5px var(--mono);letter-spacing:.02em}
+.swatch .name{flex:1;font:500 12px var(--mono);color:var(--tx-2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.swatch .pct{font:500 11px var(--mono);color:var(--tx-3);font-variant-numeric:tabular-nums;min-width:30px;text-align:right}
+input[type=color]{-webkit-appearance:none;appearance:none;width:30px;height:24px;padding:0;border:1px solid var(--line-2);
+  border-radius:5px;background:none;cursor:pointer;flex:none}
+input[type=color]::-webkit-color-swatch-wrapper{padding:2px}
+input[type=color]::-webkit-color-swatch{border:none;border-radius:3px}
+input[type=color]::-moz-color-swatch{border:none;border-radius:3px}
+.pickbtn{padding:4px 8px;font:500 11px/1.2 var(--body)}
+.pickbtn.on{background:var(--orange);color:#1a0f02;border-color:var(--orange)}
 
 /* ---------- main ---------- */
-#main{flex:1;display:flex;flex-direction:column;min-width:0}
-#tabs{display:flex;gap:2px;padding:8px 14px 0;border-bottom:1px solid var(--line);background:var(--panel)}
-.tab{padding:7px 15px;border-radius:7px 7px 0 0;border:1px solid transparent;border-bottom:none;
-  cursor:pointer;color:var(--tx2);font-size:12px}
-.tab.on{background:var(--bg);border-color:var(--line);color:var(--tx);margin-bottom:-1px}
-#stage{flex:1;position:relative;overflow:hidden;background:
-  radial-gradient(circle at 50% 40%,#161d26 0%,#0b0e13 75%)}
+#main{flex:1;display:flex;flex-direction:column;min-width:0;min-height:0}
+#tabs{flex:none;display:flex;align-items:center;gap:12px;height:48px;padding:0 16px;border-bottom:1px solid var(--line);background:var(--bg-2)}
+.tabset{display:inline-flex;background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:3px;gap:2px}
+.tab{all:unset;box-sizing:border-box;padding:0 14px;height:28px;line-height:28px;border-radius:5px;cursor:pointer;
+  color:var(--tx-2);font:500 12.5px/28px var(--body);white-space:nowrap}
+.tab:hover{color:var(--tx)}
+.tab.on{background:var(--panel-2);color:var(--tx);box-shadow:inset 0 0 0 1px var(--line-2)}
+.tab:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+.tabhint{margin-left:auto;font:500 11px var(--mono);color:var(--tx-3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* the build plate: millimetre grid */
+#stage{flex:1;position:relative;overflow:hidden;min-height:0;background-color:var(--bg);
+  background-image:
+    radial-gradient(ellipse 70% 60% at 50% 45%,transparent 0%,#0f111499 100%),
+    linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px),
+    linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);
+  background-size:100% 100%,50px 50px,50px 50px,10px 10px,10px 10px;background-position:center}
 #face2d,#gl{position:absolute;inset:0;width:100%;height:100%}
 #face2d{display:block}
 #gl{display:none}
-#overlay{position:absolute;left:14px;bottom:12px;font-size:11px;color:var(--tx2);
-  background:#0b0e13cc;border:1px solid var(--line);border-radius:7px;padding:6px 10px;
-  pointer-events:none;max-width:70%}
-#bar{border-top:1px solid var(--line);background:var(--panel);padding:10px 14px;
-  display:flex;gap:9px;align-items:center;flex-wrap:wrap}
-#stat{flex:1;font-size:11.5px;color:var(--tx2);min-width:180px}
-#stat.err{color:var(--bad)}
-#stat.ok{color:var(--acc)}
-.kbd{background:var(--panel2);border:1px solid var(--line);border-radius:4px;padding:1px 4px;font-size:10.5px}
-#partlist{padding:0 14px 10px;background:var(--panel);border-top:1px solid var(--line);
-  display:none;max-height:150px;overflow:auto}
-#partlist table{width:100%;border-collapse:collapse;font-size:11.5px}
-#partlist th{text-align:left;color:var(--tx2);font-weight:600;padding:6px 6px;position:sticky;top:0;background:var(--panel)}
-#partlist td{padding:4px 6px;border-top:1px solid var(--line);color:var(--tx2)}
-#partlist td.n{color:var(--tx)}
-.dot{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid #0006;vertical-align:-1px}
+#overlay{position:absolute;left:14px;bottom:12px;font:500 11px/1.4 var(--mono);color:var(--tx-2);letter-spacing:.01em;
+  background:#0f1114d9;border:1px solid var(--line);border-radius:var(--r-sm);padding:6px 10px;
+  pointer-events:none;max-width:calc(100% - 28px)}
+body:not(.has-art) #overlay{display:none}
+
+/* empty state */
+#empty{position:absolute;inset:0;display:grid;place-items:center;padding:24px;pointer-events:none}
+body.has-art #empty{display:none}
+.empty-in{pointer-events:auto;width:min(440px,100%);background:#131519f2;border:1px solid var(--line);border-radius:var(--r-lg);
+  padding:26px 26px 22px;box-shadow:0 30px 80px -30px #000c}
+.eyebrow{font:500 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+.empty-in h2{margin:12px 0 8px;font:800 23px/1.1 var(--display);font-stretch:112%;letter-spacing:-.02em}
+.empty-in p{margin:0;color:var(--tx-2);font-size:13.5px;line-height:1.6}
+.empty-act{display:flex;align-items:center;gap:14px;margin:18px 0 18px;flex-wrap:wrap}
+.empty-act button{padding:10px 16px;font-size:14px}
+.empty-act span{font-size:12.5px;color:var(--tx-3)}
+.steps{list-style:none;margin:0;padding:14px 0 0;border-top:1px solid var(--line);display:grid;gap:8px;counter-reset:s}
+.steps li{display:flex;gap:10px;font-size:12.5px;color:var(--tx-2);counter-increment:s}
+.steps li::before{content:counter(s);font:500 11px/18px var(--mono);color:var(--tx-3);width:18px;height:18px;flex:none;text-align:center;
+  border:1px solid var(--line-2);border-radius:4px}
+.empty-spec{margin-top:14px;font:500 10.5px var(--mono);color:var(--tx-3);letter-spacing:.02em}
+
+/* status bar */
+#bar{flex:none;border-top:1px solid var(--line);background:var(--bg-2);padding:10px 16px;
+  display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+#stat{flex:1;font-size:12.5px;color:var(--tx-2);min-width:200px;display:flex;align-items:center;gap:8px;line-height:1.4}
+#stat::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--line-2);flex:none}
+#stat.err{color:#ff8a7a} #stat.err::before{background:var(--red)}
+#stat.ok{color:var(--tx)} #stat.ok::before{background:var(--ok)}
+#bar button{height:36px;padding:0 15px;font-size:13px}
+#bar .quiet{background:transparent;border-color:transparent;color:var(--tx-2);padding:0 10px}
+#bar .quiet:hover:not(:disabled){color:var(--tx);border-color:var(--line-2)}
+#bar .vr{width:1px;height:22px;background:var(--line);margin:0 4px}
+/* one clear primary action: Build until there's a mesh, then Download */
+body.has-art #bar:has(#btnStl:disabled) #btnBuild{background:var(--orange);border-color:var(--orange);color:#1a0f02;font-weight:600}
+body.has-art #bar:has(#btnStl:disabled) #btnBuild:hover{background:var(--orange-hi);border-color:var(--orange-hi)}
+#btnStl:disabled{background:var(--panel-2);border-color:var(--line-2);color:var(--tx-2);opacity:.55}
+.kbd{background:var(--panel-2);border:1px solid var(--line-2);border-radius:4px;padding:1px 5px;font:500 11px var(--mono);color:var(--tx);white-space:nowrap}
+
+/* part list */
+#partlist{flex:none;padding:12px 16px 12px;background:var(--panel);border-top:1px solid var(--line);
+  display:none;max-height:min(300px,38vh);overflow:auto}
+#partlist .warnbox,#partlist .freenote{margin:0 0 10px}
+#partlist table{width:100%;border-collapse:collapse;font-size:12.5px}
+#partlist th{text-align:left;color:var(--tx-3);font:500 10.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;padding:6px 8px;
+  position:sticky;top:-12px;background:var(--panel);border-bottom:1px solid var(--line)}
+#partlist td{padding:7px 8px;border-top:1px solid var(--line);color:var(--tx-2);white-space:nowrap}
+#partlist tbody tr:first-child td{border-top:none}
+#partlist td:nth-child(n+3){font:500 12px var(--mono)}
+#partlist td:last-child,#partlist th:last-child{text-align:right}
+#partlist td.n{color:var(--tx);font:500 12px var(--mono)}
+.dot{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid #ffffff22;vertical-align:-1px;margin-right:4px}
+/* the pause banner: the one instruction that can ruin a print if missed */
+.warnbox.pause{background:#1f1710;border-color:#6b4a1d;border-left-color:var(--orange);color:var(--tx-2);font-size:12.5px;padding:11px 13px}
+.warnbox.pause b{color:var(--tx)}
+.warnbox.pause b:first-child{display:block;color:var(--orange);font:700 13px var(--display);font-stretch:108%;margin-bottom:3px}
 
 /* ---------- Pro / licensing ---------- */
-.plan{flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
-  font-size:11px;font-weight:600;letter-spacing:.02em;border:1px solid var(--line);background:var(--panel2);color:var(--tx2)}
-.plan:hover{border-color:var(--acc);color:var(--tx)}
-.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--tx2)}
-.plan.pro{border-color:#6b4a1d;color:#ffd7a3;background:#2a1d0e}
-.plan.pro .pip{background:var(--acc)}
-.protag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--acc);border:1px solid #6b4a1d;border-radius:4px;padding:0 4px;margin-left:6px;vertical-align:1px}
+.protag{display:inline-block;font:700 9.5px/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;
+  color:var(--orange);border:1px solid #6b4a1d;border-radius:4px;padding:3px 5px;margin-left:2px;font-stretch:100%}
 .protag[hidden]{display:none}
-.freenote{background:#1c1712;border:1px solid #4a3418;color:#e9c99a;border-radius:6px;padding:7px 9px;font-size:11px;margin:8px 0}
-.freenote button{padding:2px 8px;font-size:11px;margin-left:4px}
+.freenote{background:#1c1712;border:1px solid #4a3418;color:#e9c99a;border-radius:var(--r-sm);padding:9px 11px;font-size:12px;margin:10px 0;line-height:1.55}
+.freenote button{padding:4px 10px;font-size:12px;margin-left:6px;background:transparent;border-color:#6b4a1d;color:var(--cream)}
+.freenote button:hover{border-color:var(--orange);color:var(--tx)}
 
-dialog#pro{width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line);
-  border-radius:14px;background:var(--panel);color:var(--tx);box-shadow:0 30px 80px #000a}
-dialog#pro::backdrop{background:#05070acc;backdrop-filter:blur(3px)}
-.pro-in{padding:26px 26px 22px;display:flex;flex-direction:column;gap:18px}
+dialog#pro{width:min(660px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line);
+  border-radius:var(--r-lg);background:var(--panel);color:var(--tx);box-shadow:0 40px 100px -20px #000d}
+dialog#pro::backdrop{background:#0a0b0dcc;backdrop-filter:blur(4px)}
+.pro-in{padding:28px 28px 24px;display:flex;flex-direction:column;gap:20px}
 .pro-head{display:flex;align-items:flex-start;gap:12px}
-.pro-head h2{margin:0;font-size:20px;letter-spacing:-.01em;line-height:1.2}
-.pro-head p{margin:4px 0 0;color:var(--tx2);font-size:12.5px;line-height:1.5}
-.pro-x{margin-left:auto;flex:none;width:30px;height:30px;padding:0;border-radius:8px;font-size:16px;line-height:1}
-.pro-uses{background:#1c1712;border:1px solid #4a3418;border-radius:9px;padding:10px 12px;font-size:12px;color:#e9c99a;line-height:1.55}
+.pro-head h2{margin:8px 0 0;font:800 24px/1.1 var(--display);font-stretch:112%;letter-spacing:-.02em}
+.pro-head p{margin:6px 0 0;color:var(--tx-2);font-size:13.5px;line-height:1.5}
+.pro-x{margin-left:auto;flex:none;width:32px;height:32px;padding:0;border-radius:8px;font-size:18px;line-height:1;background:transparent;border-color:var(--line)}
+.pro-uses{background:#1f1710;border:1px solid #4a3418;border-left:3px solid var(--orange);border-radius:var(--r-sm);padding:11px 13px;font-size:13px;color:#e9c99a;line-height:1.55}
 .pro-uses b{color:#ffd7a3}
-.pro-uses .sw{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.pro-uses .sw{display:flex;gap:8px;margin-top:10px;flex-wrap:wrap}
+.pro-uses .sw button{background:transparent;border-color:#6b4a1d;color:var(--cream)}
 .tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
 @media (max-width:620px){.tiers{grid-template-columns:minmax(0,1fr)}}
-.tier{border:1px solid var(--line);border-radius:11px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;background:var(--panel2);min-width:0}
-.tier.hi{border-color:var(--acc);background:linear-gradient(180deg,#2a1d0e 0%,var(--panel2) 70%)}
-.tier .nm{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2)}
-.tier.hi .nm{color:var(--acc)}
-.tier .pr{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
-.tier .pr small{font-size:11px;font-weight:400;color:var(--tx2);letter-spacing:0}
-.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--tx2);flex:1}
+.tier{border:1px solid var(--line);border-radius:var(--r);padding:16px 16px 14px;display:flex;flex-direction:column;gap:10px;background:var(--bg-2);min-width:0}
+.tier.hi{border-color:var(--orange);background:linear-gradient(180deg,#2a1d0e 0%,var(--bg-2) 70%)}
+.tier .nm{font:600 10.5px/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2)}
+.tier.hi .nm{color:var(--orange)}
+.tier .pr{font:800 28px/1 var(--display);font-stretch:112%;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+.tier .pr small{font:400 11.5px var(--body);color:var(--tx-2);letter-spacing:0;margin-left:2px}
+.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:12.5px;color:var(--tx-2);flex:1}
 .tier li{padding-left:15px;position:relative;line-height:1.4}
-.tier li:before{content:"";position:absolute;left:2px;top:6px;width:6px;height:6px;border-radius:2px;background:#4a5058}
-.tier.hi li:before,.tier.co li:before{background:var(--acc)}
-.tier .buy{width:100%;justify-content:center;text-align:center;text-decoration:none;display:block;font-weight:600}
-a.buy{background:var(--panel);border:1px solid var(--line);color:var(--tx);border-radius:7px;padding:7px 11px}
-a.buy:hover{border-color:var(--acc)}
-.tier.hi a.buy{background:var(--acc);border-color:var(--acc);color:#1a0f02}
-.tier.hi a.buy:hover{background:#ffa53d}
+.tier li:before{content:"";position:absolute;left:1px;top:6px;width:6px;height:6px;border-radius:2px;background:var(--line-2)}
+.tier.hi li:before,.tier.co li:before{background:var(--orange)}
+.tier .buy{width:100%;justify-content:center;text-align:center;text-decoration:none;display:block;font-weight:600;margin-top:4px}
+a.buy{background:var(--panel-2);border:1px solid var(--line-2);color:var(--tx);border-radius:var(--r-sm);padding:9px 11px;font-size:13px}
+a.buy:hover{border-color:var(--orange)}
+.tier.hi a.buy{background:var(--orange);border-color:var(--orange);color:#1a0f02}
+.tier.hi a.buy:hover{background:var(--orange-hi)}
 .buy.off{opacity:.45;pointer-events:none}
-.keyrow{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
-.keyrow label{font-size:12px;color:var(--tx2)}
+.keyrow{border-top:1px solid var(--line);padding-top:18px;display:flex;flex-direction:column;gap:8px}
+.keyrow label{font-size:13px;color:var(--tx-2)}
 .keyrow .in{display:flex;gap:8px}
-.keyrow input{flex:1;width:auto;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;padding:8px 10px;letter-spacing:.02em}
-#proMsg{font-size:12px;min-height:1.2em;color:var(--tx2)}
-#proMsg.err{color:var(--bad)} #proMsg.ok{color:#7fe0a8}
+.keyrow input{flex:1;width:auto;min-width:0;height:38px;font:500 12.5px var(--mono);padding:0 11px;letter-spacing:.02em}
+.keyrow button{flex:none;padding:0 18px;height:38px}
+#proMsg{font-size:12.5px;min-height:1.2em;color:var(--tx-2)}
+#proMsg:empty{display:none}
+#proMsg.err{color:#ff8a7a} #proMsg.ok{color:var(--ok)}
 .owned{display:flex;flex-direction:column;gap:10px}
-.owned dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 12px;margin:0;font-size:12.5px}
-.owned dt{color:var(--tx2)} .owned dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.owned dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:8px 12px;margin:0;font-size:13px}
+.owned dt{color:var(--tx-2)} .owned dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+#ownKey{font-family:var(--mono);font-size:12.5px}
 .manage{display:flex;gap:8px;flex-wrap:wrap}
 .manage[hidden]{display:none}
 dialog#pro [hidden]{display:none!important}
-.pro-foot{font-size:11px;color:var(--tx2);line-height:1.5}
+.pro-foot{font-size:12px;color:var(--tx-3);line-height:1.5}
+
+.powered{background:var(--bg);flex:none;padding:7px 16px 8px;border-top:1px solid var(--line);
+  font:500 10.5px/1.3 var(--mono);letter-spacing:.06em;color:var(--tx-3);text-align:center}
+.powered a{color:var(--tx-2);text-decoration:none}
+.powered a:hover{color:var(--tx)}
+
+/* ---------- narrow screens: sidebar above the stage, page scrolls ---------- */
+@media (max-width:1100px){ .tagline{display:none} }
+@media (max-width:900px){
+  html,body{height:auto}
+  body{overflow:auto;height:auto;min-height:100vh}
+  #brand{position:sticky;top:0;z-index:10;padding:0 12px 0 16px;gap:10px}
+  .appnav a{padding:7px 7px}
+  .appnav .sep{margin:0 4px}
+  #app{flex-direction:column;flex:none}
+  #side{width:auto;min-width:0;border-right:none;border-bottom:1px solid var(--line)}
+  #ctrls{overflow:visible;padding:0 16px 8px}
+  select{max-width:58vw}
+  #main{flex:none}
+  #stage{flex:none;height:min(72vh,560px);min-height:340px}
+  #tabs{padding:0 16px}
+  #partlist{max-height:none;overflow-x:auto}
+  #partlist td,#partlist th{padding-left:5px;padding-right:5px}
+  #bar{position:sticky;bottom:0;z-index:5;padding:10px 16px calc(10px + env(safe-area-inset-bottom,0px))}
+  #stat{flex-basis:100%;min-width:0}
+  #bar .vr{display:none}
+  #bar button{flex:1 1 auto}
+  #bar .quiet{flex:0 0 auto}
+  .empty-in{padding:22px 20px 18px}
+  .empty-in h2{font-size:20px}
+}
+@media (max-width:480px){
+  #build{display:none}
+  #brand h1{font-size:15px}
+  .tabhint{display:none}
+  #brand{flex-wrap:wrap;height:auto;padding:9px 12px 4px 14px;row-gap:2px;column-gap:8px}
+  #brand::after{content:"";order:2;flex-basis:100%;height:0}
+  .appnav{display:contents}
+  .appnav .sep{display:none}
+  .plan{order:1;margin-left:auto;height:28px;padding:0 10px}
+  .appnav a{order:3;font-size:12.5px;padding:6px 8px}
+  .appnav a.about{margin-left:28px;padding-left:0}
+  #partlist th:nth-child(2),#partlist td:nth-child(2){display:none}
+  .pro-in{padding:22px 18px 18px}
+}
 </style>
 </head>
 <body>
+<header id="brand">
+  <a class="mark" href="./" title="About NFC Studio">
+    <svg viewBox="0 0 79.9 66.6" aria-hidden="true">
+      <g transform="translate(-100.447,-44.954)">
+      <path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/>
+      <path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/>
+      <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
+      </g>
+    </svg>
+    <h1>NFC Studio</h1>
+  </a>
+  <span id="build"></span>
+  <span class="tagline">Logo to multi-colour STL for Bambu Studio</span>
+  <nav class="appnav" aria-label="Veer Tools">
+    <a class="about" href="./">About NFC Studio</a>
+    <a href="../">All tools</a>
+    <span class="sep" aria-hidden="true"></span>
+    <button type="button" class="plan" id="planChip" title="Plan and license"><span class="pip"></span><span id="planTxt">Free · Upgrade</span></button>
+  </nav>
+</header>
 <div id="app">
 
 <!-- ============ SIDEBAR ============ -->
 <div id="side">
-  <div id="brand">
-    <div style="display:flex;align-items:center;gap:9px">
-      <svg viewBox="0 0 79.9 66.6" width="26" height="22" aria-label="Veer">
-        <g transform="translate(-100.447,-44.954)">
-        <path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/>
-        <path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/>
-        <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
-        </g>
-      </svg>
-      <h1 style="flex:1;white-space:nowrap">NFC Studio <span id="build" style="font-size:10px;font-weight:400;color:var(--acc);
-        border:1px solid var(--acc2);border-radius:4px;padding:1px 5px;vertical-align:2px"></span></h1>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
-      <p style="flex:1;margin:0">Veer &middot; logo &rarr; multi-colour STL for Bambu Studio</p>
-      <button type="button" class="plan" id="planChip" title="Plan and license"><span class="pip"></span><span id="planTxt">Free · Upgrade</span></button>
-    </div>
-  </div>
   <div id="ctrls">
 
-    <details class="sec" open><summary>1 · Artwork</summary><div class="body">
-      <div id="drop">
-        <b>Drop a logo here</b><br>PNG · JPG · SVG · WEBP<br>
-        <span style="font-size:10.5px">transparent PNG or SVG gives the best trace</span>
+    <details class="sec" open><summary><span class="n">1</span>Artwork</summary><div class="body">
+      <div id="drop" role="button" tabindex="0" aria-label="Choose a logo file">
+        <svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 15V4m0 0L8 8m4-4 4 4"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/></svg>
+        <b>Drop a logo here, or click to choose</b>
+        <span>Transparent PNG or SVG gives the cleanest trace.</span>
+        <span class="fmt">PNG · JPG · SVG · WEBP</span>
       </div>
       <input type="file" id="file" accept="image/*" hidden>
-      <div class="row"><label>Fit width</label>
+      <div class="row"><label for="artScale">Fit width</label>
         <input type="range" id="artScale" min="10" max="100" value="60"><span class="val" id="artScaleV">60%</span></div>
-      <div class="row"><label>Move X / Y (mm)</label>
-        <input type="number" id="artX" value="0" step="0.5" style="width:62px">
-        <input type="number" id="artY" value="0" step="0.5" style="width:62px"></div>
-      <div class="row"><label>Keep clear of edge (mm)</label>
+      <div class="row"><label for="artX">Move X / Y <span class="u">mm</span></label>
+        <input type="number" id="artX" value="0" step="0.5" style="width:66px" aria-label="Move X (mm)">
+        <input type="number" id="artY" value="0" step="0.5" style="width:66px" aria-label="Move Y (mm)"></div>
+      <div class="row"><label for="margin">Keep clear of edge <span class="u">mm</span></label>
         <input type="number" id="margin" value="3" step="0.5" min="0"></div>
-      <div class="chk"><input type="checkbox" id="rmBg" checked><span>Drop background colour (auto)</span></div>
-      <div class="row"><label>Background tolerance</label>
+      <label class="chk"><input type="checkbox" id="rmBg" checked><span>Drop background colour (auto)</span></label>
+      <div class="row"><label for="bgTol">Background tolerance</label>
         <input type="range" id="bgTol" min="1" max="40" value="12"><span class="val" id="bgTolV">12</span></div>
     </div></details>
 
-    <details class="sec" open><summary>2 · Colours <span id="colCount" style="text-transform:none;color:var(--acc)"></span></summary><div class="body">
-      <div class="row"><label>Logo colours</label>
-        <select id="k"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></div>
-      <div class="chk"><input type="checkbox" id="lockPal"><span>Lock palette (match my colours, don't auto-detect)</span></div>
-      <div class="chk"><input type="checkbox" id="despeckle" checked><span>Clean up JPEG noise / dithering</span></div>
+    <details class="sec" open><summary><span class="n">2</span>Colours <span id="colCount"></span></summary><div class="body">
+      <div class="row"><label id="kLbl">Logo colours</label>
+        <div class="seg" id="kSeg" role="group" aria-labelledby="kLbl"></div>
+        <select id="k" class="sr" tabindex="-1" aria-hidden="true"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></div>
+      <label class="chk"><input type="checkbox" id="lockPal"><span>Lock palette (match my colours, don't auto-detect)</span></label>
+      <label class="chk"><input type="checkbox" id="despeckle" checked><span>Clean up JPEG noise / dithering</span></label>
       <div id="swatches"></div>
-      <div class="note">Slot 1 is the card itself. Use the <b>pick</b> button then click the preview to sample a colour straight off your logo.</div>
+      <div class="note">AMS 1 is the card itself. Press <b>pick</b>, then click the card preview to sample a colour straight off your logo.</div>
       <div id="colWarn"></div>
       <div id="colPro"></div>
     </div></details>
 
-    <details class="sec"><summary>3 · Text (optional)<span class="protag" id="txTag">Pro</span></summary><div class="body">
-      <div class="chk"><input type="checkbox" id="txOn"><span>Add company info</span></div>
-      <input type="text" class="wide" id="tx1" placeholder="Line 1 — e.g. Camden Shapeworks" style="margin:4px 0">
-      <input type="text" class="wide" id="tx2" placeholder="Line 2 — e.g. 3D Printing &amp; Design" style="margin:4px 0">
-      <input type="text" class="wide" id="tx3" placeholder="Line 3 — e.g. 555-0142" style="margin:4px 0">
-      <div class="row"><label>Font</label>
+    <details class="sec"><summary><span class="n">3</span>Text <span class="opt">optional</span><span class="protag" id="txTag">Pro</span></summary><div class="body">
+      <label class="chk"><input type="checkbox" id="txOn"><span>Add company info</span></label>
+      <input type="text" class="wide" id="tx1" placeholder="Line 1 — e.g. Camden Shapeworks" aria-label="Text line 1">
+      <input type="text" class="wide" id="tx2" placeholder="Line 2 — e.g. 3D Printing &amp; Design" aria-label="Text line 2">
+      <input type="text" class="wide" id="tx3" placeholder="Line 3 — e.g. 555-0142" aria-label="Text line 3">
+      <div class="row"><label for="txFont">Font</label>
         <select id="txFont">
           <option value="Arial Black">Arial Black (best for print)</option>
           <option value="Impact">Impact</option>
@@ -235,24 +423,24 @@ dialog#pro [hidden]{display:none!important}
           <option value="Courier New">Courier New</option>
           <option value="Verdana">Verdana</option>
         </select></div>
-      <div class="row"><label>Cap height (mm)</label>
+      <div class="row"><label for="txSize">Cap height <span class="u">mm</span></label>
         <input type="number" id="txSize" value="3.5" step="0.25" min="1.5"></div>
-      <div class="row"><label>Line spacing</label>
+      <div class="row"><label for="txLead">Line spacing</label>
         <input type="range" id="txLead" min="100" max="220" value="145"><span class="val" id="txLeadV">1.45</span></div>
-      <div class="row"><label>Align</label>
+      <div class="row"><label for="txAlign">Align</label>
         <select id="txAlign"><option value="center" selected>Centre</option><option value="left">Left</option><option value="right">Right</option></select></div>
-      <div class="row"><label>Position X / Y (mm)</label>
-        <input type="number" id="txX" value="0" step="0.5" style="width:62px">
-        <input type="number" id="txY" value="-18" step="0.5" style="width:62px"></div>
-      <div class="row"><label>Print in colour slot</label>
+      <div class="row"><label for="txX">Position X / Y <span class="u">mm</span></label>
+        <input type="number" id="txX" value="0" step="0.5" style="width:66px" aria-label="Text position X (mm)">
+        <input type="number" id="txY" value="-18" step="0.5" style="width:66px" aria-label="Text position Y (mm)"></div>
+      <div class="row"><label for="txSlot">Print in colour slot</label>
         <select id="txSlot"></select></div>
-      <div class="row"><label>Bold weight</label>
+      <div class="row"><label for="txBold">Bold weight</label>
         <input type="range" id="txBold" min="0" max="60" value="0"><span class="val" id="txBoldV">0.00</span></div>
       <div class="note">Cap height under 2.5&nbsp;mm gets mushy on a 0.4&nbsp;mm nozzle. 3.5&nbsp;mm is a safe minimum for phone-readable text.</div>
     </div></details>
 
-    <details class="sec" open><summary>4 · Card</summary><div class="body">
-      <div class="row"><label>Preset</label>
+    <details class="sec" open><summary><span class="n">4</span>Card</summary><div class="body">
+      <div class="row"><label for="preset">Preset</label>
         <select id="preset">
           <optgroup label="Cards">
           <option value="cr80">Credit card — 85.6 × 54</option>
@@ -267,24 +455,24 @@ dialog#pro [hidden]{display:none!important}
           </optgroup>
           <option value="custom">Custom…</option>
         </select></div>
-      <div class="row"><label>Shape</label>
+      <div class="row"><label for="shape">Shape</label>
         <select id="shape">
           <option value="rect" selected>Rounded rectangle</option>
           <option value="pill">Pill / stadium</option>
           <option value="circle">Circle / disc</option>
         </select></div>
-      <div class="row"><label>Width × Height (mm)</label>
-        <input type="number" id="cw" value="85.6" step="0.1" style="width:62px">
-        <input type="number" id="ch" value="54" step="0.1" style="width:62px"></div>
-      <div class="row"><label>Thickness (mm)</label>
+      <div class="row"><label for="cw">Width × Height <span class="u">mm</span></label>
+        <input type="number" id="cw" value="85.6" step="0.1" style="width:66px" aria-label="Width (mm)">
+        <input type="number" id="ch" value="54" step="0.1" style="width:66px" aria-label="Height (mm)"></div>
+      <div class="row"><label for="ct">Thickness <span class="u">mm</span></label>
         <input type="number" id="ct" value="2" step="0.1" min="0.8"></div>
-      <div class="row"><label>Corner radius (mm)</label>
+      <div class="row"><label for="cr">Corner radius <span class="u">mm</span></label>
         <input type="number" id="cr" value="3.5" step="0.5" min="0"></div>
-      <div class="row"><label>Colour layer depth (mm)</label>
+      <div class="row"><label for="ah">Colour layer depth <span class="u">mm</span></label>
         <input type="number" id="ah" value="0.6" step="0.2" min="0.2"></div>
-      <div class="row"><label>Layer height (mm)</label>
+      <div class="row"><label for="layerH">Layer height <span class="u">mm</span></label>
         <input type="number" id="layerH" value="0.2" step="0.04" min="0.04"></div>
-      <div class="row"><label>First layer height (mm)</label>
+      <div class="row"><label for="layer1">First layer height <span class="u">mm</span></label>
         <input type="number" id="layer1" value="0.2" step="0.04" min="0.04"></div>
       <div class="note">Match these to your slicer profile exactly. The tag cavity's floor and
         ceiling are snapped onto real layer boundaries — if they land mid-layer the slicer has to
@@ -292,10 +480,11 @@ dialog#pro [hidden]{display:none!important}
         on the back of the card.</div>
       <div class="note">Colour depth should be a multiple of your layer height. 0.6&nbsp;mm = 3 layers at 0.2&nbsp;mm — enough to fully hide the colour underneath.</div>
 
-      <div class="chk" style="margin-top:12px"><input type="checkbox" id="hangOn"><span>Keyring hole</span></div>
-      <div class="row"><label>Hole diameter (mm)</label>
+      <div class="sub">
+      <label class="chk"><input type="checkbox" id="hangOn"><span>Keyring hole</span></label>
+      <div class="row"><label for="hangD">Hole diameter <span class="u">mm</span></label>
         <input type="number" id="hangD" value="4" step="0.5" min="1.5"></div>
-      <div class="row"><label>Position</label>
+      <div class="row"><label for="hangPos">Position</label>
         <select id="hangPos">
           <option value="tl">Top left</option>
           <option value="tr" selected>Top right</option>
@@ -305,16 +494,17 @@ dialog#pro [hidden]{display:none!important}
           <option value="lc">Left centre</option>
           <option value="custom">Custom…</option>
         </select></div>
-      <div class="row"><label>Hole X / Y (mm)</label>
-        <input type="number" id="hangX" value="0" step="0.5" style="width:62px">
-        <input type="number" id="hangY" value="0" step="0.5" style="width:62px"></div>
+      <div class="row"><label for="hangX">Hole X / Y <span class="u">mm</span></label>
+        <input type="number" id="hangX" value="0" step="0.5" style="width:66px" aria-label="Hole X (mm)">
+        <input type="number" id="hangY" value="0" step="0.5" style="width:66px" aria-label="Hole Y (mm)"></div>
       <div class="note">The hole goes right through. Artwork and the tag cavity are both held clear of
         it automatically. 4&nbsp;mm suits a split ring; 5&nbsp;mm if you want a lanyard clip.</div>
+      </div>
     </div></details>
 
-    <details class="sec" open><summary>5 · NFC pocket</summary><div class="body">
-      <div class="chk"><input type="checkbox" id="pkOn" checked><span>Recess a tag pocket in the back</span></div>
-      <div class="row"><label>Tag</label>
+    <details class="sec" open><summary><span class="n">5</span>NFC pocket</summary><div class="body">
+      <label class="chk"><input type="checkbox" id="pkOn" checked><span>Recess a tag pocket in the back</span></label>
+      <div class="row"><label for="pkPreset">Tag</label>
         <select id="pkPreset">
           <option value="25">NTAG215 round sticker — 25 mm</option>
           <option value="30">NTAG215 round sticker — 30 mm</option>
@@ -322,57 +512,57 @@ dialog#pro [hidden]{display:none!important}
           <option value="rect45">Rectangular wet inlay — 45 × 25</option>
           <option value="custom">Custom…</option>
         </select></div>
-      <div class="row"><label>Shape</label>
+      <div class="row"><label for="pkShape">Shape</label>
         <select id="pkShape"><option value="circle" selected>Circle</option><option value="rect">Rectangle</option></select></div>
-      <div class="row"><label id="pkDimL">Diameter (mm)</label>
-        <input type="number" id="pkW" value="25" step="0.5" style="width:62px">
-        <input type="number" id="pkH" value="25" step="0.5" style="width:62px" disabled></div>
-      <div class="row"><label>Clearance (mm)</label>
+      <div class="row"><label id="pkDimL" for="pkW">Diameter (mm)</label>
+        <input type="number" id="pkW" value="25" step="0.5" style="width:66px" aria-label="Tag width or diameter (mm)">
+        <input type="number" id="pkH" value="25" step="0.5" style="width:66px" disabled aria-label="Tag height (mm)"></div>
+      <div class="row"><label for="pkGap">Clearance <span class="u">mm</span></label>
         <input type="number" id="pkGap" value="0.6" step="0.1" min="0"></div>
-      <div class="row"><label>Tag thickness (mm)</label>
+      <div class="row"><label for="pkD">Tag thickness <span class="u">mm</span></label>
         <input type="number" id="pkD" value="0.5" step="0.1" min="0.2"></div>
-      <div class="chk"><input type="checkbox" id="pkSeal" checked><span>Seal the tag inside the card</span></div>
-      <div class="row"><label>Cover thickness (mm)</label>
+      <label class="chk"><input type="checkbox" id="pkSeal" checked><span>Seal the tag inside the card</span></label>
+      <div class="row"><label for="pkLid">Cover thickness <span class="u">mm</span></label>
         <input type="number" id="pkLid" value="0.6" step="0.2" min="0.4"></div>
       <div class="note">Sealed cards need a <b>pause</b> mid-print to drop the tag in — the tool tells
         you the exact height and layer. Set <b>Tag thickness</b> to your tag's real thickness: if the
         cavity is deeper than the tag, the cover has to bridge over air instead of printing straight
         onto the tag. A paper-thin NTAG215 sticker is ~0.3–0.4&nbsp;mm; a foam-backed disc ~0.8&nbsp;mm.</div>
-      <div class="row"><label>Offset X / Y (mm)</label>
-        <input type="number" id="pkX" value="0" step="0.5" style="width:62px">
-        <input type="number" id="pkY" value="0" step="0.5" style="width:62px"></div>
+      <div class="row"><label for="pkX">Offset X / Y <span class="u">mm</span></label>
+        <input type="number" id="pkX" value="0" step="0.5" style="width:66px" aria-label="Pocket offset X (mm)">
+        <input type="number" id="pkY" value="0" step="0.5" style="width:66px" aria-label="Pocket offset Y (mm)"></div>
       <div id="pkWarn"></div>
     </div></details>
 
-    <details class="sec"><summary>6 · Trace quality</summary><div class="body">
-      <div class="row"><label>Resolution</label>
+    <details class="sec"><summary><span class="n">6</span>Trace quality</summary><div class="body">
+      <div class="row"><label for="res">Resolution</label>
         <select id="res">
           <option value="8">Draft — 8 px/mm (fast)</option>
           <option value="12" selected>Normal — 12 px/mm</option>
           <option value="18">Fine — 18 px/mm</option>
           <option value="26">Ultra — 26 px/mm (slow)</option>
         </select></div>
-      <div class="row"><label>Edge smoothing</label>
+      <div class="row"><label for="smooth">Edge smoothing</label>
         <input type="range" id="smooth" min="0" max="4" value="1"><span class="val" id="smoothV">1</span></div>
-      <div class="row"><label>Simplify (mm)</label>
+      <div class="row"><label for="simp">Simplify <span class="u">mm</span></label>
         <input type="range" id="simp" min="0" max="30" value="6"><span class="val" id="simpV">0.06</span></div>
-      <div class="row"><label>Drop specks under (mm²)</label>
+      <div class="row"><label for="minA">Drop specks under <span class="u">mm²</span></label>
         <input type="number" id="minA" value="0.15" step="0.05" min="0"></div>
       <div class="note">Higher resolution + low simplify keeps fine detail but makes bigger files. If the slicer complains about the mesh, raise simplify slightly.</div>
     </div></details>
 
-    <details class="sec"><summary>7 · Print notes</summary><div class="body">
+    <details class="sec"><summary><span class="n">7</span>Print notes</summary><div class="body">
       <div class="note" style="line-height:1.65">
-        <b style="color:var(--tx)">Orientation:</b> the model is already built face-down — the logo sits on
+        <b>Orientation:</b> the model is already built face-down — the logo sits on
         the build plate as the first layers, and the NFC pocket opens upward. Don't rotate it.<br><br>
-        <b style="color:var(--tx)">Plate:</b> a smooth PEI or textured plate becomes the card's front finish.
+        <b>Plate:</b> a smooth PEI or textured plate becomes the card's front finish.
         Textured hides layer lines best.<br><br>
-        <b style="color:var(--tx)">Settings:</b> 0.2&nbsp;mm layers, 100% infill (the card is thin — solid is
+        <b>Settings:</b> 0.2&nbsp;mm layers, 100% infill (the card is thin — solid is
         faster than sparse + top layers), 0 elephant-foot if you can.<br><br>
-        <b style="color:var(--tx)">Colours:</b> in Bambu Studio, right-click the object &rarr;
+        <b>Colours:</b> in Bambu Studio, right-click the object &rarr;
         <span class="kbd">Change filament</span> per part, or click each part in the object list and set its
         filament. Colour changes only happen in the first few layers, so purge waste stays small.<br><br>
-        <b style="color:var(--tx)">Tag:</b> drop the NFC sticker into the pocket after printing and cover
+        <b>Tag:</b> drop the NFC sticker into the pocket after printing and cover
         with a printed lid, vinyl sticker, or a smear of glue. Keep the card away from metal surfaces —
         metal detunes the antenna and kills the read.
       </div>
@@ -384,21 +574,42 @@ dialog#pro [hidden]{display:none!important}
 <!-- ============ MAIN ============ -->
 <div id="main">
   <div id="tabs">
-    <div class="tab on" data-v="2d">Card face</div>
-    <div class="tab" data-v="3d">3D preview</div>
+    <div class="tabset" role="tablist" aria-label="Preview">
+      <button type="button" class="tab on" data-v="2d" role="tab">Card face</button>
+      <button type="button" class="tab" data-v="3d" role="tab">3D preview</button>
+    </div>
+    <span class="tabhint">Logo prints face-down on the plate</span>
   </div>
   <div id="stage">
     <canvas id="face2d"></canvas>
     <canvas id="gl"></canvas>
+    <div id="empty">
+      <div class="empty-in">
+        <div class="eyebrow">Start here</div>
+        <h2>Drop in your logo</h2>
+        <p>Drag a PNG, JPG, SVG or WEBP anywhere onto this page. NFC Studio splits it into filament colours and builds an STL set your Bambu prints in one go.</p>
+        <div class="empty-act">
+          <button type="button" class="primary" id="emptyPick">Choose a logo</button>
+          <span>Nothing is uploaded.</span>
+        </div>
+        <ol class="steps">
+          <li>Check the colours. Each one gets its own AMS slot.</li>
+          <li>Pick a card or keychain size and the NFC tag you have.</li>
+          <li>Build the mesh, then download the STL set.</li>
+        </ol>
+        <div class="empty-spec">85.6 × 54 mm card · 0.2 mm layers · AMS 1–4</div>
+      </div>
+    </div>
     <div id="overlay">Drop a logo in the panel on the left to begin.</div>
   </div>
   <div id="partlist"></div>
   <div id="bar">
     <div id="stat">Ready.</div>
+    <button id="btnReset" class="quiet">Reset</button>
+    <button id="btn3mf" class="quiet" disabled title="Bambu Studio discards part and filament data from any 3MF it didn't write itself — it will import as one solid colour. Use the STL set.">3MF (single colour only)</button>
+    <span class="vr" aria-hidden="true"></span>
     <button id="btnBuild">Build mesh</button>
     <button id="btnStl" class="primary" disabled>Download STL set (.zip)</button>
-    <button id="btn3mf" disabled title="Bambu Studio discards part and filament data from any 3MF it didn't write itself — it will import as one solid colour. Use the STL set.">3MF (single colour only)</button>
-    <button id="btnReset">Reset</button>
   </div>
 </div>
 </div>
@@ -406,6 +617,7 @@ dialog#pro [hidden]{display:none!important}
   <div class="pro-in">
     <div class="pro-head">
       <div>
+        <div class="eyebrow">Upgrade</div>
         <h2 id="proTitle">NFC Studio Pro</h2>
         <p id="proSub">Full-colour cards, company text, and clean files with no Veer mark.</p>
       </div>
@@ -473,7 +685,7 @@ dialog#pro [hidden]{display:none!important}
     </div>
   </div>
 </dialog>
-<div class="powered">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
+<div class="powered">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a> · runs in your browser, nothing is uploaded</div>
 
 <script>
 "use strict";
@@ -488,7 +700,7 @@ dialog#pro [hidden]{display:none!important}
 /* Bump this on every change. It shows in the header, in the STL header bytes
    and in the 3MF metadata, so there's never any doubt which build produced a
    file — browsers cache file:// pages aggressively. */
-const BUILD = "b11 · 2026-11-09";
+const BUILD = "b12 · 2026-11-09";
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v<a?a:v>b?b:v;
@@ -537,8 +749,15 @@ async function verifyToken(token){
     return pl;
   }catch(e){ return null; }
 }
-function licStored(){ try{ return JSON.parse(localStorage.getItem(PRO.storeKey)||"null"); }catch(e){ return null; } }
-function licStore(o){ try{ o ? localStorage.setItem(PRO.storeKey, JSON.stringify(o)) : localStorage.removeItem(PRO.storeKey); }catch(e){} }
+/* A Veer Pro bundle key is stored once under a shared key, so every Veer
+   tool on this site picks it up without spending another activation. */
+const BUNDLE_KEY="veerLicense:veer-pro";
+function licStored(){ try{ return JSON.parse(localStorage.getItem(PRO.storeKey)||localStorage.getItem(BUNDLE_KEY)||"null"); }catch(e){ return null; } }
+function licStore(o){ try{
+  if(o){ localStorage.setItem(PRO.storeKey, JSON.stringify(o)); if(o.bundle) localStorage.setItem(BUNDLE_KEY, JSON.stringify(o)); }
+  else { const cur=licStored(); localStorage.removeItem(PRO.storeKey);
+    if(cur&&cur.bundle) Object.keys(localStorage).forEach(k=>{ if(k.startsWith("veerLicense:")) localStorage.removeItem(k); }); }
+}catch(e){} }
 function licApply(pl, stored){
   LIC.tier = pl ? (pl.t==="commercial"?"commercial":"pro") : "free";
   LIC.email = pl ? (pl.e||"") : ""; LIC.exp = pl ? pl.exp : 0; LIC.iat = pl ? pl.iat : 0;
@@ -564,7 +783,7 @@ async function licActivate(key){
   if(!r.ok) return r;
   const pl = await verifyToken(r.token);
   if(!pl) return {ok:false, error:"The license server's reply couldn't be verified. Reload the page and try again."};
-  const stored = {key, instance:r.instance||"", token:r.token, checked:Date.now()};
+  const stored = {key, instance:r.instance||"", token:r.token, checked:Date.now()}; stored.bundle = pl.p==="veer-pro";
   licStore(stored); licApply(pl, stored);
   return {ok:true};
 }
@@ -624,6 +843,24 @@ function proUI(){
     else { el.removeAttribute("href"); el.classList.add("off"); el.setAttribute("aria-disabled","true"); el.title="Checkout opens soon"; } };
   setBuy($("buyPro"), PRO.buyPro, PRO.pricePro, "pricePro");
   setBuy($("buyCom"), PRO.buyCommercial, PRO.priceCommercial, "priceCom");
+  syncKSeg();
+}
+/* segmented buttons for "Logo colours" — they drive the real #k <select> */
+function syncKSeg(){
+  const k=$("k"), seg=$("kSeg"); if(!seg) return;
+  if(!seg.children.length) [...k.options].forEach((o,i)=>{
+    const b=document.createElement("button"); b.type="button";
+    b.onclick=()=>{ const v=k.options[i].value;
+      if(k.value!==v){ k.value=v; k.dispatchEvent(new Event("change",{bubbles:true})); } };
+    seg.appendChild(b);
+  });
+  [...seg.children].forEach((b,i)=>{
+    const o=k.options[i], n=o.value, pro=/Pro/.test(o.textContent);
+    b.innerHTML = n + (pro ? '<span class="p" aria-hidden="true"></span>' : "");
+    b.title = pro ? `${n} colours (Pro)` : `${n} colour${n>1?"s":""}`;
+    b.setAttribute("aria-label", b.title);
+    b.setAttribute("aria-pressed", String(k.value===n));
+  });
 }
 function proMsg(t,cls){ const m=$("proMsg"); m.textContent=t||""; m.className=cls||""; }
 function openPro(needs){
@@ -1929,14 +2166,14 @@ function draw2D(){
       x2.rect(X,Y,(st.pkW+2*st.pkGap)*sc,(st.pkH+2*st.pkGap)*sc);
     }
     x2.stroke();
-    x2.fillStyle="#ffffff55"; x2.font="11px system-ui"; x2.textAlign="center";
+    x2.fillStyle="#ffffff55"; x2.font="500 11px 'JetBrains Mono', ui-monospace, monospace"; x2.textAlign="center";
     const [TX,TY]=toS(st.pkX, st.pkY);
     x2.fillText("NFC pocket (back)", TX, TY+4);
     x2.restore();
   }
 
   // ruler
-  x2.strokeStyle="#ffffff22"; x2.fillStyle="#8b98a6"; x2.font="11px system-ui"; x2.textAlign="center";
+  x2.strokeStyle="#ffffff2e"; x2.fillStyle="#a5a39e"; x2.font="500 11px 'JetBrains Mono', ui-monospace, monospace"; x2.textAlign="center";
   const [ax,ay]=toS(-st.W/2, -st.H/2-2.5), [bx,by]=toS(st.W/2, -st.H/2-2.5);
   x2.beginPath(); x2.moveTo(ax,ay); x2.lineTo(bx,by); x2.stroke();
   x2.fillText(st.W.toFixed(1)+" mm", (ax+bx)/2, ay+15);
@@ -2030,7 +2267,7 @@ function drawGL(){
   const dpr=window.devicePixelRatio||1;
   glc.width=glc.clientWidth*dpr; glc.height=glc.clientHeight*dpr;
   gl.viewport(0,0,glc.width,glc.height);
-  gl.clearColor(0.055,0.066,0.086,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);
+  gl.clearColor(0.17,0.175,0.185,1); gl.clear(gl.COLOR_BUFFER_BIT|gl.DEPTH_BUFFER_BIT);   // lighter than the default black card so it reads
   const st=readSettings();
   const d=cam.dist;
   const eye=[d*Math.cos(cam.el)*Math.sin(cam.az), d*Math.cos(cam.el)*Math.cos(cam.az)*-1, d*Math.sin(cam.el)];
@@ -2102,6 +2339,7 @@ function renderSwatches(){
     ts.appendChild(o);
   }
   ts.value = (cur && cur<=st.k) ? cur : 1;
+  syncKSeg();
   $("colCount").textContent = ` (${st.k+1} filaments)`;
 
   const cw=$("colWarn");
@@ -2128,6 +2366,7 @@ function refresh(){
       const needs = isPro() ? [] : proNeeds(st);
       $("colPro").innerHTML = needs.length ? `<div class="freenote">This design uses Pro features (${needs.join(", ")}).
         Preview freely; downloading needs Pro. <button type="button" onclick="openPro(proNeeds(readSettings()))">See Pro</button></div>` : "";
+      document.body.classList.toggle("has-art", !!S.img);
       $("overlay").textContent = S.img
         ? `${st.W}×${st.H}×${st.T} mm · logo ${st.k} colour${st.k>1?"s":""} · traced at ${st.res} px/mm · ${(performance.now()-t0).toFixed(0)} ms`
         : "Drop a logo in the panel on the left to begin.";
@@ -2196,7 +2435,7 @@ function showParts(parts){
   box.style.display="block";
   const lyr = S.pauseZ ? Math.round((S.pauseZ-st.layer1)/st.layerH)+1 : 0;
   const grew = S.cavityDepth && S.cavityDepth > st.pkD+1e-6;
-  const pause = S.pauseZ ? `<div class="warnbox" style="background:#0b2a27;border-color:#12756a;color:#7ff0e0">
+  const pause = S.pauseZ ? `<div class="warnbox pause">
     <b>Sealed tag — this print needs a pause.</b> Slice it, then right-click the layer slider at
     <b>Z&nbsp;=&nbsp;${S.pauseZ.toFixed(2)}&nbsp;mm</b> (after layer ${lyr}) and choose
     <b>Add pause</b>. Drop the tag in when it stops, press it flat, then resume.<br>
@@ -2321,6 +2560,8 @@ function loadFile(f){
   rd.readAsDataURL(f);
 }
 $("drop").onclick=()=>$("file").click();
+$("drop").addEventListener("keydown",e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); $("file").click(); } });
+$("emptyPick").onclick=()=>$("file").click();
 $("file").onchange=e=>loadFile(e.target.files[0]);
 ["dragenter","dragover"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.add("over");}));
 ["dragleave","drop"].forEach(ev=>$("drop").addEventListener(ev,e=>{e.preventDefault();$("drop").classList.remove("over");}));
@@ -2372,7 +2613,7 @@ $("pkPreset").onchange=()=>{
 function syncShape(){
   const c = $("pkShape").value==="circle";
   $("pkH").disabled=c;
-  $("pkDimL").textContent = c ? "Diameter (mm)" : "Width × Height (mm)";
+  $("pkDimL").innerHTML = c ? 'Diameter <span class="u">mm</span>' : 'Width × Height <span class="u">mm</span>';
   if(c) $("pkH").value=$("pkW").value;
 }
 $("pkShape").onchange=()=>{ syncShape(); refresh(); };
@@ -2399,6 +2640,7 @@ function syncLabels(){
 $("btnBuild").onclick=doBuild;
 $("btnReset").onclick=()=>{ localStorage.removeItem("nfcCardStudio"); location.reload(); };
 window.addEventListener("resize",()=>{ draw2D(); drawGL(); });
+if(document.fonts && document.fonts.ready) document.fonts.ready.then(()=>draw2D());
 
 /* persistence */
 function save(){
