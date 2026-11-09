@@ -1,0 +1,47 @@
+{
+  "before-after.webp": {
+    "width": 2160,
+    "height": 948,
+    "bytes": 65400
+  },
+  "maker-exports.webp": {
+    "width": 2216,
+    "height": 424,
+    "bytes": 24326
+  },
+  "out-plaque.webp": {
+    "width": 1380,
+    "height": 1038,
+    "bytes": 32264
+  },
+  "p3-cutter.webp": {
+    "width": 2160,
+    "height": 1564,
+    "bytes": 73270
+  },
+  "out-cutter.webp": {
+    "width": 1380,
+    "height": 1080,
+    "bytes": 33996
+  },
+  "out-stamp.webp": {
+    "width": 1380,
+    "height": 1080,
+    "bytes": 33406
+  },
+  "og.jpg": {
+    "width": 1200,
+    "height": 630,
+    "bytes": 63811
+  },
+  "p3-stencil.webp": {
+    "width": 2160,
+    "height": 1454,
+    "bytes": 61144
+  },
+  "out-stencil.webp": {
+    "width": 1380,
+    "height": 1080,
+    "bytes": 26458
+  }
+}

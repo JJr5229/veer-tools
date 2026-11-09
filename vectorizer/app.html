@@ -3437,6 +3437,17 @@ function opts(){
 var SEL = {};   // colour hex -> included?
 function plan(t, o){
   var R = raster(t, o.width, MODES[o.mode].pad(o));
+  /* "Width" means the width of the design itself, not of the traced canvas
+     (which still includes any removed background margin). Measure the art
+     once and re-rasterise at the scale that makes it exactly that wide. */
+  (function(){
+    var on = R.layers.filter(function(L){ return SEL[L.hex] !== false; });
+    if(!on.length) return;
+    var b = bboxMm(R, orMasks(on.map(function(L){ return L.mask; }), R.gw*R.gh));
+    if(!b) return;
+    var artW = b.x1 - b.x0;
+    if(artW > 1 && Math.abs(artW - o.width) > 0.3) R = raster(t, o.width * o.width / artW, MODES[o.mode].pad(o));
+  })();
   var N = R.gw*R.gh, w = R.gw, h = R.gh;
   var sel = R.layers.filter(function(L){ return SEL[L.hex] !== false; });
   if(!sel.length) return {err:'Pick at least one colour to use.'};
@@ -3445,6 +3456,7 @@ function plan(t, o){
   art = fillSmallHoles(art, w, h, minPx);
   if(!countSet(art)) return {err:'Nothing to print — the selected colours are empty.'};
   var p = {R:R, o:o, mode:o.mode, warn:[], art:art, sel:sel};
+  var ab = bboxMm(R, art); p.artSize = ab ? {w:+(ab.x1-ab.x0).toFixed(1), h:+(ab.y1-ab.y0).toFixed(1)} : null;
 
   if(o.mode === 'cutter'){
     p.sil = fillHoles(art, w, h);
@@ -3644,9 +3656,10 @@ function update(){
     var o = opts();
     document.querySelectorAll('.p3f').forEach(function(f){ f.hidden = f.dataset.m !== o.mode; });
     $('p3Dl').textContent = o.mode === 'plaque' ? 'Download STL set (.zip)' : 'Download STL';
-    $('p3H').textContent = '× ' + (o.width * t.h / t.w).toFixed(1) + ' mm art';
+    $('p3H').textContent = '';
     try{ last = plan(t, o); }catch(e){ console.error(e); last = {err:'Couldn’t plan this shape: ' + e.message}; }
     draw(last);
+    if(last && last.artSize) $('p3H').textContent = 'Design ' + last.artSize.w + ' × ' + last.artSize.h + ' mm';
     var info = [];
     if(last && !last.err){
       info.push('<b>' + last.size.w + ' × ' + last.size.h + ' × ' + last.size.z + ' mm</b>');

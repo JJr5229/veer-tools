@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Free PNG to SVG converter, plus cookie cutters and DXF · Veer Vectorizer</title>
+<meta name="description" content="Convert PNG or JPG to SVG free, with background removal. It runs in your browser and nothing is uploaded. Pro ($19) adds real-size layered SVG, DXF for laser cutters, and STL cookie cutters, stamps, stencils and plaques.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Veer Tools">
+<meta property="og:title" content="Veer Vectorizer: free PNG to SVG, and a drawing into a cookie cutter">
+<meta property="og:description" content="Free, unlimited PNG/JPG to SVG in your browser, nothing uploaded. Pro adds layered SVG for Cricut, DXF for laser, and STL cookie cutters, stamps, stencils and plaques.">
+<meta property="og:image" content="/vectorizer/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A marker drawing of a gingerbread person beside the cookie cutter preview Vectorizer made from it.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="theme-color" content="#0f1114">
+<link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 79.9 66.6"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="%23ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="%23bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="%23f69322"/></g></svg>'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+/* site.css styles .nav a after .btn-primary, which greys out the header button text */
+.nav a.btn-primary,.nav a.btn-primary:hover{color:#1a0f02;background:var(--orange)}
+.nav a.btn-primary:hover{background:var(--orange-hi)}
+/* quieter than --tx-2 but still 5:1 on --bg, for small mono labels */
+:root{--tx-quiet:#8f8d88}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+/* ---------- hero: the free converter, for someone who wants an SVG now ---------- */
+.hero{overflow:hidden;padding-block:clamp(48px,7vw,88px) clamp(40px,6vw,72px);border-bottom:1px solid var(--line)}
+.hero-top{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,1fr);gap:clamp(28px,5vw,72px);align-items:end}
+.hero h1{margin-top:18px;max-width:14ch}
+.hero .lede{margin-top:20px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:30px}
+.cta-row .note{font:500 .78rem/1.4 var(--mono);color:var(--tx-2);letter-spacing:.02em}
+.spec{margin:0;border-top:1px solid var(--line);font-size:.95rem}
+.spec div{display:grid;grid-template-columns:8.5em minmax(0,1fr);gap:12px;padding:11px 0;border-bottom:1px solid var(--line)}
+.spec dt{font:500 .74rem/1.9 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tx-quiet)}
+.spec dd{margin:0;color:var(--tx)}
+.spec dd .muted{font-size:.9em}
+.hero-shot{margin:clamp(36px,5vw,56px) 0 0}
+.hero-shot figcaption,.fig-cap{display:flex;justify-content:space-between;gap:10px 24px;flex-wrap:wrap;margin-top:14px;font-size:.9rem;color:var(--tx-2)}
+.fig-cap .dim{white-space:nowrap}
+
+/* ---------- 3D: the star ---------- */
+.p3{position:relative}
+.p3-intro{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.45fr);gap:clamp(28px,5vw,64px);align-items:start}
+.p3-intro h2{margin-top:14px}
+.p3-intro .lede{margin-top:18px}
+.tips{margin:26px 0 0;padding:18px 20px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg-2)}
+.tips h3{font:600 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2);margin-bottom:12px}
+.tips ul{margin:0;padding:0 0 0 1.1em;color:var(--tx-2);font-size:.95rem;display:flex;flex-direction:column;gap:6px}
+.tips li::marker{color:var(--orange)}
+.free-pro{margin-top:18px;font:500 .8rem/1.5 var(--mono);color:var(--tx-2)}
+.free-pro b{color:var(--orange);font-weight:600}
+
+.modes{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px;margin-top:clamp(48px,6vw,72px);list-style:none;padding:0}
+.mode{margin:0;display:flex;flex-direction:column;gap:12px;min-width:0}
+.mode img{width:100%;height:auto;aspect-ratio:1380/1080;object-fit:cover;object-position:top;border-radius:var(--r);border:1px solid var(--line);background:var(--panel)}
+.mode h3{margin-top:4px}
+.mode p{color:var(--tx-2);font-size:.95rem}
+.mode .mm{font:500 .76rem/1.5 var(--mono);color:var(--tx-quiet);letter-spacing:.02em}
+
+.split{display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(28px,5vw,64px);align-items:center;margin-top:clamp(56px,7vw,96px)}
+.split h3{font-size:clamp(1.35rem,2.2vw,1.7rem);margin-top:12px}
+.split p{color:var(--tx-2);margin-top:14px;max-width:52ch}
+.split p strong{color:var(--tx);font-weight:600}
+
+/* ---------- how it works: a real sequence ---------- */
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-top:1px solid var(--line);counter-reset:s}
+.steps li{padding:22px 22px 4px 0;counter-increment:s;position:relative;min-width:0}
+.steps li+li{padding-left:22px;border-left:1px solid var(--line)}
+.steps li::before{content:counter(s);display:block;font:500 .78rem/1 var(--mono);color:var(--orange);margin-bottom:16px}
+.steps h3{font-size:1.08rem}
+.steps p{color:var(--tx-2);font-size:.95rem;margin-top:8px}
+.steps .tag{display:inline-block;margin-top:12px;font:500 .72rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--tx-quiet)}
+.steps .tag.pro{color:var(--orange)}
+
+/* ---------- formats ---------- */
+.formats-shot{margin:0 0 clamp(28px,4vw,40px)}
+.ftable{width:100%;border-collapse:collapse;font-size:.97rem}
+.ftable th,.ftable td{text-align:left;vertical-align:top;padding:16px 18px 16px 0;border-bottom:1px solid var(--line)}
+.ftable thead th{font:500 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-quiet);padding-bottom:12px}
+.ftable tbody th{font-weight:600;width:24%}
+.ftable tbody th .mono{display:block;margin-top:4px;color:var(--tx-quiet);font-weight:400;font-size:.8rem}
+.ftable td{color:var(--tx-2)}
+.ftable td.apps{color:var(--tx);width:28%}
+.ftable .badge-pro{margin-left:6px}
+.free-tag{display:inline-block;margin-left:6px;font:700 .66rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--ok);border:1px solid #24563a;border-radius:4px;padding:3px 5px;vertical-align:2px}
+
+/* ---------- pricing ---------- */
+.prices{max-width:820px}
+.price .btn{align-self:flex-start;margin-top:6px}
+.price .fine{font:400 .78rem/1.5 var(--mono);color:var(--tx-quiet)}
+.price-note{margin-top:20px;color:var(--tx-2);font-size:.92rem;max-width:68ch}
+
+/* ---------- faq ---------- */
+.faq-wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,2fr);gap:clamp(28px,5vw,64px);align-items:start}
+.faq details p+p{margin-top:-10px}
+
+/* ---------- final cta ---------- */
+.final{border-top:1px solid var(--line);padding-block:clamp(56px,7vw,88px)}
+#faq{padding-bottom:clamp(56px,7vw,88px)}
+.final .wrap{display:flex;justify-content:space-between;align-items:end;gap:28px;flex-wrap:wrap}
+.final h2{max-width:18ch}
+.final p{color:var(--tx-2);margin-top:14px;max-width:52ch}
+
+/* ---------- responsive ---------- */
+@media (max-width:980px){
+  .modes{grid-template-columns:repeat(2,minmax(0,1fr));row-gap:36px}
+  .steps{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .steps li:nth-child(3){padding-left:0;border-left:0}
+  .steps li:nth-child(n+3){border-top:1px solid var(--line);margin-top:18px}
+}
+@media (max-width:860px){
+  .hero-top,.p3-intro,.split,.faq-wrap{grid-template-columns:minmax(0,1fr)}
+  .split .shot{order:-1}
+}
+@media (max-width:640px){
+  .modes{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .steps li,.steps li+li{padding:20px 0 4px;border-left:0}
+  .steps li+li{border-top:1px solid var(--line);margin-top:0}
+  .steps li:nth-child(n+3){margin-top:0}
+  .spec div{grid-template-columns:7.2em minmax(0,1fr)}
+  .ftable thead{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  .ftable,.ftable tbody,.ftable tr,.ftable th,.ftable td{display:block;width:auto!important}
+  .ftable tr{padding:16px 0;border-bottom:1px solid var(--line)}
+  .ftable th,.ftable td{border:0;padding:0}
+  .ftable td{margin-top:6px}
+  .ftable td.apps::before{content:"Open in: ";color:var(--tx-quiet)}
+  .cta-row .btn{flex:1 1 auto}
+  /* the app screenshots are illegible this narrow; the previews and the table say the same thing */
+  .p3-intro figure,.formats-shot{display:none}
+}
+</style>
+</head>
+<body>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Veer Tools home">
+      <svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      Veer <span>Tools</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="/nfc-studio/">NFC Studio</a>
+      <a class="hide-sm" href="/vectorizer/" aria-current="page">Vectorizer</a>
+      <a class="hide-sm" href="/lightbox/">Light Box Studio</a>
+      <a class="hide-sm" href="/#pricing">Pricing</a>
+      <a class="btn btn-primary btn-sm" href="/#tools">Open a tool</a>
+    </nav>
+  </div>
+</header>
+
+<main>
+
+<!-- ═════════ Hero: the free converter ═════════ -->
+<section class="hero mm-grid glow" aria-labelledby="hero-title">
+  <div class="wrap">
+    <div class="hero-top">
+      <div>
+        <p class="eyebrow">Vectorizer · free PNG to SVG converter</p>
+        <h1 id="hero-title">PNG or JPG in. Clean SVG out.</h1>
+        <p class="lede">Drop in a logo, icon or drawing and download it as an SVG. It's free with no limit, and the tracing runs in your browser, so your image is never uploaded.</p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="app.html">Convert an image free</a>
+          <a class="btn btn-ghost" href="#print-3d">See the cookie cutters</a>
+        </div>
+      </div>
+      <dl class="spec" aria-label="Free converter at a glance">
+        <div><dt>Input</dt><dd>PNG, JPG, WebP, GIF, BMP <span class="muted">· drop, browse or paste</span></dd></div>
+        <div><dt>Output</dt><dd>SVG download, or copy the SVG code</dd></div>
+        <div><dt>Background</dt><dd>Remove the backdrop, the enclosed areas too, or keep it</dd></div>
+        <div><dt>Presets</dt><dd>Logo, Simple mark, Black &amp; white, Detailed art</dd></div>
+        <div><dt>Cost</dt><dd>Free and unlimited. No account.</dd></div>
+        <div><dt>Uploads</dt><dd>None. It works on your machine.</dd></div>
+      </dl>
+    </div>
+
+    <figure class="hero-shot">
+      <div class="shot">
+        <img src="img/before-after.webp" width="2160" height="948" fetchpriority="high"
+             alt="Vectorizer with a flat three-colour logo loaded. Left pane: the original 900 by 900 pixel PNG on a white square. Right pane: the traced SVG, the same teal disc, yellow ring and red heart, with the white background removed.">
+      </div>
+      <figcaption>
+        <span>A flat three-colour logo with the Logo preset. Background removed; the counts in each corner are the tool's own.</span>
+        <span class="dim">raster → vector</span>
+      </figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ═════════ Print it in 3D ═════════ -->
+<section class="p3" id="print-3d" aria-labelledby="p3-title">
+  <div class="wrap">
+    <div class="p3-intro">
+      <div>
+        <p class="eyebrow">Pro · Print it in 3D</p>
+        <h2 id="p3-title">Turn your kid's drawing into a <span class="grad">cookie cutter</span>.</h2>
+        <p class="lede">Take a photo of the drawing, drop it in, and switch to Cookie cutter. Vectorizer follows the outside line and builds a thin cutting wall on a flange that prints flat on the bed. Download the STL, print it, and bake before December gets busy.</p>
+        <div class="tips">
+          <h3>For a clean trace from a drawing</h3>
+          <ul>
+            <li>Thick, dark marker on plain white paper.</li>
+            <li>Photograph it straight on, in daylight, and crop close.</li>
+            <li>Close the outline. With a gap in the line, the cutter can't tell inside from outside.</li>
+            <li>Faces and buttons inside aren't cut. Make a stamp from the same drawing to press them in.</li>
+          </ul>
+        </div>
+        <p class="free-pro">3D preview: <b>free</b> · STL download: <b>Pro</b></p>
+      </div>
+      <figure style="margin:0">
+        <div class="shot">
+          <img src="img/p3-cutter.webp" width="2160" height="1564" loading="lazy"
+               alt="The Print it in 3D panel in Cookie cutter mode. A marker drawing of a gingerbread person has become a cutter outline: an orange cutting wall on a grey flange, with settings for width, height, wall and flange, and a Download STL button.">
+        </div>
+        <figcaption class="fig-cap"><span>A marker drawing of a gingerbread person, as a cookie cutter.</span><span class="dim">15 mm wall height</span></figcaption>
+      </figure>
+    </div>
+
+    <ul class="modes" aria-label="The four things Vectorizer can print">
+      <li class="mode">
+        <img src="img/out-cutter.webp" width="1380" height="1080" loading="lazy" alt="Top-view preview of the gingerbread cookie cutter: an orange cutting wall on a grey flange.">
+        <h3>Cookie cutter</h3>
+        <p>A thin cutting wall plus a flange that prints on the bed. The file is mirrored, because you use the cutter flange-up.</p>
+        <span class="mm">15 mm tall · 1 mm wall · 3.5 mm flange</span>
+      </li>
+      <li class="mode">
+        <img src="img/out-stamp.webp" width="1380" height="1080" loading="lazy" alt="Top-view preview of a round stamp: the gingerbread drawing's lines, eyes, smile and buttons raised in orange on a grey circular base.">
+        <h3>Stamp</h3>
+        <p>A base plate with the design raised. Mirrored so the impression reads the right way round, on cookies, clay or fondant.</p>
+        <span class="mm">base: outline, rounded rectangle or circle</span>
+      </li>
+      <li class="mode">
+        <img src="img/out-stencil.webp" width="1380" height="1080" loading="lazy" alt="Top-view preview of a stencil plate with the word BOO cut through it. Red bars mark four bridges that hold the centres of the B and both Os in place.">
+        <h3>Stencil</h3>
+        <p>A flat plate with the design cut through, for spray paint, signs and shirts. Bridges are added automatically so letter centres stay put.</p>
+        <span class="mm">0.8 mm plate · 10 mm border · 1.6 mm bridges</span>
+      </li>
+      <li class="mode">
+        <img src="img/out-plaque.webp" width="1380" height="1038" loading="lazy" alt="Top-view preview of a round multi-colour plaque: teal disc, yellow ring and red heart on a dark base, with a dashed circle marking the magnet pocket underneath.">
+        <h3>Multi-colour plaque</h3>
+        <p>A base and one STL per colour, zipped, for an AMS. Add a magnet pocket underneath and it's a fridge magnet.</p>
+        <span class="mm">one STL per colour · magnet pocket optional</span>
+      </li>
+    </ul>
+
+    <div class="split">
+      <div class="shot">
+        <img src="img/p3-stencil.webp" width="2160" height="1454" loading="lazy"
+             alt="The Print it in 3D panel in Stencil mode for the word BOO: thickness 0.8 mm, border 10 mm, bridges switched on at 1.6 mm wide. The preview reads 4 bridges added.">
+      </div>
+      <div>
+        <p class="eyebrow">Stencils</p>
+        <h3>The middle of the O stays where it belongs.</h3>
+        <p>Cut an O out of a sheet and its centre falls out, leaving a blob. Vectorizer finds every enclosed island in the design, like the centres of O, A and B, and ties each one to the plate with a thin bridge. <strong>"BOO" needs four</strong>: two for the B, one for each O.</p>
+        <p>Set the bridge width to suit your brush or spray. Switch bridges off if you'd rather place the centres by hand.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═════════ How it works ═════════ -->
+<section id="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-title">One image, four steps, all in the browser tab.</h2>
+    </div>
+    <ol class="steps">
+      <li>
+        <h3>Drop in an image</h3>
+        <p>PNG, JPG, WebP, GIF or BMP. Drag it in, browse, or paste from the clipboard.</p>
+        <span class="tag">Free</span>
+      </li>
+      <li>
+        <h3>Tune the trace</h3>
+        <p>Pick a preset, then adjust colours, detail, smoothing and speckle removal. The SVG redraws as you go.</p>
+        <span class="tag">Free</span>
+      </li>
+      <li>
+        <h3>Take the SVG</h3>
+        <p>Download it or copy the code. Or set a width in millimetres and export layered SVG, one SVG per colour, or DXF.</p>
+        <span class="tag">Free · exports Pro</span>
+      </li>
+      <li>
+        <h3>Or print it</h3>
+        <p>Choose cookie cutter, stamp, stencil or plaque, check the preview, and download the STL for your slicer.</p>
+        <span class="tag pro">Pro</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═════════ Formats ═════════ -->
+<section id="formats" aria-labelledby="formats-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Maker exports</p>
+      <h2 id="formats-title">Files that arrive at the right size.</h2>
+      <p class="lede">A plain SVG is measured in pixels, so it lands in Design Space or LightBurn at whatever size the software guesses. Pro exports use the width you set in millimetres, and keep each colour on its own layer.</p>
+    </div>
+    <figure class="formats-shot">
+      <div class="shot">
+        <img src="img/maker-exports.webp" width="2216" height="424" loading="lazy"
+             alt="The Maker exports row in Vectorizer: an output width of 100 mm, and buttons for Sized SVG with layers grouped, One SVG per colour as a zip, DXF for laser, and Batch convert files.">
+      </div>
+    </figure>
+    <table class="ftable">
+      <caption class="sr-only">Export formats, what each contains, and where to open it</caption>
+      <thead><tr><th scope="col">Format</th><th scope="col">What you get</th><th scope="col">Open it in</th></tr></thead>
+      <tbody>
+        <tr>
+          <th scope="row">SVG <span class="free-tag">Free</span><span class="mono">.svg</span></th>
+          <td>The traced paths, sized in pixels. Download the file or copy the code.</td>
+          <td class="apps">Inkscape, Illustrator, Figma, a web page</td>
+        </tr>
+        <tr>
+          <th scope="row">Sized SVG, layered <span class="badge-pro">Pro</span><span class="mono">.svg · mm</span></th>
+          <td>Your width in millimetres, with each colour grouped on its own named layer.</td>
+          <td class="apps">Cricut Design Space, Inkscape, LightBurn</td>
+        </tr>
+        <tr>
+          <th scope="row">SVG per colour <span class="badge-pro">Pro</span><span class="mono">.zip of .svg</span></th>
+          <td>One file per colour, so each vinyl colour gets its own mat, or each laser pass its own file.</td>
+          <td class="apps">Cricut Design Space, LightBurn</td>
+        </tr>
+        <tr>
+          <th scope="row">DXF <span class="badge-pro">Pro</span><span class="mono">DXF R12 · mm</span></th>
+          <td>Closed polylines in millimetres, one layer per colour, for laser cutting and engraving.</td>
+          <td class="apps">LightBurn, and CAD or CNC software that reads DXF</td>
+        </tr>
+        <tr>
+          <th scope="row">STL <span class="badge-pro">Pro</span><span class="mono">binary STL · mm</span></th>
+          <td>Cookie cutter, stamp or stencil as one file. A plaque comes as a zip with one STL per colour and a short README.</td>
+          <td class="apps">Bambu Studio, OrcaSlicer, PrusaSlicer</td>
+        </tr>
+        <tr>
+          <th scope="row">Batch <span class="badge-pro">Pro</span><span class="mono">.zip</span></th>
+          <td>A stack of images converted in one go, each as a sized SVG and a DXF.</td>
+          <td class="apps">Any of the above</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═════════ Pricing ═════════ -->
+<section id="pricing" aria-labelledby="pricing-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Pricing</p>
+      <h2 id="pricing-title">The converter is free. The maker files are $19, once.</h2>
+    </div>
+    <div class="prices">
+      <div class="price">
+        <span class="tier">Free</span>
+        <div class="amt">$0</div>
+        <ul>
+          <li>Unlimited PNG, JPG, WebP to SVG</li>
+          <li>Background removal</li>
+          <li>Download the SVG or copy its code</li>
+          <li>3D preview of every mode</li>
+          <li>Nothing uploaded, ever</li>
+        </ul>
+        <a class="btn" href="app.html">Convert an image free</a>
+      </div>
+      <div class="price feature">
+        <span class="tier">Pro</span>
+        <div class="amt">$19<small>one-time</small></div>
+        <ul>
+          <li>Exports at real size in mm</li>
+          <li>Colour layers grouped, or one SVG per colour</li>
+          <li>DXF for laser cutters</li>
+          <li>Batch convert a stack of images</li>
+          <li>STL cookie cutters, stamps, stencils and multi-colour plaques</li>
+          <li>All future Vectorizer updates</li>
+        </ul>
+        <a class="btn btn-primary" href="app.html" data-checkout="vectorizer-pro" data-fallback="app.html">Get Vectorizer Pro</a>
+        <span class="fine">License key by email · unlock once online, then works offline</span>
+      </div>
+    </div>
+    <p class="price-note">No subscription. Pro is a license key you paste into the tool once; everything still runs on your machine.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ═════════ FAQ ═════════ -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="wrap faq-wrap">
+    <div class="section-head" style="margin-bottom:0">
+      <p class="eyebrow">Questions</p>
+      <h2 id="faq-title">Before you print.</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Is the converter really free? Is my image uploaded?</summary>
+        <p>Yes, and no. Converting PNG or JPG to SVG is free with no limit and no account. The tracing runs in your browser, so the image never leaves your computer. Pro checks its license key online now and then, but it never sends your images anywhere.</p>
+      </details>
+      <details>
+        <summary>Will it work on a photo?</summary>
+        <p>Not well, and that's the format, not the tool. SVG describes flat areas of colour, so it suits logos, icons, lettering, line art and drawings. A photo traces into thousands of tiny shapes and a heavy file. Vectorizer tells you when a trace looks like a photo, and suggests fewer colours or a tighter crop.</p>
+      </details>
+      <details>
+        <summary>Are 3D-printed cookie cutters food safe?</summary>
+        <p>Treat them with care. PETG is the safer choice for food contact, and the cutter should only touch the dough briefly. Wash it by hand in warm water, not the dishwasher: heat warps PLA, and layer lines can hold on to dough, so scrub the edge. A home-printed cutter isn't a certified food-contact item, so keep it for your own baking.</p>
+      </details>
+      <details>
+        <summary>Why is the cookie cutter file mirrored?</summary>
+        <p>It prints flange-down, the way the file sits. You use it flange-up, which flips it back. For a symmetrical shape you won't notice; for lettering or a lopsided drawing, it's the difference between the right way round and backwards. Stamps are mirrored for the same reason.</p>
+      </details>
+      <details>
+        <summary>Why do stencils need bridges?</summary>
+        <p>Anything fully enclosed by a cut, like the middle of an O, A or B, would fall out of the plate and leave a solid blob. Bridges are thin strips that tie each centre to the rest of the stencil. Vectorizer adds them automatically and lets you set their width, or switch them off.</p>
+      </details>
+      <details>
+        <summary>Does it work with Cricut, LightBurn and my slicer?</summary>
+        <p>The sized, layered SVG imports into Cricut Design Space, Inkscape and LightBurn at the millimetre width you set. DXF is R12 with closed polylines, which laser software reads cleanly. STLs are binary and in millimetres, for Bambu Studio, OrcaSlicer or PrusaSlicer. For a plaque, drag all the STLs onto the plate together and load them as one object with multiple parts.</p>
+      </details>
+      <details>
+        <summary>How do I unlock Pro?</summary>
+        <p>Buy Pro for $19, one time, and you get a license key by email. Paste it into the tool. Unlocking needs an internet connection once; after that, Vectorizer works offline.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════ Final CTA ═════════ -->
+<section class="final mm-grid" aria-labelledby="final-title">
+  <div class="wrap">
+    <div>
+      <h2 id="final-title">Start with the drawing on the fridge.</h2>
+      <p>Convert it to SVG for free, preview it as a cutter, and decide about Pro when you see the result.</p>
+    </div>
+    <div class="cta-row" style="margin-top:0">
+      <a class="btn btn-primary" href="app.html">Convert an image free</a>
+      <a class="btn" href="app.html" data-checkout="vectorizer-pro" data-fallback="app.html">Get Pro · $19</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="brand" href="/"><svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg> Veer <span>Tools</span></a>
+        <p style="margin-top:14px;max-width:34ch">Browser tools for makers, from Veer, a digital studio for small businesses. Everything runs on your machine.</p>
+      </div>
+      <div><h4>Tools</h4><ul><li><a href="/nfc-studio/">NFC Studio</a></li><li><a href="/vectorizer/">Vectorizer</a></li><li><a href="/lightbox/">Light Box Studio</a></li></ul></div>
+      <div><h4>Veer</h4><ul><li><a href="https://veersolutions.com">Websites &amp; marketing</a></li><li><a href="https://instagram.com/getveer">Instagram @getveer</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="/#faq">FAQ</a></li><li><a href="/#pricing">Pricing &amp; licenses</a></li></ul></div>
+    </div>
+    <div class="base"><span>© 2026 Veer</span><span>No uploads. No accounts. Your files stay yours.</span></div>
+  </div>
+</footer>
+
+<script src="/assets/checkout.js" defer></script>
+</body>
+</html>
