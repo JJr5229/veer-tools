@@ -292,3 +292,48 @@ sell. A raised multi-colour card is not.
 Outsource flat cards to Tagstand at $2.60 when a customer wants conventional
 ones. Buy the card printer only once you're consistently past ~100 flat
 cards/month.
+
+## Free and Pro
+
+Anyone can design with every feature. The plan only matters at download.
+
+| | Free | Pro | Commercial |
+|---|---|---|---|
+| Logo colours | 1–2 | up to 4 | up to 4 |
+| Company info text | — | ✓ | ✓ |
+| Back of the card | small `MADE WITH VEER` deboss, one layer deep | clean | clean |
+| Selling prints | — | — | ✓ |
+
+The free-plan mark is placed wherever it fits clear of the edge, the tag pocket
+and the keyring hole. On blanks too small to fit it (e.g. a 45 × 28 keychain
+with a 22 mm tag) it's left off.
+
+### How unlocking works
+
+1. The buyer pastes the license key from their receipt into **Free · Upgrade → Unlock**.
+2. The page sends it to `/api/license` (`api/license.js`, a Vercel function),
+   which checks it with Lemon Squeezy or Gumroad.
+3. If it's good, the function returns a token signed with Veer's private key.
+   The page checks the signature with the public key embedded in
+   `index.html`, so Pro can't be switched on by editing browser storage, and it
+   keeps working offline until the token expires (14 days). While online, the
+   page quietly renews it every few days, and drops Pro if the store says the
+   license was refunded or revoked.
+
+### Going live: checklist
+
+1. **Create the products** in Lemon Squeezy (recommended) or Gumroad, with
+   license keys turned on: *NFC Studio Pro* and *NFC Studio Commercial*. They
+   can be two variants of one product as long as the commercial variant's name
+   contains "Commercial".
+2. **Set Vercel environment variables** on the veer-tools project (see the top
+   of `api/license.js` for the full list): `LICENSE_SIGNING_KEY`,
+   `LICENSE_PROVIDER`, `LS_STORE_ID` and `LS_PRODUCTS` (or `GUMROAD_PRODUCTS`).
+3. **Paste the checkout links** into `PRO.buyPro` and `PRO.buyCommercial` near
+   the top of the script in `index.html`. Until then, the buy buttons show as
+   "opens soon".
+4. Test with a real purchase in the store's test mode, then refund it.
+
+To rotate the signing keys, run `node scripts/gen-license-keypair.js`. It
+writes the new public key into the page and the private key to a git-ignored
+file for Vercel.

@@ -110,6 +110,62 @@ button.primary:hover{background:var(--acc);color:#05201d}
 #partlist td{padding:4px 6px;border-top:1px solid var(--line);color:var(--tx2)}
 #partlist td.n{color:var(--tx)}
 .dot{display:inline-block;width:11px;height:11px;border-radius:3px;border:1px solid #0006;vertical-align:-1px}
+
+/* ---------- Pro / licensing ---------- */
+.plan{flex:none;display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:999px;
+  font-size:11px;font-weight:600;letter-spacing:.02em;border:1px solid var(--line);background:var(--panel2);color:var(--tx2)}
+.plan:hover{border-color:var(--acc);color:var(--tx)}
+.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--tx2)}
+.plan.pro{border-color:#6b4a1d;color:#ffd7a3;background:#2a1d0e}
+.plan.pro .pip{background:var(--acc)}
+.protag{display:inline-block;font-size:9.5px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
+  color:var(--acc);border:1px solid #6b4a1d;border-radius:4px;padding:0 4px;margin-left:6px;vertical-align:1px}
+.protag[hidden]{display:none}
+.freenote{background:#1c1712;border:1px solid #4a3418;color:#e9c99a;border-radius:6px;padding:7px 9px;font-size:11px;margin:8px 0}
+.freenote button{padding:2px 8px;font-size:11px;margin-left:4px}
+
+dialog#pro{width:min(620px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line);
+  border-radius:14px;background:var(--panel);color:var(--tx);box-shadow:0 30px 80px #000a}
+dialog#pro::backdrop{background:#05070acc;backdrop-filter:blur(3px)}
+.pro-in{padding:26px 26px 22px;display:flex;flex-direction:column;gap:18px}
+.pro-head{display:flex;align-items:flex-start;gap:12px}
+.pro-head h2{margin:0;font-size:20px;letter-spacing:-.01em;line-height:1.2}
+.pro-head p{margin:4px 0 0;color:var(--tx2);font-size:12.5px;line-height:1.5}
+.pro-x{margin-left:auto;flex:none;width:30px;height:30px;padding:0;border-radius:8px;font-size:16px;line-height:1}
+.pro-uses{background:#1c1712;border:1px solid #4a3418;border-radius:9px;padding:10px 12px;font-size:12px;color:#e9c99a;line-height:1.55}
+.pro-uses b{color:#ffd7a3}
+.pro-uses .sw{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+.tiers{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px}
+@media (max-width:620px){.tiers{grid-template-columns:minmax(0,1fr)}}
+.tier{border:1px solid var(--line);border-radius:11px;padding:14px 14px 12px;display:flex;flex-direction:column;gap:8px;background:var(--panel2);min-width:0}
+.tier.hi{border-color:var(--acc);background:linear-gradient(180deg,#2a1d0e 0%,var(--panel2) 70%)}
+.tier .nm{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2)}
+.tier.hi .nm{color:var(--acc)}
+.tier .pr{font-size:22px;font-weight:700;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.tier .pr small{font-size:11px;font-weight:400;color:var(--tx2);letter-spacing:0}
+.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:5px;font-size:11.5px;color:var(--tx2);flex:1}
+.tier li{padding-left:15px;position:relative;line-height:1.4}
+.tier li:before{content:"";position:absolute;left:2px;top:6px;width:6px;height:6px;border-radius:2px;background:#4a5058}
+.tier.hi li:before,.tier.co li:before{background:var(--acc)}
+.tier .buy{width:100%;justify-content:center;text-align:center;text-decoration:none;display:block;font-weight:600}
+a.buy{background:var(--panel);border:1px solid var(--line);color:var(--tx);border-radius:7px;padding:7px 11px}
+a.buy:hover{border-color:var(--acc)}
+.tier.hi a.buy{background:var(--acc);border-color:var(--acc);color:#1a0f02}
+.tier.hi a.buy:hover{background:#ffa53d}
+.buy.off{opacity:.45;pointer-events:none}
+.keyrow{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
+.keyrow label{font-size:12px;color:var(--tx2)}
+.keyrow .in{display:flex;gap:8px}
+.keyrow input{flex:1;width:auto;font-family:ui-monospace,Consolas,monospace;font-size:12.5px;padding:8px 10px;letter-spacing:.02em}
+#proMsg{font-size:12px;min-height:1.2em;color:var(--tx2)}
+#proMsg.err{color:var(--bad)} #proMsg.ok{color:#7fe0a8}
+.owned{display:flex;flex-direction:column;gap:10px}
+.owned dl{display:grid;grid-template-columns:120px minmax(0,1fr);gap:6px 12px;margin:0;font-size:12.5px}
+.owned dt{color:var(--tx2)} .owned dd{margin:0;font-variant-numeric:tabular-nums;overflow-wrap:anywhere}
+.manage{display:flex;gap:8px;flex-wrap:wrap}
+.manage[hidden]{display:none}
+dialog#pro [hidden]{display:none!important}
+.pro-foot{font-size:11px;color:var(--tx2);line-height:1.5}
 </style>
 </head>
 <body>
@@ -126,10 +182,13 @@ button.primary:hover{background:var(--acc);color:#05201d}
         <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
         </g>
       </svg>
-      <h1 style="flex:1">NFC Studio <span id="build" style="font-size:10px;font-weight:400;color:var(--acc);
+      <h1 style="flex:1;white-space:nowrap">NFC Studio <span id="build" style="font-size:10px;font-weight:400;color:var(--acc);
         border:1px solid var(--acc2);border-radius:4px;padding:1px 5px;vertical-align:2px"></span></h1>
     </div>
-    <p>Veer &middot; logo &rarr; multi-colour STL for Bambu Studio</p>
+    <div style="display:flex;align-items:center;gap:10px;margin-top:6px">
+      <p style="flex:1;margin:0">Veer &middot; logo &rarr; multi-colour STL for Bambu Studio</p>
+      <button type="button" class="plan" id="planChip" title="Plan and license"><span class="pip"></span><span id="planTxt">Free · Upgrade</span></button>
+    </div>
   </div>
   <div id="ctrls">
 
@@ -153,15 +212,16 @@ button.primary:hover{background:var(--acc);color:#05201d}
 
     <details class="sec" open><summary>2 · Colours <span id="colCount" style="text-transform:none;color:var(--acc)"></span></summary><div class="body">
       <div class="row"><label>Logo colours</label>
-        <select id="k"><option>1</option><option>2</option><option selected>3</option><option>4</option></select></div>
+        <select id="k"><option value="1">1</option><option value="2" selected>2</option><option value="3">3</option><option value="4">4</option></select></div>
       <div class="chk"><input type="checkbox" id="lockPal"><span>Lock palette (match my colours, don't auto-detect)</span></div>
       <div class="chk"><input type="checkbox" id="despeckle" checked><span>Clean up JPEG noise / dithering</span></div>
       <div id="swatches"></div>
       <div class="note">Slot 1 is the card itself. Use the <b>pick</b> button then click the preview to sample a colour straight off your logo.</div>
       <div id="colWarn"></div>
+      <div id="colPro"></div>
     </div></details>
 
-    <details class="sec"><summary>3 · Text (optional)</summary><div class="body">
+    <details class="sec"><summary>3 · Text (optional)<span class="protag" id="txTag">Pro</span></summary><div class="body">
       <div class="chk"><input type="checkbox" id="txOn"><span>Add company info</span></div>
       <input type="text" class="wide" id="tx1" placeholder="Line 1 — e.g. Camden Shapeworks" style="margin:4px 0">
       <input type="text" class="wide" id="tx2" placeholder="Line 2 — e.g. 3D Printing &amp; Design" style="margin:4px 0">
@@ -342,6 +402,77 @@ button.primary:hover{background:var(--acc);color:#05201d}
   </div>
 </div>
 </div>
+<dialog id="pro" aria-labelledby="proTitle">
+  <div class="pro-in">
+    <div class="pro-head">
+      <div>
+        <h2 id="proTitle">NFC Studio Pro</h2>
+        <p id="proSub">Full-colour cards, company text, and clean files with no Veer mark.</p>
+      </div>
+      <button type="button" class="pro-x" id="proClose" aria-label="Close">&times;</button>
+    </div>
+    <div class="pro-uses" id="proUses" hidden></div>
+
+    <div id="proBuy">
+      <div class="tiers">
+        <div class="tier">
+          <div class="nm">Free</div>
+          <div class="pr">$0</div>
+          <ul>
+            <li>1–2 logo colours</li>
+            <li>Every shape, keychain and tag option</li>
+            <li>Sealed NFC pocket</li>
+            <li>Small VEER mark debossed on the back</li>
+            <li>Personal use</li>
+          </ul>
+        </div>
+        <div class="tier hi">
+          <div class="nm">Pro</div>
+          <div class="pr"><span id="pricePro">$29</span> <small>one-time</small></div>
+          <ul>
+            <li>Up to 4 logo colours</li>
+            <li>Company info text, any font</li>
+            <li>No mark on the back</li>
+            <li>All future NFC Studio updates</li>
+          </ul>
+          <a class="buy" id="buyPro" target="_blank" rel="noopener">Get Pro</a>
+        </div>
+        <div class="tier co">
+          <div class="nm">Commercial</div>
+          <div class="pr"><span id="priceCom">$79</span> <small>one-time</small></div>
+          <ul>
+            <li>Everything in Pro</li>
+            <li>Sell the cards and keychains you print</li>
+            <li>Make files for clients</li>
+          </ul>
+          <a class="buy" id="buyCom" target="_blank" rel="noopener">Get Commercial</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="owned" id="proOwned" hidden>
+      <dl>
+        <dt>Plan</dt><dd id="ownTier"></dd>
+        <dt>Licensed to</dt><dd id="ownEmail"></dd>
+        <dt>Key</dt><dd id="ownKey"></dd>
+        <dt>Checked</dt><dd id="ownChecked"></dd>
+      </dl>
+    </div>
+
+    <div class="keyrow" id="proKeyRow">
+      <label for="proKey">Already bought it? Paste the license key from your receipt email.</label>
+      <div class="in">
+        <input type="text" id="proKey" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false">
+        <button type="button" class="primary" id="proActivate">Unlock</button>
+      </div>
+    </div>
+    <div id="proMsg" role="status"></div>
+    <div class="pro-foot" id="proFoot">Unlocking needs an internet connection once. After that, NFC Studio works offline and checks in now and then while you're online.</div>
+    <div id="proManage" class="manage" hidden>
+      <button type="button" id="proRemove">Remove from this browser</button>
+    </div>
+  </div>
+</dialog>
 <div class="powered">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
 
 <script>
@@ -357,10 +488,164 @@ button.primary:hover{background:var(--acc);color:#05201d}
 /* Bump this on every change. It shows in the header, in the STL header bytes
    and in the 3MF metadata, so there's never any doubt which build produced a
    file — browsers cache file:// pages aggressively. */
-const BUILD = "b10 · 2026-08-06";
+const BUILD = "b11 · 2026-11-09";
 
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v<a?a:v>b?b:v;
+
+/* ───────────────────────── Pro licensing ─────────────────────────
+   Free: 1–2 logo colours, no company text, small VEER mark debossed into the
+   back. Pro / Commercial lift all three. Anyone can DESIGN with Pro features —
+   the gate is only at download, so people see exactly what they'd be buying.
+
+   A license key is checked by /api/license (api/license.js), which returns a
+   token signed with Veer's private key. We verify it here with the public key
+   below, so the unlock survives offline and can't be faked by editing storage.
+   Fill in the checkout links once the store products exist. */
+const PRO = {
+  product: "nfc-studio",
+  // Where the license API lives. Same-origin when hosted; a file:// copy of
+  // the page needs the full origin of the hosted tools site.
+  apiOrigin: "",
+  buyPro: "",            // e.g. https://veer.lemonsqueezy.com/buy/…
+  buyCommercial: "",
+  pricePro: "$29", priceCommercial: "$79",
+  publicKey: /*LICENSE_PUBLIC_KEY*/{"kty":"EC","crv":"P-256","x":"sr_eBjg_v3h7zakhjM-WbGFKfXWqc7yEwZdXDJq0RnU","y":"J-9R79HF6EG_ElknZ05epfUiGk_PQ3MZqaq5yDulaYU"}/*/LICENSE_PUBLIC_KEY*/,
+  storeKey: "veerLicense:nfc-studio",
+  refreshAfterDays: 3
+};
+const LIC = { tier:"free", email:"", exp:0, iat:0, key:"", instance:"" };
+const isPro = () => LIC.tier==="pro" || LIC.tier==="commercial";
+
+const b64urlBytes = s => {
+  s = s.replace(/-/g,"+").replace(/_/g,"/"); while(s.length%4) s+="=";
+  const bin = atob(s), u = new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) u[i]=bin.charCodeAt(i);
+  return u;
+};
+async function verifyToken(token){
+  if(!PRO.publicKey || !token || !(window.crypto && crypto.subtle)) return null;
+  const [body, sig] = String(token).split(".");
+  if(!body || !sig) return null;
+  try{
+    const key = await crypto.subtle.importKey("jwk", PRO.publicKey, {name:"ECDSA", namedCurve:"P-256"}, false, ["verify"]);
+    const ok = await crypto.subtle.verify({name:"ECDSA", hash:"SHA-256"}, key, b64urlBytes(sig), new TextEncoder().encode(body));
+    if(!ok) return null;
+    const pl = JSON.parse(new TextDecoder().decode(b64urlBytes(body)));
+    if(pl.p!==PRO.product && pl.p!=="veer-pro") return null;
+    if(!(pl.exp*1000 > Date.now())) return null;
+    return pl;
+  }catch(e){ return null; }
+}
+function licStored(){ try{ return JSON.parse(localStorage.getItem(PRO.storeKey)||"null"); }catch(e){ return null; } }
+function licStore(o){ try{ o ? localStorage.setItem(PRO.storeKey, JSON.stringify(o)) : localStorage.removeItem(PRO.storeKey); }catch(e){} }
+function licApply(pl, stored){
+  LIC.tier = pl ? (pl.t==="commercial"?"commercial":"pro") : "free";
+  LIC.email = pl ? (pl.e||"") : ""; LIC.exp = pl ? pl.exp : 0; LIC.iat = pl ? pl.iat : 0;
+  LIC.key = stored ? stored.key : ""; LIC.instance = stored ? stored.instance : "";
+  proUI();
+}
+async function licCall(action, key, instance){
+  if(location.protocol==="file:" && !PRO.apiOrigin)
+    return {ok:false, error:"Unlocking works on the hosted version of NFC Studio. Open it from the Veer Tools site, unlock once, and you're set."};
+  try{
+    const r = await fetch(PRO.apiOrigin+"/api/license", {
+      method:"POST", headers:{"Content-Type":"application/json"},
+      body: JSON.stringify({action, product:PRO.product, key, instance})
+    });
+    const j = await r.json().catch(()=>({}));
+    return j && typeof j==="object" ? j : {ok:false, error:"Unexpected reply from the license server."};
+  }catch(e){
+    return {ok:false, offline:true, error:"Couldn't reach the license server. Check your connection and try again."};
+  }
+}
+async function licActivate(key){
+  const r = await licCall("activate", key, "");
+  if(!r.ok) return r;
+  const pl = await verifyToken(r.token);
+  if(!pl) return {ok:false, error:"The license server's reply couldn't be verified. Reload the page and try again."};
+  const stored = {key, instance:r.instance||"", token:r.token, checked:Date.now()};
+  licStore(stored); licApply(pl, stored);
+  return {ok:true};
+}
+async function licInit(){
+  const stored = licStored();
+  if(!stored){ licApply(null); return; }
+  const pl = await verifyToken(stored.token);
+  licApply(pl, pl ? stored : null);
+  const stale = !pl || (Date.now() - (stored.checked||0)) > PRO.refreshAfterDays*86400e3;
+  if(stale && navigator.onLine!==false){
+    const r = await licCall("refresh", stored.key, stored.instance);
+    if(r.ok){
+      const np = await verifyToken(r.token);
+      if(np){ const ns={...stored, token:r.token, instance:r.instance||stored.instance, checked:Date.now()}; licStore(ns); licApply(np, ns); }
+    }else if(!r.offline){
+      // the store says no (refunded, revoked, subscription ended): drop Pro now
+      licStore(null); licApply(null);
+      setStatus(r.error||"Your Pro license is no longer active.","err");
+    }
+  }
+  if(pl || isPro()) refresh();
+}
+
+/* what in the current design needs Pro */
+function proNeeds(st){
+  const n=[];
+  if(st.k>2) n.push(`${st.k} logo colours`);
+  if(st.txOn && st.txLines.length) n.push("company info text");
+  return n;
+}
+
+/* ── the upgrade / license dialog ── */
+function proUI(){
+  const pro=isPro();
+  $("planChip").classList.toggle("pro", pro);
+  $("planTxt").textContent = LIC.tier==="commercial" ? "Commercial" : pro ? "Pro" : "Free · Upgrade";
+  $("txTag").hidden = pro;
+  // logo-colour options: flag the Pro ones on the free plan
+  [...$("k").options].forEach(o=>{ const n=+o.value||+o.textContent; o.textContent = (!pro && n>2) ? `${n}  (Pro)` : `${n}`; o.value=n; });
+  $("proBuy").hidden = pro;
+  $("proOwned").hidden = !pro;
+  $("proManage").hidden = !pro;
+  $("proKeyRow").hidden = pro;
+  $("proFoot").hidden = pro;
+  $("proTitle").textContent = pro ? (LIC.tier==="commercial" ? "NFC Studio Commercial" : "NFC Studio Pro") : "NFC Studio Pro";
+  $("proSub").textContent = pro ? "Thanks for supporting Veer. Every Pro feature is unlocked in this browser."
+                                : "Full-colour cards, company text, and clean files with no Veer mark.";
+  if(pro){
+    $("ownTier").textContent = LIC.tier==="commercial" ? "Commercial (you may sell what you print)" : "Pro (personal use)";
+    $("ownEmail").textContent = LIC.email || "—";
+    $("ownKey").textContent = LIC.key ? LIC.key.slice(0,4)+"••••••••"+LIC.key.slice(-4) : "—";
+    const st=licStored();
+    $("ownChecked").textContent = st && st.checked ? new Date(st.checked).toLocaleDateString(undefined,{year:"numeric",month:"short",day:"numeric"}) : "—";
+  }
+  const setBuy=(el,url,price,priceEl)=>{ $(priceEl).textContent=price;
+    if(url){ el.href=url; el.classList.remove("off"); el.removeAttribute("aria-disabled"); }
+    else { el.removeAttribute("href"); el.classList.add("off"); el.setAttribute("aria-disabled","true"); el.title="Checkout opens soon"; } };
+  setBuy($("buyPro"), PRO.buyPro, PRO.pricePro, "pricePro");
+  setBuy($("buyCom"), PRO.buyCommercial, PRO.priceCommercial, "priceCom");
+}
+function proMsg(t,cls){ const m=$("proMsg"); m.textContent=t||""; m.className=cls||""; }
+function openPro(needs){
+  const u=$("proUses");
+  if(needs && needs.length && !isPro()){
+    u.hidden=false;
+    u.innerHTML = `This design uses <b>${needs.join("</b> and <b>")}</b>, which are part of Pro. `+
+      `Unlock Pro to download it as it is, or switch it to free settings.`+
+      `<div class="sw"><button type="button" id="proToFree">Switch to free settings</button></div>`;
+    $("proToFree").onclick=()=>{ toFreeSettings(); $("pro").close(); };
+  }else u.hidden=true;
+  proMsg("");
+  if(!$("pro").open) $("pro").showModal();
+  if(!isPro()) setTimeout(()=>$("proKey").focus(), 30);
+}
+function toFreeSettings(){
+  if(+$("k").value>2) $("k").value="2";
+  $("txOn").checked=false;
+  refresh();
+  setStatus("Switched to free settings. Build the mesh again, then download.","ok");
+  S.parts=[]; $("btnStl").disabled=true; $("btn3mf").disabled=true;
+}
 
 /* ───────────────────────── state ───────────────────────── */
 const S = {
@@ -1204,6 +1489,70 @@ function cavityPlan(st){
            minThickness: Math.ceil(want*10)/10 };
 }
 
+
+/* ───────────────────────── free-plan mark ─────────────────────────
+   Free exports get a small "MADE WITH VEER" (or "VEER") debossed one layer
+   into the back face. It's placed wherever it fits clear of the card edge,
+   the tag pocket and the keyring hole; if nothing fits (tiny keychains with a
+   big tag) it's simply left off. Authored mirrored, because buildParts()
+   mirrors everything into print space and the back is read from above. */
+/* Separate loops whose vertices sit on one exact line (letter baselines, the
+   flat bottoms of logo shapes) make the cap ear-clipper emit T-junctions along
+   that line. A sub-micron deterministic nudge breaks the collinearity; walls
+   and caps use the same nudged vertices, so the solid stays watertight. */
+function jitterLoops(loops){
+  let seed=1;
+  const j=()=>{ seed=(seed*16807)%2147483647; return (seed/2147483647-0.5)*0.0016; };
+  return loops.map(L=>L.map(q=>({x:q.x+j(), y:q.y+j()})));
+}
+function watermarkLoops(st, pocket){
+  const d = st.layerH;
+  if(st.T - d < st.h + MIN_FLOOR) return null;
+  const res=S.res, gw=S.gw, gh=S.gh, ox=S.ox, oy=S.oy;
+  let pb=null;
+  if(pocket){
+    pb={x0:Infinity,y0:Infinity,x1:-Infinity,y1:-Infinity};
+    for(const q of pocket){ pb.x0=Math.min(pb.x0,q.x); pb.x1=Math.max(pb.x1,q.x); pb.y0=Math.min(pb.y0,q.y); pb.y1=Math.max(pb.y1,q.y); }
+    const g=1.2; pb.x0-=g; pb.y0-=g; pb.x1+=g; pb.y1+=g;
+  }
+  const holeR = st.hangOn ? st.hangD/2+1.5 : -1;
+  const ok = (mx,my) => insideCard(mx,my,st,1.5)
+    && !(pb && mx>pb.x0 && mx<pb.x1 && my>pb.y0 && my<pb.y1)
+    && !(holeR>0 && Math.hypot(mx-st.hcx,my-st.hcy) < holeR);
+
+  const c=document.createElement("canvas"); c.width=gw; c.height=gh;
+  const g=c.getContext("2d",{willReadFrequently:true});
+  const px0=(0-ox)*res;
+  const tries=[{t:"MADE WITH VEER",cap:2.2,ls:0.35},{t:"VEER",cap:2.6,ls:0.5},{t:"VEER",cap:2.0,ls:0.4}];
+  for(const tr of tries){
+    const ys=[-st.H/2+2.2+tr.cap/2, st.H/2-2.2-tr.cap/2, 0];
+    const xs=[0, st.W/4, -st.W/4];
+    for(const y of ys) for(const x of xs){
+      g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,gw,gh);
+      g.setTransform(-1,0,0,1,2*px0,0);            // mirror about the card centre
+      const fpx = tr.cap*res/0.716;
+      g.font = `800 ${fpx}px "Segoe UI","Helvetica Neue",Arial,sans-serif`;
+      try{ g.letterSpacing = (tr.ls*res)+"px"; }catch(e){}
+      g.textAlign="center"; g.textBaseline="middle";
+      g.fillStyle="#fff"; g.strokeStyle="#fff"; g.lineJoin="round"; g.lineWidth=0.24*res;
+      const cx=(x-ox)*res, cy=(gh-1)-(y-oy)*res;
+      g.strokeText(tr.t,cx,cy); g.fillText(tr.t,cx,cy);
+      const dd=g.getImageData(0,0,gw,gh).data;
+      const mask=new Uint8Array(gw*gh); let any=false, bad=false;
+      for(let py=0;py<gh && !bad;py++) for(let qx=0;qx<gw;qx++){
+        if(dd[(py*gw+qx)*4+3]<=128) continue;
+        const mx=ox+qx/res, my=oy+((gh-1)-py)/res;
+        if(!ok(mx,my)){ bad=true; break; }
+        mask[((gh-1)-py)*gw+qx]=1; any=true;
+      }
+      if(bad || !any) continue;
+      const loops=maskToLoops(mask,gw,gh,ox,oy,res,1,Math.min(st.simp,0.04),0.01);
+      if(loops.length) return jitterLoops(loops);
+    }
+  }
+  return null;
+}
+
 /* ───────────────────────── mesh assembly ───────────────────────── */
 function buildParts(st){
   const parts=[];
@@ -1236,7 +1585,7 @@ function buildParts(st){
      ear-clipper can triangulate cleanly. The union traces as one boundary. */
   {
     const t=[];
-    const uniLoops = maskToLoops(union, S.gw, S.gh, S.ox, S.oy, S.res, st.smooth, st.simp, st.minA);
+    const uniLoops = jitterLoops(maskToLoops(union, S.gw, S.gh, S.ox, S.oy, S.res, st.smooth, st.simp, st.minA));
     // reversed, the art outline becomes a hole in the card; counters inside the
     // art (the middle of an "O") flip back to solid.
     const holes = uniLoops.map(revLoop);
@@ -1260,6 +1609,15 @@ function buildParts(st){
     const cavity = !!pocket && plan.valid;
     S.cavityDepth = cavity ? +plan.depth.toFixed(3) : null;
 
+    // free plan: deboss the Veer mark one layer into the back face
+    const wm = isPro() ? null : watermarkLoops(st, cavity ? pocket : null);
+    const wmHoles = wm ? wm.map(revLoop) : [];
+    S.watermark = !!wm;
+    if(wm){
+      addWalls(t, wmHoles, T-st.layerH, T);                 // sides of the debossed letters
+      addCaps (t, wm, T-st.layerH, true);                    // floor of the deboss
+    }
+
     addCaps (t, [cardLoop, ...holes, ...hangHole], 0, false); // front face, logo + hole cut out
     addWalls(t, holes, 0, h);                                // sides of the logo recess
     addCaps (t, uniLoops, h, false);                         // ceiling above the logo recess
@@ -1267,18 +1625,18 @@ function buildParts(st){
     addWalls(t, hangHole, 0, T);                             // keyring hole wall
 
     if(cavity && st.pkSeal){
-      addCaps (t, [cardLoop, ...hangHole], T, true);         // back face: solid, tag hidden
+      addCaps (t, [cardLoop, ...hangHole, ...wmHoles], T, true);         // back face: solid, tag hidden
       addCaps (t, [pocket], zBot, true);                     // cavity floor  (normal into void)
       addWalls(t, [revLoop(pocket)], zBot, zTop);            // cavity wall
       addCaps (t, [pocket], zTop, false);                    // cavity ceiling (normal into void)
       S.pauseZ = zTop;
     }else if(cavity){
-      addCaps (t, [cardLoop, revLoop(pocket), ...hangHole], T, true);  // back + pocket opening
+      addCaps (t, [cardLoop, revLoop(pocket), ...hangHole, ...wmHoles], T, true);  // back + pocket opening
       addWalls(t, [revLoop(pocket)], zBot, T);               // pocket wall
       addCaps (t, [pocket], zBot, true);                     // pocket floor
       S.pauseZ = null;
     }else{
-      addCaps (t, [cardLoop, ...hangHole], T, true);
+      addCaps (t, [cardLoop, ...hangHole, ...wmHoles], T, true);
       S.pauseZ = null;
     }
     parts.unshift({ name:"card", label:"Card + NFC pocket", tris:t, zr:[0,T],
@@ -1767,6 +2125,9 @@ function refresh(){
       renderSwatches();
       draw2D();
       validate(st);
+      const needs = isPro() ? [] : proNeeds(st);
+      $("colPro").innerHTML = needs.length ? `<div class="freenote">This design uses Pro features (${needs.join(", ")}).
+        Preview freely; downloading needs Pro. <button type="button" onclick="openPro(proNeeds(readSettings()))">See Pro</button></div>` : "";
       $("overlay").textContent = S.img
         ? `${st.W}×${st.H}×${st.T} mm · logo ${st.k} colour${st.k>1?"s":""} · traced at ${st.res} px/mm · ${(performance.now()-t0).toFixed(0)} ms`
         : "Drop a logo in the panel on the left to begin.";
@@ -1843,7 +2204,9 @@ function showParts(parts){
     number of ${st.layerH} mm layers)`:``}, cover is <b>${(st.T-S.pauseZ).toFixed(2)} mm</b>.
     These assume layer height <b>${st.layerH}</b> / first layer <b>${st.layer1}</b> — if your slicer
     profile differs, change them in section 4 or the pause will land mid-layer.</div>` : "";
-  box.innerHTML = pause + `<table><thead><tr><th>File</th><th>Part</th><th>Filament</th><th>Z range</th><th>Triangles</th></tr></thead><tbody>`+
+  const mark = (!isPro() && S.watermark) ? `<div class="freenote">Free plan: a small VEER mark is debossed
+    into the back of the card. <button type="button" onclick="openPro()">Remove it with Pro</button></div>` : "";
+  box.innerHTML = pause + mark + `<table><thead><tr><th>File</th><th>Part</th><th>Filament</th><th>Z range</th><th>Triangles</th></tr></thead><tbody>`+
     parts.map(p=>{
       const z = `${p.zr[0].toFixed(2)} – ${p.zr[1].toFixed(2)}`;
       return `<tr><td class="n">${p.name}.stl</td><td>${p.label}</td>`+
@@ -1856,8 +2219,15 @@ function baseName(){
   return (S.imgName.replace(/\.[^.]+$/,"").replace(/[^\w\-]+/g,"_") || "nfc_card")
     + `_${st.W}x${st.H}`;
 }
+function exportBlocked(){
+  if(isPro()) return false;
+  const needs=proNeeds(readSettings());
+  if(!needs.length) return false;
+  openPro(needs); return true;
+}
 $("btnStl").onclick=()=>{
   if(!S.parts.length) return;
+  if(exportBlocked()) return;
   const bn=baseName();
   const files=S.parts.map((p,i)=>({name:`${bn}/${i+1}_${p.name}.stl`, data:stlBinary(p.tris, p.label)}));
   const st=readSettings();
@@ -1867,6 +2237,7 @@ $("btnStl").onclick=()=>{
 };
 $("btn3mf").onclick=()=>{
   if(!S.parts.length) return;
+  if(exportBlocked()) return;
   const st=readSettings(), bn=baseName();
   download(make3mf(S.parts, st, bn), bn+".3mf", "model/3mf");
   setStatus("3MF downloaded — WARNING: Bambu Studio flattens non-Bambu 3MFs into one solid and drops the "+
@@ -1877,6 +2248,9 @@ function readmeText(st, parts, bn){
   return [
 `${bn}
 Generated by Veer NFC Studio  build ${BUILD}`,
+LIC.tier==="commercial" ? `Licence: Commercial - you may sell prints made from these files.`
+  : isPro() ? `Licence: Pro - personal use.`
+  : `Licence: Free - personal use. A small VEER mark is debossed on the back${S.watermark?"":" (left off: no room on this design)"}.`,
 ``,
 `CARD          ${st.W} x ${st.H} x ${st.T} mm, ${st.R} mm corner radius`,
 `COLOUR DEPTH  ${st.h} mm (the logo layers)`,
@@ -2044,6 +2418,33 @@ function save(){
   $("build").textContent = BUILD;
   syncShape(); syncCardShape(); syncLabels(); renderSwatches(); draw2D();
 })();
+
+/* Pro dialog wiring */
+$("planChip").onclick=()=>openPro();
+$("proClose").onclick=()=>$("pro").close();
+$("pro").addEventListener("click",e=>{ if(e.target===$("pro")) $("pro").close(); });
+async function doActivate(){
+  const key=$("proKey").value.trim();
+  if(!key){ proMsg("Paste your license key first.","err"); return; }
+  $("proActivate").disabled=true; proMsg("Checking your key…");
+  const r=await licActivate(key);
+  $("proActivate").disabled=false;
+  if(!r.ok){ proMsg(r.error||"That key didn't work.","err"); return; }
+  $("proKey").value=""; $("proUses").hidden=true;
+  proMsg(LIC.tier==="commercial"?"Commercial unlocked. You're all set.":"Pro unlocked. You're all set.","ok");
+  S.parts=[]; $("btnStl").disabled=true; $("btn3mf").disabled=true;
+  refresh();
+  setStatus("Pro unlocked. Build the mesh again to get clean, full-colour files.","ok");
+}
+$("proActivate").onclick=doActivate;
+$("proKey").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doActivate(); } });
+$("proRemove").onclick=async()=>{
+  const st=licStored();
+  if(st) licCall("deactivate", st.key, st.instance);   // frees the seat; fine if it fails
+  licStore(null); licApply(null); proMsg("Removed from this browser. Your key still works anywhere else.","ok");
+  refresh();
+};
+licInit().then(()=>proUI());
 </script>
 </body>
 </html>
