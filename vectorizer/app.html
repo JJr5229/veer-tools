@@ -4,400 +4,526 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Vectorizer · Veer Tools</title>
-<meta name="description" content="Turn a PNG or JPG logo into a crisp, scalable SVG — traced entirely in your browser.">
+<meta name="description" content="Turn a PNG or JPG logo into a crisp, scalable SVG, traced entirely in your browser. Export cut files for Cricut and laser, or STL files for your 3D printer.">
 <link rel="icon" type="image/svg+xml" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 79.9 66.6"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="%23ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="%23bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="%23f69322"/></g></svg>'>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
+/* Tokens copied from /assets/site.css (the app stays self-contained). */
 :root{
-  --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
-  --tx:#f2efe9; --tx2:#9b9a96;
-  --red:#ef4037; --red2:#bd222f; --orange:#f69322;
-  --pass:#41c777;
+  --bg:#0f1114; --bg-2:#131519; --panel:#17191d; --panel-2:#1e2126; --line:#2c3037; --line-2:#3a3f47;
+  --tx:#f2efe9; --tx-2:#a5a39e; --tx-3:#6f6e6a;
+  --red:#ef4037; --red-2:#bd222f; --orange:#f69322; --orange-hi:#ffa53d; --cream:#ffd9a1;
+  --ok:#41c777; --warn:#f3d089;
+  --display:"Archivo","Segoe UI",system-ui,sans-serif;
+  --body:"Figtree","Segoe UI",system-ui,-apple-system,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,"SFMono-Regular",Consolas,monospace;
+  --r-sm:8px; --r:12px; --r-lg:16px;
+  --wrap:1120px;
+  /* legacy names still read by the app's JS (canvas text, verdict colours) */
+  --panel2:var(--panel-2); --tx2:var(--tx-2); --pass:var(--ok); --red2:var(--red-2);
+  color-scheme:dark;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:76px}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
 html,body{margin:0;min-height:100%}
-body{
-  background:var(--bg); color:var(--tx);
-  font:16px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-.wrap{max-width:1060px;margin:0 auto;padding:0 24px}
+body{background:var(--bg);color:var(--tx);font:15px/1.6 var(--body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;overflow-x:hidden}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--orange);outline-offset:2px;border-radius:4px}
+::selection{background:#f6932244}
+h1,h2,h3{font-family:var(--display);font-stretch:112%;font-weight:800;letter-spacing:-.02em;line-height:1.08;margin:0;text-wrap:balance}
+p{margin:0}
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+.eyebrow{font:500 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+.mono{font-family:var(--mono)}
+.unit{font:500 12px/1 var(--mono);color:var(--tx-3)}
+.mm-grid{background-color:var(--bg);
+  background-image:
+    linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px),
+    linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);
+  background-size:50px 50px,50px 50px,10px 10px,10px 10px;background-position:-1px -1px}
 
-/* ---- header ---- */
-header{
-  border-bottom:1px solid var(--line);
-  background:
-    radial-gradient(900px 320px at 12% -40%, rgba(239,64,55,.18), transparent 70%),
-    radial-gradient(700px 300px at 78% -50%, rgba(246,147,34,.14), transparent 70%);
-}
-.bar{display:flex;align-items:center;gap:12px;padding:26px 0 0}
-.bar svg{flex:none}
-.bar b{font-size:19px;letter-spacing:.2px}
-.bar .back{margin-left:auto;color:var(--tx2);font-size:13px;text-decoration:none}
-.bar .back:hover{color:var(--orange)}
-.hero{padding:36px 0 40px}
-h1{
-  margin:0 0 12px; font-size:clamp(28px,4.6vw,40px); line-height:1.12; letter-spacing:-.5px;
-  background:linear-gradient(96deg,var(--red) 0%,var(--orange) 62%,#ffd9a1 100%);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  padding-bottom:.08em;
-}
-.hero p{margin:0;color:var(--tx2);max-width:62ch;font-size:16px}
-.titlerow{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px}
-.titlerow h1{margin:0}
-.build{
-  font:600 11.5px/1 ui-monospace,Consolas,monospace; letter-spacing:.08em;
-  color:var(--tx2); border:1px solid var(--line); background:var(--panel);
-  border-radius:999px; padding:5px 11px; white-space:nowrap;
-}
+/* ---- app bar ---- */
+.appbar{border-bottom:1px solid var(--line);background:var(--bg)}
+.bar{display:flex;align-items:center;gap:14px;height:60px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-stretch:112%;font-weight:800;font-size:1rem;letter-spacing:-.01em;white-space:nowrap}
+.brand svg{width:28px;height:23px;flex:none}
+.brand span{color:var(--tx-2);font-weight:600}
+.crumb{color:var(--tx-3);font:500 .72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;white-space:nowrap}
+.crumb::before{content:"/";margin-right:12px;color:var(--line-2)}
+.barnav{margin-left:auto;display:flex;align-items:center;gap:2px}
+.barnav a{color:var(--tx-2);text-decoration:none;font-size:.88rem;font-weight:500;padding:7px 11px;border-radius:var(--r-sm);white-space:nowrap}
+.barnav a:hover{color:var(--tx);background:var(--panel)}
+.plan{display:inline-flex;align-items:center;gap:8px;margin-left:8px;padding:7px 12px;border-radius:999px;cursor:pointer;white-space:nowrap;
+  font:600 .8rem/1 var(--body);border:1px solid var(--line-2);background:var(--panel);color:var(--tx-2);transition:border-color .15s,color .15s}
+.plan:hover{border-color:var(--orange);color:var(--tx)}
+.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--tx-3)}
+.plan.pro{border-color:#6b4a1d;color:var(--cream);background:#2a1d0e}
+.plan.pro .pip{background:var(--orange)}
 
-main{padding:36px 0 64px}
+/* ---- hero (kept short: the converter is the point) ---- */
+.hero{padding:34px 0 26px}
+body{background:radial-gradient(680px 260px at 14% 0%,#ef403718,transparent 70%) no-repeat,radial-gradient(620px 240px at 62% 0%,#f6932210,transparent 70%) no-repeat,var(--bg)}
+.appbar{background:transparent}
+.titlerow{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin:12px 0 12px}
+h1{font-size:clamp(2rem,4.4vw,3rem)}
+.build{font:500 11px/1 var(--mono);letter-spacing:.06em;color:var(--tx-2);border:1px solid var(--line);background:var(--panel);
+  border-radius:999px;padding:6px 10px;white-space:nowrap}
+.hero p.lede{color:var(--tx-2);max-width:64ch;font-size:1.02rem;line-height:1.6}
+
+main{padding:0 0 72px}
 
 /* ---- dropzone ---- */
-#drop{
-  border:2px dashed var(--line); border-radius:16px; background:var(--panel);
-  padding:64px 28px; text-align:center; cursor:pointer;
-  transition:border-color .16s, background .16s;
-}
-#drop:hover,#drop.over{border-color:var(--orange);background:var(--panel2)}
-#drop .big{font-size:19px;font-weight:600;margin:14px 0 6px}
-#drop .sub{color:var(--tx2);font-size:14px;margin:0}
-#drop .sub b{color:var(--tx)}
-#drop svg{opacity:.85}
-#dropMsg{margin:12px 0 0;font-size:14px;color:var(--orange);min-height:1.4em}
+#drop{position:relative;border:1px dashed var(--line-2);border-radius:var(--r-lg);cursor:pointer;overflow:hidden;
+  transition:border-color .16s,box-shadow .16s;display:block}
+#drop:hover,#drop.over{border-color:var(--orange);box-shadow:0 0 0 4px #f6932214}
+#drop:focus-visible{outline:2px solid var(--orange);outline-offset:3px}
+.drop-in{display:flex;flex-direction:column;align-items:center;text-align:center;padding:64px 24px 54px;position:relative}
+.drop-ico{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;background:#f693221a;border:1px solid #f6932240;margin-bottom:18px}
+#drop .big{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:clamp(1.3rem,2.6vw,1.7rem);letter-spacing:-.02em;line-height:1.15;margin:0 0 8px}
+#drop .sub{color:var(--tx-2);font-size:.95rem;margin:0}
+#drop .sub b{color:var(--orange);font-weight:600}
+#drop kbd{font:500 .78rem/1 var(--mono);color:var(--tx);border:1px solid var(--line-2);border-bottom-width:2px;border-radius:5px;padding:2px 5px;background:var(--panel)}
+.formats{display:flex;gap:6px;flex-wrap:wrap;justify-content:center;margin-top:18px}
+.formats span{font:500 .7rem/1 var(--mono);letter-spacing:.08em;color:var(--tx-2);border:1px solid var(--line);border-radius:5px;padding:5px 7px;background:var(--bg)}
+#dropMsg{margin:14px 0 0;font-size:.9rem;color:var(--orange);min-height:1.4em}
+/* corner ticks: a cutting mat, not a generic upload box */
+.tick{position:absolute;width:14px;height:14px;border-color:var(--tx-3);border-style:solid;border-width:0}
+.tick.tl{top:14px;left:14px;border-top-width:1px;border-left-width:1px}
+.tick.tr{top:14px;right:14px;border-top-width:1px;border-right-width:1px}
+.tick.bl{bottom:14px;left:14px;border-bottom-width:1px;border-left-width:1px}
+.tick.br{bottom:14px;right:14px;border-bottom-width:1px;border-right-width:1px}
+.drop-stages{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));border-top:1px solid var(--line);background:#131519e6}
+.drop-stages div{padding:16px 22px;display:flex;flex-direction:column;gap:6px;min-width:0}
+.drop-stages div+div{border-left:1px solid var(--line)}
+.drop-stages b{font-size:.92rem;font-weight:600;display:flex;align-items:center;gap:8px}
+.drop-stages b i{font:600 .68rem/1 var(--mono);font-style:normal;color:var(--orange);border:1px solid #f6932255;border-radius:4px;padding:3px 5px}
+.drop-stages span{font:400 .75rem/1.5 var(--mono);color:var(--tx-2)}
 input[type=file]{display:none}
 
 /* ---- workspace ---- */
 #work{display:none}
-.panes{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.pane{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:16px}
-.pane .phead{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:12px}
-.pane .phead h2{
-  margin:0;font-size:11px;letter-spacing:.16em;text-transform:uppercase;
-  color:var(--tx2);font-weight:600;
-}
-.pane .meta{color:var(--tx2);font-size:12.5px;text-align:right}
-.canvasbox{
-  position:relative;height:min(400px,48vh);border-radius:10px;overflow:hidden;
-  background:repeating-conic-gradient(#1b1e23 0% 25%, #14161a 0% 50%) 0 0/16px 16px;
-  display:flex;align-items:center;justify-content:center;
-}
+
+/* sticky stage nav */
+.stagenav{position:sticky;top:0;z-index:15;margin:0 calc(-1 * max(20px,env(safe-area-inset-left,0px)));padding:0 max(20px,env(safe-area-inset-left,0px));
+  background:#0f1114eb;backdrop-filter:saturate(140%) blur(10px);-webkit-backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line)}
+.stagenav ol{list-style:none;margin:0;padding:0;display:flex;gap:4px;height:52px;align-items:center;overflow-x:auto;scrollbar-width:none}
+.stagenav ol::-webkit-scrollbar{display:none}
+.stagenav a{display:inline-flex;align-items:center;gap:9px;text-decoration:none;color:var(--tx-2);font-size:.88rem;font-weight:600;padding:8px 12px;border-radius:var(--r-sm);white-space:nowrap}
+.stagenav a i{font:600 .68rem/1 var(--mono);font-style:normal;color:var(--tx-3);border:1px solid var(--line-2);border-radius:4px;padding:3px 5px}
+.stagenav a:hover{color:var(--tx);background:var(--panel)}
+.stagenav a.on{color:var(--tx)}
+.stagenav a.on i{color:var(--orange);border-color:#f6932270}
+.stagenav li.sep{width:18px;height:1px;background:var(--line-2);flex:none}
+
+.stage{padding-top:34px}
+.stage+.stage{margin-top:22px;border-top:1px solid var(--line);padding-top:38px}
+.stage-head{display:flex;align-items:flex-end;justify-content:space-between;gap:12px 24px;flex-wrap:wrap;margin-bottom:20px}
+.stage-head .eyebrow{display:block;margin-bottom:10px}
+.stage-head h2{font-size:clamp(1.35rem,2.4vw,1.75rem)}
+.stage-head p{color:var(--tx-2);font-size:.95rem;max-width:62ch;margin-top:8px}
+.protag{display:inline-block;font:600 .62rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;font-stretch:100%;
+  color:var(--orange);border:1px solid #6b4a1d;background:#2a1d0e;border-radius:4px;padding:4px 6px;vertical-align:.32em;margin-left:6px}
+.protag[hidden]{display:none}
+
+/* before / after */
+.panes{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:14px}
+.pane{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:12px;min-width:0}
+.pane .phead{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:2px 4px 10px;min-width:0}
+.pane .phead h2{margin:0;font:600 .7rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2);font-stretch:100%;display:flex;align-items:center;gap:8px}
+.pane .phead h2::before{content:"";width:7px;height:7px;border-radius:2px;background:var(--tx-3)}
+.pane.out .phead h2{color:var(--tx)}
+.pane.out .phead h2::before{background:var(--orange)}
+.pane .meta{color:var(--tx-2);font:400 .72rem/1.4 var(--mono);text-align:right;min-width:0;overflow-wrap:anywhere}
+.canvasbox{position:relative;height:min(420px,52vh);border-radius:10px;overflow:hidden;
+  background:repeating-conic-gradient(#1b1e23 0% 25%,#15171b 0% 50%) 0 0/16px 16px;
+  display:flex;align-items:center;justify-content:center;padding:14px}
+.canvasbox.mm-grid{background-color:#121418;border:1px solid #ffffff08}
 .canvasbox img{max-width:100%;max-height:100%;display:block}
 #svgOut{width:100%;height:100%;display:flex;align-items:center;justify-content:center}
 #svgOut svg{width:100%;height:100%}
-.canvasbox.tracing::after{
-  content:"Tracing…"; position:absolute; inset:0;
-  display:flex;align-items:center;justify-content:center;
-  background:rgba(15,17,20,.72); color:var(--orange);
-  font-size:14px; font-weight:600; letter-spacing:.06em;
-}
+.canvasbox.tracing::after{content:"Tracing…";position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  background:rgba(15,17,20,.74);color:var(--orange);font:500 .78rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase}
 
-/* ---- verdict ---- */
-#verdict{
-  display:none; margin-top:16px; padding:13px 18px;
-  border:1px solid var(--line); border-left:3px solid var(--vcolor,var(--pass));
-  background:var(--panel); border-radius:0 10px 10px 0;
-  font-size:14px; color:var(--tx2);
-  align-items:center; gap:14px; flex-wrap:wrap;
-}
+/* verdict */
+#verdict{display:none;margin-top:14px;padding:12px 16px;border:1px solid var(--line);border-left:3px solid var(--vcolor,var(--ok));
+  background:var(--panel);border-radius:0 var(--r) var(--r) 0;font-size:.92rem;color:var(--tx-2);align-items:center;gap:10px 14px;flex-wrap:wrap}
 #verdict.show{display:flex}
-#verdict .msg{color:var(--tx)}
+#verdict .msg{color:var(--tx);font-weight:500}
 #verdict .chips{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}
-.chip{
-  font-size:11.5px;color:var(--tx2);border:1px solid var(--line);
-  border-radius:999px;padding:2px 10px;background:var(--panel2);white-space:nowrap;
-}
+.chip{font:400 .72rem/1 var(--mono);color:var(--tx-2);border:1px solid var(--line);border-radius:6px;padding:6px 8px;background:var(--bg);white-space:nowrap}
 .chip b{color:var(--tx);font-weight:600}
 
-/* ---- controls ---- */
-#controls{
-  margin-top:16px;background:var(--panel);border:1px solid var(--line);
-  border-radius:14px;padding:20px;
-}
-.presets{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:18px}
-.preset{
-  font-size:13px;color:var(--tx2);border:1px solid var(--line);border-radius:999px;
-  padding:5px 14px;background:var(--panel2);cursor:pointer;
-  transition:border-color .14s,color .14s;
-}
-.preset:hover{border-color:var(--orange)}
-.preset.on{border-color:var(--orange);color:var(--orange);font-weight:600}
-.sliders{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px}
-.slider label{display:flex;justify-content:space-between;font-size:13px;color:var(--tx2);margin-bottom:4px}
-.slider label output{color:var(--tx);font-weight:600}
-.slider input[type=range]{width:100%;accent-color:var(--orange)}
-.check{display:flex;align-items:center;gap:8px;font-size:13px;color:var(--tx2);margin-top:14px}
-.check input{accent-color:var(--orange)}
-.check select{
-  font:inherit;font-size:13px;color:var(--tx);background:var(--panel2);
-  border:1px solid var(--line);border-radius:7px;padding:5px 9px;cursor:pointer;
-}
-.check select:hover{border-color:var(--orange)}
-#bgHint{color:var(--faint,rgba(255,255,255,.38));font-size:12.5px}
-@media (max-width:620px){ #bgHint{display:none} }
-.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
-.btn{
-  font:600 14px/1 "Segoe UI",system-ui,sans-serif; border-radius:9px; cursor:pointer;
-  padding:11px 20px; border:1px solid var(--line); background:var(--panel2); color:var(--tx);
-  transition:border-color .14s, background .14s, transform .14s;
-}
+/* controls */
+#controls{margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px 22px}
+.ctl-label{display:block;font:500 .68rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);margin-bottom:10px}
+.presets{display:inline-flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:11px;max-width:100%}
+.preset{font:600 .85rem/1 var(--body);color:var(--tx-2);border:0;border-radius:8px;padding:9px 14px;background:transparent;cursor:pointer;transition:color .14s,background .14s}
+.preset:hover{color:var(--tx)}
+.preset.on{background:var(--panel-2);color:var(--orange);box-shadow:inset 0 0 0 1px var(--line-2)}
+.sliders{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:18px 28px;margin-top:22px}
+.slider label{display:flex;justify-content:space-between;align-items:baseline;font-size:.86rem;color:var(--tx-2);margin-bottom:8px}
+.slider label output{font:600 .82rem/1 var(--mono);color:var(--tx);min-width:2ch;text-align:right}
+input[type=range]{-webkit-appearance:none;appearance:none;width:100%;height:22px;background:transparent;margin:0;cursor:pointer;accent-color:var(--orange)}
+input[type=range]::-webkit-slider-runnable-track{height:4px;border-radius:4px;background:var(--line-2)}
+input[type=range]::-moz-range-track{height:4px;border-radius:4px;background:var(--line-2)}
+input[type=range]::-moz-range-progress{height:4px;border-radius:4px;background:var(--orange)}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;margin-top:-6px;border-radius:50%;background:var(--orange);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--orange)}
+input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--orange);border:3px solid var(--bg);box-shadow:0 0 0 1px var(--orange)}
+input[type=range]:focus-visible{outline:none}
+input[type=range]:focus-visible::-webkit-slider-thumb{box-shadow:0 0 0 1px var(--orange),0 0 0 5px #f6932240}
+.opts{display:flex;flex-wrap:wrap;gap:12px 28px;align-items:center;margin-top:22px;padding-top:18px;border-top:1px solid var(--line)}
+.check{display:flex;align-items:center;gap:9px;flex-wrap:wrap;font-size:.88rem;color:var(--tx-2)}
+input[type=checkbox]{width:16px;height:16px;margin:0;accent-color:var(--orange);cursor:pointer;flex:none}
+.check:has(input[type=checkbox]){flex-wrap:nowrap;align-items:flex-start;cursor:pointer}
+.check:has(input[type=checkbox]) input{margin-top:.2em}
+select{-webkit-appearance:none;appearance:none;font:500 .86rem/1.2 var(--body);color:var(--tx);background-color:var(--panel-2);
+  background-image:url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="10" height="6" viewBox="0 0 10 6"><path d="M1 1l4 4 4-4" fill="none" stroke="%23a5a39e" stroke-width="1.5" stroke-linecap="round"/></svg>');
+  background-repeat:no-repeat;background-position:right 11px center;border:1px solid var(--line-2);border-radius:var(--r-sm);padding:8px 32px 8px 11px;cursor:pointer;max-width:100%}
+select:hover{border-color:var(--orange)}
+select:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+#bgHint{color:var(--tx-3);font-size:.8rem;flex-basis:100%}
+#bgNote{font-size:.82rem}
+#bgNote:empty{display:none}
+
+/* buttons */
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:20px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 .9rem/1 var(--body);border-radius:10px;cursor:pointer;
+  padding:12px 18px;border:1px solid var(--line-2);background:var(--panel-2);color:var(--tx);transition:border-color .14s,background .14s,transform .14s}
 .btn:hover{border-color:var(--orange)}
-.btn.primary{background:var(--orange);border-color:var(--orange);color:#131313}
-.btn.primary:hover{background:#ffa63e;transform:translateY(-1px)}
+.btn.primary{background:var(--orange);border-color:var(--orange);color:#1a0f02}
+.btn.primary:hover{background:var(--orange-hi);border-color:var(--orange-hi);transform:translateY(-1px)}
+.btn.ghost{background:transparent;border-color:transparent;color:var(--tx-2)}
+.btn.ghost:hover{color:var(--tx);border-color:var(--line-2)}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
+.btn svg{width:16px;height:16px;flex:none}
+.actions .push{margin-left:auto}
+
+/* stage 2: maker exports */
+.maker{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px 22px}
+.maker-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:.88rem;color:var(--tx-2)}
+.maker-row label{color:var(--tx)}
+#mmH{font:400 .8rem/1 var(--mono);color:var(--tx-2)}
+.num{display:inline-flex;align-items:center;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--panel-2);padding-right:10px;transition:border-color .14s}
+.num:focus-within{border-color:var(--orange)}
+.num input{border:0!important;background:transparent!important;outline:none!important}
+input[type=number]{font:500 .86rem/1.2 var(--mono);color:var(--tx);background:var(--panel-2);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:8px 4px 8px 10px;width:78px}
+input[type=number]:focus{outline:none;border-color:var(--orange)}
+.maker .actions{margin-top:18px}
+.ex-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-top:18px}
+.ex-grid .btn{flex-direction:column;align-items:flex-start;justify-content:flex-start;gap:6px;text-align:left;padding:14px 16px;line-height:1.25;min-width:0}
+.ex-grid .btn small{font:400 .72rem/1.4 var(--mono);color:var(--tx-2)}
+.ex-grid .btn.primary small{color:#3a2306}
+#makerMsg{font-size:.86rem;color:var(--tx-2);margin-top:12px;min-height:1.3em}
+#makerMsg:empty{margin-top:0}
+#makerMsg.ok{color:var(--ok)} #makerMsg.err{color:var(--red)}
+
+/* stage 3: Print it in 3D */
+#p3d{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:20px 22px 22px}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:11px;width:max-content;max-width:100%}
+.seg button{font:600 .86rem/1 var(--body);color:var(--tx-2);background:transparent;border:0;border-radius:8px;padding:10px 15px;cursor:pointer;transition:color .14s,background .14s}
+.seg button:hover{color:var(--tx)}
+.seg button.on{background:var(--panel-2);color:var(--orange);box-shadow:inset 0 0 0 1px var(--line-2)}
+.seg button:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
+.p3-body{display:grid;grid-template-columns:minmax(0,320px) minmax(0,1fr);gap:24px;margin-top:20px;align-items:start}
+.p3-opts{display:flex;flex-direction:column;gap:12px;min-width:0}
+.p3f{display:flex;flex-direction:column;gap:12px;padding-top:12px;border-top:1px solid var(--line)}
+.p3f[hidden]{display:none}
+.fld{display:flex;align-items:center;gap:8px 10px;flex-wrap:wrap;font-size:.88rem;color:var(--tx-2)}
+.fld>label{flex:1;min-width:110px;color:var(--tx-2)}
+.fld .u{display:inline-flex;align-items:center;gap:7px;font:500 12px/1 var(--mono);color:var(--tx-3)}
+.fld .sub{width:100%;font:400 .74rem/1 var(--mono);color:var(--tx-3);text-align:right;margin-top:-4px}
+.fld .sub:empty{display:none}
+.fld input[type=number]{width:78px}
+.fld select{min-width:180px}
+.fld input[type=color]{width:42px;height:34px;padding:3px;border:1px solid var(--line-2);border-radius:var(--r-sm);background:var(--panel-2);cursor:pointer}
+.fld input[type=color]:focus-visible{outline:2px solid var(--orange)}
+#p3d .check{margin:0;color:var(--tx)}
+.hint{font-size:.82rem;line-height:1.55;color:var(--tx-2);padding-left:12px;border-left:2px solid var(--line-2)}
+.lchips{display:flex;flex-wrap:wrap;gap:6px}
+.lchip{display:inline-flex;align-items:center;gap:7px;font:600 .74rem/1 var(--mono);color:var(--tx-2);background:var(--bg);
+  border:1px dashed var(--line-2);border-radius:999px;padding:5px 10px 5px 5px;cursor:pointer;transition:border-color .14s,color .14s}
+.lchip i{width:16px;height:16px;border-radius:50%;box-shadow:inset 0 0 0 1px #0007;opacity:.35}
+.lchip.on{color:var(--tx);border-style:solid;background:var(--panel-2)}
+.lchip.on i{opacity:1}
+.lchip:hover{border-color:var(--orange)}
+.lchip:focus-visible{outline:2px solid var(--orange)}
+.p3-prev{min-width:0;border:1px solid var(--line);border-radius:var(--r);padding:10px;position:relative}
+.p3-prev::before{content:"Top view · preview";position:absolute;top:12px;left:14px;font:500 .64rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);pointer-events:none}
+#p3Canvas{display:block;width:100%}
+.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:.8rem;color:var(--tx-2);padding:8px 6px 0}
+.legend span{display:inline-flex;align-items:center;gap:7px}
+.legend i{width:10px;height:10px;border-radius:3px}
+.p3-info{font:400 .78rem/1.5 var(--mono);color:var(--tx-2);padding:6px 6px 2px}
+.p3-info:empty{display:none}
+.p3-info b{color:var(--tx);font-weight:600;font-size:.9rem}
+#p3Warn .warn,#p3Warn .note{margin-top:12px;font-size:.86rem;line-height:1.5;border-radius:0 var(--r-sm) var(--r-sm) 0;padding:10px 14px}
+#p3Warn .warn{background:#211a0c;border:1px solid #4d3a12;border-left:3px solid var(--warn);color:var(--warn)}
+#p3Warn .note{background:var(--bg-2);border:1px solid var(--line);border-left:3px solid var(--line-2);color:var(--tx-2)}
+#p3d .actions{margin-top:20px;padding-top:18px;border-top:1px solid var(--line)}
+#p3Msg{font:400 .8rem/1.4 var(--mono);color:var(--tx-2)}
+#p3Msg.ok{color:var(--ok)} #p3Msg.err{color:var(--red)}
+.fine{font:400 .74rem/1.4 var(--mono);color:var(--tx-3);margin-left:auto}
 
 /* ---- footer ---- */
-footer{border-top:1px solid var(--line);padding:26px 0 0;color:var(--tx2);font-size:13px}
-.powered{
-  background:#0b0d10; margin-top:26px; padding:9px 0 10px;
-  font-size:.72rem; letter-spacing:.05em; color:#6f6e6a;
-  text-align:center; line-height:1.3;
-}
-.powered a{color:#9b9a96;font-weight:600;text-decoration:none}
-.powered a:hover{color:#fff}
-footer a{color:var(--orange);text-decoration:none}
-footer a:hover{text-decoration:underline}
+footer{border-top:1px solid var(--line);color:var(--tx-2);font-size:.86rem}
+.foot{display:flex;gap:10px 24px;flex-wrap:wrap;align-items:center;padding-top:24px;padding-bottom:24px}
+.foot nav{display:flex;gap:18px;flex-wrap:wrap;margin-left:auto}
+footer a{color:var(--tx-2);text-decoration:none}
+footer a:hover{color:var(--tx)}
+#buildFoot{font:400 .74rem/1 var(--mono);color:var(--tx-3)}
+.powered{background:#0b0d10;padding:10px 0 11px;font:400 .7rem/1.3 var(--mono);letter-spacing:.06em;color:var(--tx-3);text-align:center}
+.powered a{color:var(--tx-2);font-weight:600}
 
-@media (max-width:760px){
-  .panes{grid-template-columns:1fr}
-  .sliders{grid-template-columns:1fr}
-  #verdict .chips{margin-left:0}
-}
-
-/* ---- Pro ---- */
-.plan{display:inline-flex;align-items:center;gap:7px;padding:5px 12px;border-radius:999px;cursor:pointer;
-  font:600 12px/1 "Segoe UI",system-ui,sans-serif;letter-spacing:.02em;border:1px solid var(--line);background:var(--panel2);color:var(--tx2)}
-.plan:hover{border-color:var(--orange);color:var(--tx)}
-.plan .pip{width:6px;height:6px;border-radius:50%;background:var(--tx2)}
-.plan.pro{border-color:#6b4a1d;color:#ffd7a3;background:#2a1d0e}
-.plan.pro .pip{background:var(--orange)}
-.protag{display:inline-block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;
-  color:var(--orange);border:1px solid #6b4a1d;border-radius:4px;padding:1px 5px;vertical-align:2px}
-.protag[hidden]{display:none}
-.maker{margin-top:18px;padding-top:18px;border-top:1px solid var(--line)}
-.maker-head{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
-.maker-head b{font-size:15px}
-.maker-sub{font-size:13px;color:var(--tx2)}
-.maker-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;font-size:13px;color:var(--tx2)}
-.maker-row input[type=number]{width:84px;font:inherit;font-size:13px;color:var(--tx);background:var(--panel2);
-  border:1px solid var(--line);border-radius:7px;padding:6px 9px}
-.maker-row input:focus{outline:1px solid var(--orange)}
-.maker .actions{border-top:0;padding-top:0;margin-top:14px}
-#makerMsg{font-size:13px;color:var(--tx2);margin-top:10px;min-height:1.2em}
-#makerMsg.ok{color:var(--pass)} #makerMsg.err{color:var(--red)}
-
-dialog#pro{width:min(560px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line);
-  border-radius:16px;background:var(--panel);color:var(--tx);box-shadow:0 30px 80px #000a}
+/* ---- Pro dialog ---- */
+dialog#pro{width:min(600px,calc(100vw - 32px));max-height:calc(100vh - 32px);overflow:auto;padding:0;border:1px solid var(--line-2);
+  border-radius:var(--r-lg);background:var(--panel);color:var(--tx);box-shadow:0 30px 80px #000b}
 dialog#pro::backdrop{background:#05070acc;backdrop-filter:blur(3px)}
 dialog#pro [hidden]{display:none!important}
-.pro-in{padding:28px 28px 24px;display:flex;flex-direction:column;gap:18px}
+.pro-in{padding:26px 26px 22px;display:flex;flex-direction:column;gap:18px}
 .pro-head{display:flex;align-items:flex-start;gap:12px}
-.pro-head h2{margin:0;font-size:22px;letter-spacing:-.01em;line-height:1.2}
-.pro-head p{margin:4px 0 0;color:var(--tx2);font-size:14px;line-height:1.5}
-.pro-x{margin-left:auto;flex:none;width:32px;height:32px;padding:0;border-radius:8px;font-size:18px;line-height:1;
-  background:var(--panel2);border:1px solid var(--line);color:var(--tx);cursor:pointer}
+.pro-head .eyebrow{display:block;margin-bottom:10px}
+.pro-head h2{font-size:1.55rem}
+.pro-head p{margin:8px 0 0;color:var(--tx-2);font-size:.92rem;line-height:1.5}
+.pro-x{margin-left:auto;flex:none;width:34px;height:34px;padding:0;border-radius:var(--r-sm);font-size:20px;line-height:1;
+  background:var(--panel-2);border:1px solid var(--line-2);color:var(--tx);cursor:pointer}
 .pro-x:hover{border-color:var(--orange)}
-.tiers{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+.tiers{display:grid;grid-template-columns:minmax(0,.85fr) minmax(0,1.15fr);gap:12px}
 @media (max-width:560px){.tiers{grid-template-columns:minmax(0,1fr)}}
-.tier{border:1px solid var(--line);border-radius:12px;padding:16px;display:flex;flex-direction:column;gap:10px;background:var(--panel2);min-width:0}
-.tier.hi{border-color:var(--orange);background:linear-gradient(180deg,#2a1d0e 0%,var(--panel2) 70%)}
-.tier .nm{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--tx2)}
+.tier{border:1px solid var(--line);border-radius:var(--r);padding:16px;display:flex;flex-direction:column;gap:12px;background:var(--bg-2);min-width:0}
+.tier.hi{border-color:#f6932288;background:linear-gradient(180deg,#24190c 0%,var(--bg-2) 75%)}
+.tier .nm{font:600 .68rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2)}
 .tier.hi .nm{color:var(--orange)}
-.tier .pr{font-size:26px;font-weight:700;letter-spacing:-.02em;line-height:1}
-.tier .pr small{font-size:12px;font-weight:400;color:var(--tx2);letter-spacing:0}
-.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:13px;color:var(--tx2);flex:1}
+.tier .pr{font-family:var(--display);font-stretch:112%;font-size:1.9rem;font-weight:800;letter-spacing:-.02em;line-height:1}
+.tier .pr small{font:400 .72rem/1 var(--mono);color:var(--tx-2);letter-spacing:0;font-stretch:100%}
+.tier ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:7px;font-size:.84rem;color:var(--tx-2);flex:1}
 .tier li{padding-left:16px;position:relative;line-height:1.4}
-.tier li:before{content:"";position:absolute;left:2px;top:7px;width:6px;height:6px;border-radius:2px;background:#4a5058}
+.tier li:before{content:"";position:absolute;left:1px;top:.5em;width:6px;height:6px;border-radius:2px;background:var(--line-2)}
+.tier.hi li{color:var(--tx)}
 .tier.hi li:before{background:var(--orange)}
-a.buy{display:block;text-align:center;text-decoration:none;font:600 14px/1 "Segoe UI",system-ui,sans-serif;border-radius:9px;
-  padding:11px 16px;background:var(--orange);border:1px solid var(--orange);color:#131313}
-a.buy:hover{background:#ffa63e}
+a.buy{display:block;text-align:center;text-decoration:none;font:600 .92rem/1 var(--body);border-radius:10px;
+  padding:13px 16px;background:var(--orange);border:1px solid var(--orange);color:#1a0f02}
+a.buy:hover{background:var(--orange-hi)}
 a.buy.off{opacity:.45;pointer-events:none}
 .keyrow{border-top:1px solid var(--line);padding-top:16px;display:flex;flex-direction:column;gap:8px}
-.keyrow label{font-size:13px;color:var(--tx2)}
+.keyrow label{font-size:.86rem;color:var(--tx-2)}
 .keyrow .in{display:flex;gap:8px}
-.keyrow input{flex:1;min-width:0;font:13px ui-monospace,Consolas,monospace;color:var(--tx);background:var(--panel2);
-  border:1px solid var(--line);border-radius:8px;padding:9px 11px}
-.keyrow input:focus{outline:1px solid var(--orange)}
-#proMsg{font-size:13px;min-height:1.2em;color:var(--tx2)}
-#proMsg.err{color:var(--red)} #proMsg.ok{color:var(--pass)}
-.owned dl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:6px 12px;margin:0;font-size:14px}
-.owned dt{color:var(--tx2)} .owned dd{margin:0;overflow-wrap:anywhere}
-.pro-foot{font-size:12px;color:var(--tx2);line-height:1.5}
+.keyrow input{flex:1;min-width:0;font:.82rem var(--mono);color:var(--tx);background:var(--bg);border:1px solid var(--line-2);border-radius:var(--r-sm);padding:10px 12px}
+.keyrow input:focus{outline:none;border-color:var(--orange)}
+#proMsg{font-size:.86rem;min-height:1.2em;color:var(--tx-2)}
+#proMsg:empty{display:none}
+#proMsg.err{color:var(--red)} #proMsg.ok{color:var(--ok)}
+.owned dl{display:grid;grid-template-columns:110px minmax(0,1fr);gap:8px 12px;margin:0;font-size:.9rem}
+.owned dt{color:var(--tx-2);font:500 .72rem/1.9 var(--mono);letter-spacing:.08em;text-transform:uppercase} .owned dd{margin:0;overflow-wrap:anywhere}
+.pro-foot{font-size:.78rem;color:var(--tx-3);line-height:1.5}
 
-/* ---- Print it in 3D ---- */
-#p3d{margin-top:16px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:22px}
-.p3-head h2{margin:0;font-size:19px;letter-spacing:-.01em}
-.p3-head p{margin:6px 0 0;font-size:14px;color:var(--tx2);max-width:70ch}
-.seg{display:flex;flex-wrap:wrap;gap:4px;margin:18px 0 0;padding:4px;background:var(--bg);border:1px solid var(--line);border-radius:11px;width:max-content;max-width:100%}
-.seg button{font:600 13px/1 "Segoe UI",system-ui,sans-serif;color:var(--tx2);background:transparent;border:0;border-radius:8px;padding:9px 14px;cursor:pointer}
-.seg button:hover{color:var(--tx)}
-.seg button.on{background:var(--panel2);color:var(--orange);box-shadow:inset 0 0 0 1px var(--line)}
-.seg button:focus-visible{outline:2px solid var(--orange);outline-offset:1px}
-.p3-body{display:grid;grid-template-columns:minmax(0,300px) minmax(0,1fr);gap:22px;margin-top:18px;align-items:start}
-@media (max-width:760px){.p3-body{grid-template-columns:minmax(0,1fr)}}
-.p3-opts{display:flex;flex-direction:column;gap:10px;min-width:0}
-.p3f{display:flex;flex-direction:column;gap:10px}
-.p3f[hidden]{display:none}
-.fld{display:flex;align-items:center;gap:10px;flex-wrap:wrap;font-size:13px;color:var(--tx2)}
-.fld>label{flex:1;min-width:110px}
-.fld .u{display:inline-flex;align-items:center;gap:6px;color:var(--tx2)}
-.fld .sub{width:100%;font-size:12px;color:var(--tx2);text-align:right}
-.fld input[type=number],.fld select{font:inherit;font-size:13px;color:var(--tx);background:var(--panel2);border:1px solid var(--line);border-radius:7px;padding:6px 8px;width:76px}
-.fld select{width:auto;min-width:170px;cursor:pointer}
-.fld input[type=color]{width:40px;height:30px;padding:0;border:1px solid var(--line);border-radius:7px;background:var(--panel2);cursor:pointer}
-.fld input:focus,.fld select:focus{outline:1px solid var(--orange)}
-#p3d .check{margin-top:2px}
-.hint{margin:2px 0 0;font-size:12.5px;line-height:1.5;color:var(--tx2)}
-.lchips{display:flex;flex-wrap:wrap;gap:6px}
-.lchip{display:inline-flex;align-items:center;gap:6px;font:600 12px/1 "Segoe UI",system-ui,sans-serif;color:var(--tx2);background:var(--panel2);
-  border:1px solid var(--line);border-radius:999px;padding:5px 10px 5px 6px;cursor:pointer;opacity:.55}
-.lchip.on{opacity:1;color:var(--tx);border-color:#4a5058}
-.lchip i{width:14px;height:14px;border-radius:50%;box-shadow:inset 0 0 0 1px #0006}
-.lchip:focus-visible{outline:2px solid var(--orange)}
-.p3-prev{min-width:0;background:
-  linear-gradient(var(--bg),var(--bg)) padding-box;border:1px solid var(--line);border-radius:12px;padding:10px;
-  background-image:radial-gradient(circle,#ffffff0d 1px,transparent 1.2px);background-size:16px 16px}
-#p3Canvas{display:block;width:100%}
-.legend{display:flex;flex-wrap:wrap;gap:6px 16px;font-size:12px;color:var(--tx2);padding:6px 6px 0}
-.legend span{display:inline-flex;align-items:center;gap:6px}
-.legend i{width:10px;height:10px;border-radius:3px}
-.p3-info{font-size:13px;color:var(--tx2);padding:6px 6px 2px}
-.p3-info b{color:var(--tx);font-variant-numeric:tabular-nums}
-#p3Warn .warn,#p3Warn .note{margin-top:12px;font-size:13px;line-height:1.5;border-radius:9px;padding:9px 12px}
-#p3Warn .warn{background:#2a1f0a;border:1px solid #6b4f10;color:#f3d089}
-#p3Warn .note{background:var(--panel2);border:1px solid var(--line);color:var(--tx2)}
-#p3d .actions{align-items:center}
-#p3Msg{font-size:13px;color:var(--tx2)}
-#p3Msg.ok{color:var(--pass)} #p3Msg.err{color:var(--red)}
+/* ---- responsive ---- */
+@media (max-width:980px){
+  .sliders{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .ex-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
+@media (max-width:760px){
+  body{font-size:15px}
+  .crumb,.barnav .hide-sm{display:none}
+  .hero{padding:24px 0 20px}
+  .panes{grid-template-columns:minmax(0,1fr)}
+  .canvasbox{height:min(300px,42vh)}
+  #verdict .chips{margin-left:0}
+  .p3-body{grid-template-columns:minmax(0,1fr)}
+  .drop-in{padding:44px 20px 38px}
+  .drop-stages div{padding:12px 10px;align-items:center;text-align:center}
+  .drop-stages b{flex-direction:column;gap:6px;font-size:.84rem}
+  .drop-stages span{display:none}
+  .foot nav{margin-left:0}
+  .stage{padding-top:26px}
+  .stage+.stage{padding-top:30px}
+  #controls,.maker,#p3d{padding:16px}
+  .stagenav li.sep{display:none}
+  .stagenav a{padding:8px 9px}
+  .fine{margin-left:0;flex-basis:100%}
+}
+@media (max-width:520px){
+  .sliders{grid-template-columns:minmax(0,1fr);gap:14px}
+  .ex-grid{grid-template-columns:minmax(0,1fr)}
+  .presets,.seg{display:grid;grid-template-columns:1fr 1fr;width:100%}
+  .preset,.seg button{padding:10px 8px}
+  .actions .btn{flex:1 1 auto}
+  .actions .btn.ghost{flex:0 1 auto}
+  .fld select{min-width:0;flex:1}
+  #bgHint{display:none}
+  .barnav a{padding:7px 8px;font-size:.84rem}
+  .brand{font-size:0;gap:0}
+  .bar{gap:8px}
+  .plan{margin-left:2px;padding:7px 10px}
+}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="wrap">
-    <div class="bar">
-      <svg viewBox="0 0 79.9 66.6" width="30" height="25" aria-label="Veer">
-        <g transform="translate(-100.447,-44.954)">
-        <path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/>
-        <path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/>
-        <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
-        </g>
-      </svg>
-      <b>Veer</b>
+<header class="appbar">
+  <div class="wrap bar">
+    <a class="brand" href="../" aria-label="Veer Tools, all tools">
+      <svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      Veer <span>Tools</span>
+    </a>
+    <span class="crumb">Vectorizer</span>
+    <nav class="barnav" aria-label="Vectorizer">
+      <a href="./">About<span class="hide-sm"> Vectorizer</span></a>
       <a class="back" href="../">← All tools</a>
       <button type="button" class="plan" id="planChip" title="Plan and license"><span class="pip"></span><span id="planTxt">Free · Upgrade</span></button>
-    </div>
-    <div class="hero">
-      <div class="titlerow">
-        <h1>Vectorizer</h1>
-        <span class="build" id="build"></span>
-      </div>
-      <p>Raster in, vector out. Drop a PNG or JPG logo and leave with a crisp,
-         infinitely scalable SVG — traced entirely in your browser, nothing uploaded.</p>
-    </div>
+    </nav>
   </div>
 </header>
 
 <main>
   <div class="wrap">
 
-    <div id="drop">
-      <svg width="44" height="44" viewBox="0 0 24 24" fill="none" stroke="#f69322" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/>
-        <circle cx="9" cy="9" r="2"/>
-        <path d="M21 15l-3.9-3.9a2 2 0 0 0-2.8 0L5 20"/>
-      </svg>
-      <div class="big">Drop an image here</div>
-      <p class="sub">or <b>click to browse</b> · you can also paste from the clipboard</p>
-      <p class="sub" style="margin-top:8px">PNG · JPG · WebP · GIF · BMP</p>
-      <p id="dropMsg"></p>
-      <input type="file" id="file" accept="image/*">
+    <div class="hero">
+      <span class="eyebrow">PNG / JPG → SVG · runs in your browser</span>
+      <div class="titlerow">
+        <h1>Vectorizer</h1>
+        <span class="build" id="build"></span>
+      </div>
+      <p class="lede">Drop in a logo and get a clean SVG back. Then cut it on a Cricut or laser, or print it in 3D.
+         Everything is traced on your machine; nothing is uploaded.</p>
+    </div>
+
+    <div id="drop" class="mm-grid" role="button" tabindex="0" aria-label="Choose an image to convert">
+      <div class="drop-in">
+        <span class="tick tl"></span><span class="tick tr"></span><span class="tick bl"></span><span class="tick br"></span>
+        <div class="drop-ico">
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#f69322" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M12 15V4"/><path d="M7.5 8.5 12 4l4.5 4.5"/><path d="M4 14v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4"/>
+          </svg>
+        </div>
+        <div class="big">Drop a logo here</div>
+        <p class="sub"><b>Click to browse</b>, or paste an image from the clipboard</p>
+        <div class="formats" aria-label="Supported formats"><span>PNG</span><span>JPG</span><span>WebP</span><span>GIF</span><span>BMP</span></div>
+        <p id="dropMsg" role="status"></p>
+        <input type="file" id="file" accept="image/*">
+      </div>
+      <div class="drop-stages" aria-hidden="true">
+        <div><b><i>1</i>Convert</b><span>SVG · free, unlimited</span></div>
+        <div><b><i>2</i>Cut</b><span>sized SVG · layers · DXF</span></div>
+        <div><b><i>3</i>Print in 3D</b><span>cutter · stamp · stencil · plaque</span></div>
+      </div>
     </div>
 
     <div id="work">
-      <div class="panes">
-        <div class="pane">
-          <div class="phead"><h2>Original</h2><div class="meta" id="origMeta"></div></div>
-          <div class="canvasbox"><img id="origImg" alt="Original image"></div>
-        </div>
-        <div class="pane">
-          <div class="phead"><h2>SVG</h2><div class="meta" id="svgMeta"></div></div>
-          <div class="canvasbox" id="svgBox"><div id="svgOut"></div></div>
-        </div>
-      </div>
+      <nav class="stagenav" aria-label="Stages">
+        <ol>
+          <li><a href="#stConvert" data-st="stConvert" class="on"><i>1</i>Convert</a></li>
+          <li class="sep" aria-hidden="true"></li>
+          <li><a href="#stCut" data-st="stCut"><i>2</i>Cut &amp; laser</a></li>
+          <li class="sep" aria-hidden="true"></li>
+          <li><a href="#stPrint" data-st="stPrint"><i>3</i>Print in 3D</a></li>
+        </ol>
+      </nav>
 
-      <div id="verdict">
-        <span class="msg" id="verdictMsg"></span>
-        <span class="chips" id="verdictChips"></span>
-      </div>
+      <section class="stage" id="stConvert" aria-labelledby="stConvertTitle">
+        <div class="stage-head">
+          <div>
+            <span class="eyebrow">Stage 1 · Convert</span>
+            <h2 id="stConvertTitle">Trace to SVG</h2>
+          </div>
+        </div>
+        <div class="panes">
+          <div class="pane">
+            <div class="phead"><h2>Original</h2><div class="meta" id="origMeta"></div></div>
+            <div class="canvasbox"><img id="origImg" alt="Original image"></div>
+          </div>
+          <div class="pane out">
+            <div class="phead"><h2>SVG</h2><div class="meta" id="svgMeta"></div></div>
+            <div class="canvasbox mm-grid" id="svgBox"><div id="svgOut"></div></div>
+          </div>
+        </div>
 
-      <div id="controls">
-        <div class="presets" id="presets">
-          <button class="preset on" data-p="logo">Logo</button>
-          <button class="preset" data-p="simple">Simple mark</button>
-          <button class="preset" data-p="bw">Black &amp; white</button>
-          <button class="preset" data-p="detail">Detailed art</button>
+        <div id="verdict">
+          <span class="msg" id="verdictMsg"></span>
+          <span class="chips" id="verdictChips"></span>
         </div>
-        <div class="sliders">
-          <div class="slider">
-            <label>Colors <output id="colorsOut">8</output></label>
-            <input type="range" id="colors" min="2" max="24" step="1" value="8">
+
+        <div id="controls">
+          <span class="ctl-label" id="presetLbl">Preset</span>
+          <div class="presets" id="presets" role="group" aria-labelledby="presetLbl"><button class="preset on" data-p="logo">Logo</button><button class="preset" data-p="simple">Simple mark</button><button class="preset" data-p="bw">Black &amp; white</button><button class="preset" data-p="detail">Detailed art</button></div>
+          <div class="sliders">
+            <div class="slider">
+              <label for="colors">Colors <output id="colorsOut">8</output></label>
+              <input type="range" id="colors" min="2" max="24" step="1" value="8">
+            </div>
+            <div class="slider">
+              <label for="detail">Detail <output id="detailOut">5</output></label>
+              <input type="range" id="detail" min="1" max="10" step="1" value="5">
+            </div>
+            <div class="slider">
+              <label for="smooth">Smoothing <output id="smoothOut">0</output></label>
+              <input type="range" id="smooth" min="0" max="5" step="1" value="0">
+            </div>
+            <div class="slider">
+              <label for="speckle">Speckle removal <output id="speckleOut">8</output></label>
+              <input type="range" id="speckle" min="0" max="60" step="1" value="8">
+            </div>
           </div>
-          <div class="slider">
-            <label>Detail <output id="detailOut">5</output></label>
-            <input type="range" id="detail" min="1" max="10" step="1" value="5">
-          </div>
-          <div class="slider">
-            <label>Smoothing <output id="smoothOut">0</output></label>
-            <input type="range" id="smooth" min="0" max="5" step="1" value="0">
-          </div>
-          <div class="slider">
-            <label>Speckle removal <output id="speckleOut">8</output></label>
-            <input type="range" id="speckle" min="0" max="60" step="1" value="8">
-          </div>
-        </div>
-        <label class="check">
-          Background
-          <select id="removebg">
-            <option value="edges" selected>Remove backdrop only</option>
-            <option value="all">Remove backdrop + enclosed areas</option>
-            <option value="off">Keep it</option>
-          </select>
-          <span id="bgHint">Enclosed areas are holes inside the mark — letter counters, a donut center.</span>
-          <span id="bgNote" style="color:var(--orange)"></span>
-        </label>
-        <label class="check">
-          <input type="checkbox" id="rightangle" checked>
-          Snap near-right angles (keeps geometric logos sharp)
-        </label>
-        <div class="actions">
-          <button class="btn primary" id="download">Download SVG</button>
-          <button class="btn" id="copy">Copy SVG code</button>
-          <button class="btn" id="reset">Start over</button>
-        </div>
-        <div class="maker">
-          <div class="maker-head"><b>Maker exports</b><span class="protag" id="makerTag">Pro</span>
-            <span class="maker-sub">Real-world size, layered by colour, ready for Cricut, laser cutters and Inkscape.</span></div>
-          <div class="maker-row">
-            <label for="mmW">Output width</label>
-            <input type="number" id="mmW" value="100" min="1" max="5000" step="1"> mm
-            <span id="mmH"></span>
+          <div class="opts">
+            <label class="check">
+              Background
+              <select id="removebg">
+                <option value="edges" selected>Remove backdrop only</option>
+                <option value="all">Remove backdrop + enclosed areas</option>
+                <option value="off">Keep it</option>
+              </select>
+              <span id="bgNote" style="color:var(--orange)"></span>
+            </label>
+            <label class="check">
+              <input type="checkbox" id="rightangle" checked>
+              Snap near-right angles <span style="color:var(--tx-3)">(keeps geometric logos sharp)</span>
+            </label>
+            <span id="bgHint">Enclosed areas are holes inside the mark: letter counters, a donut centre.</span>
           </div>
           <div class="actions">
-            <button class="btn" id="exSized">Sized SVG, layers grouped</button>
-            <button class="btn" id="exLayers">One SVG per colour (.zip)</button>
-            <button class="btn" id="exDxf">DXF for laser</button>
-            <button class="btn" id="exBatch">Batch convert files…</button>
-            <input type="file" id="batchFile" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp" multiple hidden>
+            <button class="btn primary" id="download"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="m7.5 10.5 4.5 4.5 4.5-4.5"/><path d="M5 20h14"/></svg>Download SVG</button>
+            <button class="btn" id="copy">Copy SVG code</button>
+            <button class="btn ghost push" id="reset">Start over</button>
           </div>
+        </div>
+      </section>
+
+      <section class="stage" id="stCut" aria-labelledby="stCutTitle">
+        <div class="stage-head">
+          <div>
+            <span class="eyebrow">Stage 2 · Cut &amp; laser</span>
+            <h2 id="stCutTitle">Maker exports<span class="protag" id="makerTag">Pro</span></h2>
+            <p class="maker-sub">Real-world size, layered by colour. Ready for Cricut Design Space, LightBurn and Inkscape.</p>
+          </div>
+        </div>
+        <div class="maker">
+          <div class="maker-row">
+            <label for="mmW">Output width</label>
+            <span class="num"><input type="number" id="mmW" value="100" min="1" max="5000" step="1"><span class="unit">mm</span></span>
+            <span id="mmH"></span>
+          </div>
+          <div class="ex-grid">
+            <button class="btn primary" id="exSized">Sized SVG, layers grouped<small>one file · groups per colour</small></button>
+            <button class="btn" id="exLayers">One SVG per colour (.zip)<small>a file per mat or pass</small></button>
+            <button class="btn" id="exDxf">DXF for laser<small>outlines in mm</small></button>
+            <button class="btn" id="exBatch">Batch convert files…<small>a folder of logos at once</small></button>
+          </div>
+          <input type="file" id="batchFile" accept="image/png,image/jpeg,image/webp,image/gif,image/bmp" multiple hidden>
           <div id="makerMsg" role="status"></div>
         </div>
-      </div>
+      </section>
 
-      <section id="p3d" aria-labelledby="p3Title">
-        <div class="p3-head">
-          <h2 id="p3Title">Print it in 3D <span class="protag" id="p3Tag">Pro</span></h2>
-          <p>Turn this trace into something you can print: a cookie cutter, a stamp, a paint stencil or a multi-colour plaque. Preview free; the STL download is Pro.</p>
+      <section class="stage" id="stPrint" aria-labelledby="p3Title">
+        <div class="stage-head">
+          <div>
+            <span class="eyebrow">Stage 3 · Print in 3D</span>
+            <h2 id="p3Title">Print it in 3D <span class="protag" id="p3Tag">Pro</span></h2>
+            <p>Turn this trace into a cookie cutter, a stamp, a paint stencil or a multi-colour plaque. The preview is free; the STL download is Pro.</p>
+          </div>
         </div>
+      <div id="p3d">
         <div class="seg" id="p3Seg" role="tablist" aria-label="What to make">
           <button type="button" role="tab" aria-selected="true" class="on" data-m="cutter">Cookie cutter</button>
           <button type="button" role="tab" aria-selected="false" data-m="stamp">Stamp</button>
@@ -437,11 +563,11 @@ a.buy.off{opacity:.45;pointer-events:none}
               <div class="fld"><label for="pM">Margin</label><span class="u"><input type="number" id="pM" value="3" min="1" max="20" step="0.5"> mm</span></div>
               <div class="fld"><label for="pCol">Base colour</label><input type="color" id="pCol" value="#2b2f36"></div>
               <label class="check"><input type="checkbox" id="pMag"> Magnet pocket underneath (fridge magnet)</label>
-              <div class="fld"><label for="pMd">Magnet</label><span class="u"><input type="number" id="pMd" value="10" min="3" max="40" step="0.5"> × <input type="number" id="pMt" value="2" min="0.5" max="6" step="0.1"> mm</span></div>
+              <div class="fld"><label for="pMd">Magnet</label><span class="u"><input type="number" id="pMd" value="10" min="3" max="40" step="0.5" aria-label="Magnet diameter"> × <input type="number" id="pMt" value="2" min="0.5" max="6" step="0.1" aria-label="Magnet thickness"> mm</span></div>
               <p class="hint">One STL per colour for an AMS. Import them together in Bambu Studio as one object with multiple parts.</p>
             </div>
           </div>
-          <div class="p3-prev">
+          <div class="p3-prev mm-grid">
             <canvas id="p3Canvas" aria-label="Top-down preview of the printable part"></canvas>
             <div class="legend" id="p3Legend"></div>
             <div class="p3-info" id="p3Info"></div>
@@ -451,7 +577,9 @@ a.buy.off{opacity:.45;pointer-events:none}
         <div class="actions">
           <button class="btn primary" id="p3Dl" type="button">Download STL</button>
           <span id="p3Msg" role="status"></span>
+          <span class="fine">Binary STL · millimetres · Bambu Studio, OrcaSlicer, PrusaSlicer</span>
         </div>
+      </div>
       </section>
     </div>
 
@@ -463,6 +591,7 @@ a.buy.off{opacity:.45;pointer-events:none}
   <div class="pro-in">
     <div class="pro-head">
       <div>
+        <span class="eyebrow">One-time purchase · works offline</span>
         <h2 id="proTitle">Vectorizer Pro</h2>
         <p id="proSub">The free converter stays free. Pro adds the exports makers need, and 3D-printable files.</p>
       </div>
@@ -507,7 +636,7 @@ a.buy.off{opacity:.45;pointer-events:none}
       <label for="proKey">Already bought it? Paste the license key from your receipt email.</label>
       <div class="in">
         <input type="text" id="proKey" placeholder="XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX" autocomplete="off" spellcheck="false">
-        <button type="button" class="btn primary" id="proActivate">Unlock</button>
+        <button type="button" class="btn" id="proActivate">Unlock</button>
       </div>
     </div>
     <div id="proMsg" role="status"></div>
@@ -516,12 +645,16 @@ a.buy.off{opacity:.45;pointer-events:none}
   </div>
 </dialog>
 <footer>
-  <div class="wrap">
-    Veer · <a href="https://veersolutions.com">veersolutions.com</a>
-    <span id="buildFoot" style="color:#6f6e6a"></span>
+  <div class="wrap foot">
+    <span>Veer <span id="buildFoot"></span></span>
+    <nav aria-label="Footer">
+      <a href="./">About Vectorizer</a>
+      <a href="../">All tools</a>
+      <a href="https://veersolutions.com">veersolutions.com</a>
+    </nav>
   </div>
   <div class="powered">
-    <div class="wrap">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
+    <div class="wrap">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a> · No uploads. Your files stay yours.</div>
   </div>
 </footer>
 
@@ -1752,7 +1885,7 @@ if(typeof define === 'function' && define.amd){
    ships: MINOR for a new capability, PATCH for a fix. The date is the ship
    date, so a glance at the badge tells you whether the page you're looking
    at is the current one or a stale cache. */
-var BUILD = 'v1.3.0 · 2026-11-09';
+var BUILD = 'v1.3.1 · 2026-11-09';
 
 var MAXDIM = 1600;
 
@@ -3610,6 +3743,27 @@ proTag();
 window.__veerPrint3d = { plan:plan, build:build, opts:opts, stlBinary:stlBinary, last:function(){ return last; } };
 })();
 
+</script>
+<script>
+/* Page chrome only: keyboard access to the drop zone and the active stage in
+   the sticky stage nav. No app behaviour lives here. */
+(function(){
+'use strict';
+var drop = document.getElementById('drop');
+drop.addEventListener('keydown', function(e){
+  if((e.key === 'Enter' || e.key === ' ') && e.target === drop){ e.preventDefault(); document.getElementById('file').click(); }
+});
+var links = Array.prototype.slice.call(document.querySelectorAll('.stagenav a[data-st]'));
+if(!links.length || !('IntersectionObserver' in window)) return;
+var seen = {};
+var io = new IntersectionObserver(function(entries){
+  entries.forEach(function(en){ seen[en.target.id] = en.isIntersecting; });
+  var cur = null;
+  links.forEach(function(a){ if(!cur && seen[a.dataset.st]) cur = a.dataset.st; });
+  if(cur) links.forEach(function(a){ var on = a.dataset.st === cur; a.classList.toggle('on', on); if(on) a.setAttribute('aria-current', 'step'); else a.removeAttribute('aria-current'); });
+}, {rootMargin:'-80px 0px -55% 0px'});
+links.forEach(function(a){ var s = document.getElementById(a.dataset.st); if(s) io.observe(s); });
+})();
 </script>
 </body>
 </html>
