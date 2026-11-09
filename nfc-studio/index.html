@@ -1,0 +1,534 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NFC Studio · Logo to multi-colour NFC cards and keychains for Bambu · Veer Tools</title>
+<meta name="description" content="Drop in a logo and get a watertight STL set your Bambu prints in up to four filaments: an NFC business card or keychain with the tag sealed inside and the exact pause layer worked out for you. Runs in your browser.">
+<meta name="theme-color" content="#0f1114">
+<link rel="canonical" href="/nfc-studio/">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Veer Tools">
+<meta property="og:title" content="NFC Studio: your logo, off the plate as an NFC card">
+<meta property="og:description" content="Logo in, multi-colour STL set out. Sealed NFC tag with the exact pause layer, AMS slot mapping, keychain presets. For Bambu Studio. Runs in your browser.">
+<meta property="og:image" content="/nfc-studio/img/og.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A cream NFC business card with a three-colour pine and mountain logo and company text, previewed in NFC Studio.">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+/* ── NFC Studio product page. Tokens come from /assets/site.css. ── */
+.skip{position:absolute;left:-9999px;top:8px;z-index:50;background:var(--orange);color:#1a0f02;padding:10px 14px;border-radius:8px;font-weight:600;text-decoration:none}
+.skip:focus{left:12px}
+main section{scroll-margin-top:80px}
+.alt{background:var(--bg-2);border-block:1px solid var(--line)}
+
+/* hero */
+.hero{overflow-x:clip;padding-block:clamp(48px,7vw,92px) clamp(56px,8vw,104px);border-bottom:1px solid var(--line)}
+.hero-grid{display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.25fr);gap:clamp(32px,5vw,64px);align-items:center}
+.hero h1{margin-top:18px;max-width:14.5ch}
+.hero .lede{margin-top:22px}
+.cta-row{display:flex;flex-wrap:wrap;gap:12px;margin-top:30px}
+.hero-meta{margin-top:22px;display:flex;flex-wrap:wrap;gap:8px}
+
+.io{display:grid;grid-template-columns:auto auto minmax(0,1fr);align-items:center;gap:14px}
+.io-in{display:flex;flex-direction:column;align-items:center;gap:8px}
+.io-in .logo{width:92px;height:92px;padding:12px;border:1px dashed var(--line-2);border-radius:var(--r);
+  background:repeating-conic-gradient(#ffffff08 0 25%,transparent 0 50%) 0 0/12px 12px}
+.io-in .logo img{width:100%;height:100%}
+.fname{font:500 .72rem/1.2 var(--mono);color:var(--tx-3);text-align:center}
+.arrow{font:500 .78rem/1 var(--mono);color:var(--orange);display:flex;flex-direction:column;align-items:center;gap:4px}
+.arrow svg{width:40px;height:12px}
+.io-out{position:relative;padding:0 0 28px 28px}
+.io-out .dim-x{position:absolute;left:28px;right:0;bottom:0;justify-content:center;display:flex}
+.io-out .dim-y{position:absolute;left:0;top:0;bottom:28px;display:flex;align-items:center}
+.io-out .dim-y .dim{writing-mode:vertical-rl;transform:rotate(180deg)}
+.io-out .dim-y .dim::before,.io-out .dim-y .dim::after{width:1px;height:18px}
+.io-out figcaption{margin-top:14px}
+.cap{font:500 .78rem/1.5 var(--mono);color:var(--tx-3)}
+.cap b{color:var(--tx-2);font-weight:500}
+.parts-hint{display:none}
+
+/* proof section: spec sheet beside the part list */
+.proof-grid{display:flex;flex-direction:column;gap:clamp(32px,4vw,48px)}
+.spec{margin:0;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:clamp(28px,4vw,56px)}
+.spec>div{display:grid;grid-template-columns:8.5rem minmax(0,1fr);gap:18px;padding:20px 0;border-top:1px solid var(--line)}
+.spec dt{font:500 .74rem/1.5 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--orange);padding-top:3px}
+.spec dd{margin:0;color:var(--tx-2)}
+.spec dd strong{color:var(--tx);font-weight:600}
+.spec code,.kbd{font:500 .86em var(--mono);color:var(--tx);background:var(--panel-2);border:1px solid var(--line);border-radius:5px;padding:1px 5px;white-space:nowrap}
+
+/* presets */
+.presets{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:center}
+.tbl-wrap{overflow-x:auto;margin-top:8px}
+table.sizes{width:100%;border-collapse:collapse;font-size:.95rem}
+.sizes caption{text-align:left;font:500 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);padding:22px 0 10px}
+.sizes th,.sizes td{text-align:left;padding:11px 12px 11px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.sizes thead th{font:500 .72rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--tx-3);font-weight:500}
+.sizes tbody th{font-weight:600;color:var(--tx)}
+.sizes td{color:var(--tx-2);font-family:var(--mono);font-size:.84rem;white-space:nowrap}
+.note{margin-top:18px;color:var(--tx-2);font-size:.95rem;max-width:58ch}
+
+/* how it works: a real sequence, so it is numbered */
+.steps{list-style:none;margin:0;padding:0;counter-reset:s;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:0 clamp(28px,4vw,56px)}
+.steps li{counter-increment:s;display:grid;grid-template-columns:2.6rem minmax(0,1fr);gap:4px 14px;padding:22px 0;border-top:1px solid var(--line)}
+.steps li::before{content:counter(s);grid-row:span 2;font:600 .8rem/1 var(--mono);color:var(--orange);width:2rem;height:2rem;border:1px solid #6b4a1d;border-radius:50%;display:grid;place-items:center;margin-top:2px}
+.steps h3{font-size:1.1rem}
+.steps p{color:var(--tx-2)}
+.steps .where{display:block;margin-top:2px;font:500 .72rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tx-3)}
+.how-shot{margin-top:clamp(28px,4vw,48px);display:grid;grid-template-columns:minmax(0,1.3fr) minmax(0,1fr);gap:clamp(24px,4vw,48px);align-items:center}
+
+/* download contents */
+.dl-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(28px,4vw,56px);align-items:start}
+.tree{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:22px 24px;font:400 .86rem/1.9 var(--mono);color:var(--tx-2);overflow-x:auto;white-space:pre}
+.tree .f{color:var(--tx)}
+.tree .c{color:var(--tx-3)}
+.tree .sw{display:inline-block;width:.7em;height:.7em;border-radius:2px;vertical-align:-.02em;margin-right:.35em;border:1px solid #0006}
+.dl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:14px;color:var(--tx-2)}
+.dl-list li{padding-left:22px;position:relative}
+.dl-list li::before{content:"";position:absolute;left:2px;top:.62em;width:9px;height:9px;border-radius:2px;background:var(--line-2)}
+.dl-list strong{color:var(--tx);font-weight:600}
+
+/* who it's for */
+.who{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);border-top:1px solid var(--line)}
+.who>div{padding:28px 0}
+.who>div+div{border-left:1px solid var(--line);padding-left:clamp(24px,4vw,48px)}
+.who>div:first-child{padding-right:clamp(24px,4vw,48px)}
+.who h3{margin-bottom:12px}
+.who p{color:var(--tx-2)}
+.who p+p{margin-top:12px}
+
+/* pricing additions */
+.price .btn{margin-top:4px}
+.price .small{font:500 .74rem/1.5 var(--mono);color:var(--tx-3)}
+.price-note{margin-top:22px;color:var(--tx-2);font-size:.95rem;max-width:70ch}
+
+/* whole-tool screenshot */
+.tool-shot figcaption{margin-top:14px}
+
+/* final CTA */
+.final{text-align:left}
+.final-in{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-end;justify-content:space-between;border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(28px,5vw,56px);background:var(--panel)}
+.final h2{max-width:18ch}
+.final p{margin-top:14px;color:var(--tx-2);max-width:52ch}
+
+@media (max-width:900px){
+  .hero-grid,.proof-grid,.presets,.dl-grid,.how-shot{grid-template-columns:minmax(0,1fr)}
+  .steps{grid-template-columns:minmax(0,1fr)}
+  .presets .shot{order:-1}
+  .spec{grid-template-columns:minmax(0,1fr)}
+}
+@media (max-width:640px){
+  .io{grid-template-columns:minmax(0,1fr)}
+  .io-in{flex-direction:row;justify-content:flex-start;gap:12px}
+  .io-in .logo{width:64px;height:64px;padding:8px}
+  .arrow{display:none}
+  .io-out{padding:0 0 26px 22px}
+  .io-out .dim-x{left:22px}
+  .spec>div{grid-template-columns:minmax(0,1fr);gap:6px}
+  .spec{grid-template-columns:minmax(0,1fr)}
+  .who{grid-template-columns:minmax(0,1fr)}
+  .who>div+div{border-left:0;border-top:1px solid var(--line);padding-left:0}
+  .who>div:first-child{padding-right:0}
+  .sizes{font-size:.88rem}
+  .sizes td{font-size:.74rem}
+  .sizes th,.sizes td{padding-right:8px}
+  .tree{font-size:.7rem;padding:18px 16px}
+  .parts-shot{overflow-x:auto}
+  .parts-shot img{width:720px;max-width:none}
+  .parts-hint{display:inline}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Veer Tools home">
+      <svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      Veer <span>Tools</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="/nfc-studio/" aria-current="page">NFC Studio</a>
+      <a class="hide-sm" href="/vectorizer/">Vectorizer</a>
+      <a class="hide-sm" href="/lightbox/">Light Box Studio</a>
+      <a class="hide-sm" href="/#pricing">Pricing</a>
+      <a class="btn btn-primary btn-sm" href="/#tools">Open a tool</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ── hero ── -->
+<section class="hero mm-grid glow" aria-labelledby="hero-h">
+  <div class="wrap hero-grid">
+    <div>
+      <p class="eyebrow">NFC Studio · for Bambu Studio + AMS</p>
+      <h1 id="hero-h">Your logo, off the plate as an <span class="grad">NFC card.</span></h1>
+      <p class="lede">Drop in a logo. NFC Studio splits it into flat colours, traces clean edges and
+        hands you a set of STL files your Bambu prints in up to four filaments, with the NFC tag
+        sealed inside and the pause layer worked out for you. Business cards or keychains.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary" href="app.html">Open NFC Studio</a>
+        <a class="btn btn-ghost" href="#pricing">Pro from $29</a>
+      </div>
+      <div class="hero-meta">
+        <span class="chip">Free to try</span>
+        <span class="chip">Runs in your browser</span>
+        <span class="chip">Nothing uploaded</span>
+      </div>
+    </div>
+
+    <figure class="io" style="margin:0">
+      <div class="io-in">
+        <div class="logo"><img src="img/sample-logo.svg" width="68" height="68" alt="The input: a flat three-colour logo of a pine tree, a ridge and an orange sun."></div>
+        <span class="fname">logo.svg<br>3 colours</span>
+      </div>
+      <div class="arrow" aria-hidden="true">
+        <svg viewBox="0 0 40 12"><path d="M0 6h36M31 1l5 5-5 5" fill="none" stroke="currentColor" stroke-width="1.5"/></svg>
+      </div>
+      <div class="io-out">
+        <div class="shot"><img src="img/card-face.webp" width="1800" height="1200" alt="NFC Studio's card-face preview: a cream credit-card-size card with the pine and sun logo on the left and the text NORTHPINE PRINT CO., Tap for contact on the right. A faint circle marks the NFC pocket on the back."></div>
+        <div class="dim-x"><span class="dim">85.6 mm</span></div>
+        <div class="dim-y"><span class="dim">54 mm</span></div>
+      </div>
+      <figcaption class="cap" style="grid-column:1/-1"><b>Real preview from the tool.</b> CR80 card, 2.5&nbsp;mm thick, cream body + 3 logo colours = 4 filaments, 25&nbsp;mm tag sealed inside.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ── the details that matter ── -->
+<section id="details" aria-labelledby="details-h">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Built by someone who prints</p>
+      <h2 id="details-h">The fiddly parts are already handled.</h2>
+      <p class="lede">A pretty preview is easy. A card that comes off the plate right the first time
+        takes a few details most logo-to-STL tools skip.</p>
+    </div>
+
+    <div class="proof-grid">
+      <div>
+        <figure style="margin:0">
+          <div class="shot parts-shot" tabindex="0" role="region" aria-label="Part list screenshot (scrolls sideways on small screens)"><img src="img/parts.webp" width="2000" height="554" loading="lazy" alt="NFC Studio's part list after building. A banner reads: Sealed tag, this print needs a pause. Right-click the layer slider at Z = 1.80 mm (after layer 9) and choose Add pause. Below it, a table maps card.stl to AMS 1 and colour1 to colour3 to AMS 2, 3 and 4, with Z ranges and triangle counts."></div>
+          <figcaption class="cap" style="margin-top:14px"><b>The part list, after Build mesh.</b> <span class="parts-hint">Swipe to read it.</span> Pause height, cavity depth, cover thickness and the AMS slot for every file.</figcaption>
+        </figure>
+      </div>
+
+      <dl class="spec">
+        <div>
+          <dt>Sealed tag</dt>
+          <dd><strong>The tag ends up fully enclosed.</strong> No sticker or recess on the back. The cavity is
+            built to your tag's real thickness, so the cover prints straight onto the tag instead of
+            sagging over open air. Prefer an open pocket? Untick one box.</dd>
+        </div>
+        <div>
+          <dt>Pause layer</dt>
+          <dd><strong>It tells you exactly where to stop.</strong> For example <code>Z = 1.80 mm</code>, after
+            layer 9. The cavity's floor and ceiling are snapped to real layer boundaries for your
+            layer and first-layer heights, so the pause lands cleanly and the back stays flat.</dd>
+        </div>
+        <div>
+          <dt>AMS slots</dt>
+          <dd><strong>Every file has a slot.</strong> The card body is AMS&nbsp;1, logo colours are
+            AMS&nbsp;2–4. Sample colours straight off your logo, or lock your own palette. A fourth
+            logo colour is supported too, and the tool warns you that it needs a fifth filament.</dd>
+        </div>
+        <div>
+          <dt>Face-down</dt>
+          <dd><strong>The card prints face-down, so the export is mirrored for you.</strong> The logo is
+            the first layers against the plate, which is why a textured plate becomes the card's finish.
+            When you peel it off and turn it over, it reads the right way round. Don't rotate it.</dd>
+        </div>
+        <div>
+          <dt>Watertight</dt>
+          <dd><strong>Closed, manifold meshes.</strong> Colour parts drop exactly into recesses in the card,
+            with no gaps or overlaps. Bambu Studio shouldn't ask to repair them.</dd>
+        </div>
+        <div>
+          <dt>Colour swaps</dt>
+          <dd><strong>Colour only lives in the first few layers.</strong> 0.6&nbsp;mm of colour is three
+            0.2&nbsp;mm layers, so filament changes, and purge, stop early. Fill the plate with cards
+            and you pay that purge once per layer, not once per card.</dd>
+        </div>
+      </dl>
+    </div>
+  </div>
+</section>
+
+<!-- ── sizes & keychains ── -->
+<section id="sizes" class="alt" aria-labelledby="sizes-h">
+  <div class="wrap presets">
+    <div>
+      <div class="section-head" style="margin-bottom:8px">
+        <p class="eyebrow">Cards and keychains</p>
+        <h2 id="sizes-h">One click to a sensible size.</h2>
+        <p class="lede">Each preset sets the outline, thickness, tag size and keyring hole together.
+          Keychains are 3&nbsp;mm because they take more abuse than a card. Or set any size, shape and
+          corner radius yourself.</p>
+      </div>
+
+      <div class="tbl-wrap">
+        <table class="sizes">
+          <caption>Keychain presets</caption>
+          <thead><tr><th scope="col">Preset</th><th scope="col">Size</th><th scope="col">Tag</th><th scope="col">Hole</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Keychain</th><td>45 × 28 × 3 mm</td><td>22 mm</td><td>top left</td></tr>
+            <tr><th scope="row">Pill keychain</th><td>50 × 25 × 3 mm</td><td>20 mm</td><td>left end</td></tr>
+            <tr><th scope="row">Round keychain</th><td>Ø 35 × 3 mm</td><td>22 mm</td><td>top centre</td></tr>
+            <tr><th scope="row">Square keytag</th><td>38 × 38 × 3 mm</td><td>25 mm</td><td>top left</td></tr>
+          </tbody>
+        </table>
+        <table class="sizes">
+          <caption>Card presets</caption>
+          <thead><tr><th scope="col">Preset</th><th scope="col">Size</th><th scope="col">Tag</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Credit card (CR80)</th><td>85.6 × 54 × 2.5 mm</td><td>25 mm</td></tr>
+            <tr><th scope="row">US business card</th><td>88.9 × 50.8 × 2.5 mm</td><td>25 mm</td></tr>
+            <tr><th scope="row">EU business card</th><td>85 × 55 × 2.5 mm</td><td>25 mm</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p class="note">The keyring hole goes straight through, and the artwork and tag cavity are held clear
+        of it automatically. 4&nbsp;mm suits a split ring; 5&nbsp;mm a lanyard clip.</p>
+    </div>
+
+    <figure style="margin:0">
+      <div class="shot"><img src="img/keychain.webp" width="1800" height="1126" loading="lazy" alt="The Keychain preset in NFC Studio: a 45 by 28 millimetre cream keychain with a keyring hole in the top left corner and the three-colour logo in the middle, over the outline of a 22 millimetre tag pocket."></div>
+      <figcaption class="cap" style="margin-top:14px"><b>Keychain preset.</b> 45 × 28 × 3&nbsp;mm, 22&nbsp;mm tag sealed inside, hole top left.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ── how it works ── -->
+<section id="how" aria-labelledby="how-h">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-h">From logo file to a card in your hand.</h2>
+    </div>
+
+    <ol class="steps">
+      <li><h3>Drop in your logo</h3>
+        <p>PNG, JPG, SVG or WEBP. A transparent PNG or an SVG traces best. The background colour is dropped automatically.</p></li>
+      <li><h3>Check the colours</h3>
+        <p>It separates the art into flat colours and shows which AMS slot each one goes to. Lower the count to lose a stray shade, sample a colour off the logo, or lock your own.</p></li>
+      <li><h3>Pick a card or keychain</h3>
+        <p>Choose a preset and a tag. Add company info as real geometry if you like: up to three lines, printed in one of your logo colours.</p></li>
+      <li><h3>Build and download</h3>
+        <p>Build the mesh, spin the 3D preview, then download the STL set as a .zip.</p></li>
+      <li><h3>Load it into Bambu Studio <span class="where">In your slicer</span></h3>
+        <p>Drag all the STLs onto the plate at once and answer <b>Yes</b> to loading them as one object with multiple parts. Set each part's filament to the slot the tool gave it.</p></li>
+      <li><h3>Add the pause, print, drop in the tag <span class="where">At the printer</span></h3>
+        <p>Right-click the layer slider at the height the tool reported and choose <b>Add pause</b>. When it stops, press the tag flat in the cavity and resume. The next layers close over it.</p></li>
+    </ol>
+
+    <div class="how-shot">
+      <figure style="margin:0">
+        <div class="shot"><img src="img/card-3d.webp" width="1800" height="1124" loading="lazy" alt="NFC Studio's 3D preview after Build mesh: the card as exported, a solid slab with the three logo colours inlaid flush in its face."></div>
+      </figure>
+      <div>
+        <p class="eyebrow" style="margin-bottom:12px">3D preview</p>
+        <p class="muted">After <b style="color:var(--tx)">Build mesh</b> you're looking at the actual solids that
+          go into the zip, not a picture of them: drag to turn the card over, scroll to zoom. The status
+          line reports the part and triangle counts.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── what's in the download ── -->
+<section id="download" class="alt" aria-labelledby="dl-h">
+  <div class="wrap dl-grid">
+    <div>
+      <div class="section-head" style="margin-bottom:24px">
+        <p class="eyebrow">What's in the download</p>
+        <h2 id="dl-h">One STL per filament, and the notes to print them.</h2>
+      </div>
+      <ul class="dl-list">
+        <li><strong>One solid per filament.</strong> STL holds no colour, so a closed solid per filament is how a multi-colour part is described. A three-colour logo gives four files.</li>
+        <li><strong>All parts share one origin.</strong> Load them together and they line up exactly. Don't move them individually.</li>
+        <li><strong>A README with your numbers.</strong> Card size, colour depth, cavity size, the pause height and layer, the AMS slot for each file, and import and slicing steps.</li>
+        <li><strong>A 3MF button for other slicers.</strong> It's labelled single-colour for Bambu, for a reason: see the FAQ.</li>
+      </ul>
+    </div>
+    <figure style="margin:0">
+<pre class="tree" aria-label="Example contents of the download zip"><span class="f">northpine_85.6x54_STL.zip</span>
+└─ northpine_85.6x54/
+   ├─ <span class="f">1_card.stl</span>      <span class="sw" style="background:#ece3d2"></span><span class="c">AMS 1  card + tag cavity</span>
+   ├─ <span class="f">2_colour1.stl</span>   <span class="sw" style="background:#2c6e68"></span><span class="c">AMS 2  logo colour 1</span>
+   ├─ <span class="f">3_colour2.stl</span>   <span class="sw" style="background:#f08a24"></span><span class="c">AMS 3  logo colour 2</span>
+   ├─ <span class="f">4_colour3.stl</span>   <span class="sw" style="background:#1d3b2f"></span><span class="c">AMS 4  logo colour 3</span>
+   └─ <span class="f">README.txt</span>      <span class="c">sizes, pause, steps</span></pre>
+      <figcaption class="cap" style="margin-top:14px"><b>Example:</b> the card above, from a file called northpine.png.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ── who it's for ── -->
+<section id="who" aria-labelledby="who-h">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Who it's for</p>
+      <h2 id="who-h">Your own cards, or your customers'.</h2>
+    </div>
+    <div class="who">
+      <div>
+        <h3>Makers with a Bambu and an AMS</h3>
+        <p>You want a business card people keep, or a keychain that opens your link with a tap.
+          Pro gives you the full colour logo, your company details in raised text, and a clean back.</p>
+      </div>
+      <div>
+        <h3>Etsy and market sellers</h3>
+        <p>A customer sends a logo; you print a plate of their cards and post them out. Commercial
+          covers selling what you print and making files for clients.</p>
+        <p>Raised, multi-colour cards with a hidden tag aren't something a factory turns out for
+          pennies, which is the point.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── pricing ── -->
+<section id="pricing" class="alt" aria-labelledby="pricing-h">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Pricing</p>
+      <h2 id="pricing-h">Design free. Pay once when you want the full card.</h2>
+      <p class="lede">Every feature works in the designer on every plan. The plan only matters when you download.</p>
+    </div>
+
+    <div class="prices">
+      <div class="price">
+        <span class="tier">Free</span>
+        <div class="amt">$0</div>
+        <ul>
+          <li>1–2 logo colours</li>
+          <li>Every shape, keychain and tag option</li>
+          <li>Sealed NFC tag with pause layer</li>
+          <li>A small Veer mark debossed one layer into the back</li>
+          <li>Personal use</li>
+        </ul>
+        <a class="btn" href="app.html">Open NFC Studio</a>
+      </div>
+      <div class="price feature">
+        <span class="tier">Pro</span>
+        <div class="amt">$29<small>one-time</small></div>
+        <ul>
+          <li>Up to 4 logo colours</li>
+          <li>Company info text</li>
+          <li>Clean back, no mark</li>
+          <li>All future NFC Studio updates</li>
+          <li>Personal use</li>
+        </ul>
+        <a class="btn btn-primary" data-checkout="nfc-pro" data-fallback="app.html" href="app.html">Get Pro</a>
+      </div>
+      <div class="price">
+        <span class="tier">Commercial</span>
+        <div class="amt">$79<small>one-time</small></div>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>Sell the cards and keychains you print</li>
+          <li>Make files for clients</li>
+        </ul>
+        <a class="btn" data-checkout="nfc-commercial" data-fallback="app.html" href="app.html">Get Commercial</a>
+      </div>
+    </div>
+    <p class="price-note">You get a license key by email. Paste it into the tool once, online; after that NFC Studio
+      works offline. No account, no subscription.</p>
+  </div>
+</section>
+
+<!-- ── the whole tool ── -->
+<section aria-labelledby="tool-h" style="padding-bottom:0">
+  <div class="wrap tool-shot">
+    <div class="section-head">
+      <p class="eyebrow">The tool</p>
+      <h2 id="tool-h">Everything on one screen.</h2>
+    </div>
+    <figure style="margin:0">
+      <div class="shot"><img src="img/app.webp" width="2400" height="1500" loading="lazy" alt="The full NFC Studio window: a settings sidebar with artwork, colour swatches labelled AMS 1 to AMS 4, and card options; the card-face preview; the sealed-tag pause banner and part list; and the Build mesh and Download STL set buttons."></div>
+      <figcaption class="cap"><b>NFC Studio in Chrome.</b> Sidebar settings on the left, live preview and part list on the right.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ── FAQ ── -->
+<section id="faq" aria-labelledby="faq-h">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-h">Questions makers ask.</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Which NFC tags should I buy?</summary>
+        <p>Round NTAG215 stickers, 25&nbsp;mm, are the default for cards. Keychains use 22&nbsp;mm (an NTAG213 sticker), 20&nbsp;mm on the pill. The tool also has presets for 30&nbsp;mm stickers and a 45 × 25&nbsp;mm rectangular wet inlay, or you can enter any size. NTAG215 holds 504 bytes, enough for a full contact card; NTAG213 holds 144, fine for a link. Measure your tag's thickness with calipers if you can and enter it: a bare sticker is about 0.3–0.4&nbsp;mm, a foam-backed disc nearer 0.8&nbsp;mm.</p>
+      </details>
+      <details>
+        <summary>Does it work with OrcaSlicer?</summary>
+        <p>NFC Studio is built and tested against Bambu Studio. OrcaSlicer is based on Bambu Studio and imports multiple STLs the same way: select them all, load them as one object with multiple parts, then set each part's filament. You add the pause from the layer slider in the preview, as in Bambu Studio. Use the STL set, not the 3MF.</p>
+      </details>
+      <details>
+        <summary>Why STL files and not a 3MF?</summary>
+        <p>Bambu Studio only keeps part and filament data from 3MF files it wrote itself. Anything else gets the message "The 3mf is not from Bambu Lab, load geometry data and color data only" and is flattened into one object with one filament. That holds even when the file matches Bambu's own layout, which ours does. The only way around it is to embed a full printer and filament profile, which would overwrite your print settings. Loading the STL set as one object with multiple parts is the reliable path, so that's what NFC Studio gives you.</p>
+      </details>
+      <details>
+        <summary>Do I need an AMS?</summary>
+        <p>You need a printer that can print several filaments in the same layer: an AMS, AMS Lite, or similar. A manual colour change at a layer won't work, because the logo sits in the same layers as the card face. Card plus three logo colours fills a four-slot AMS.</p>
+      </details>
+      <details>
+        <summary>How do I program the tag?</summary>
+        <p>With your phone and a free NFC app such as NFC Tools. Write a link, a contact card, or whatever you want a tap to open. Writing it before you drop it in lets you check it works. It also works afterwards, through the printed cover. Most apps can lock a tag so it can't be rewritten; that's permanent, so lock it last. Keep finished cards off metal surfaces, which detune the antenna.</p>
+      </details>
+      <details>
+        <summary>Is my logo uploaded anywhere?</summary>
+        <p>No. Tracing, meshing and the zip are all done in your browser. Your logo never leaves your machine. The only network call is the one-time license check when you unlock Pro.</p>
+      </details>
+      <details>
+        <summary>Can I sell what I print?</summary>
+        <p>With Commercial, yes: cards and keychains you print, and files you make for clients. Free and Pro are for personal use.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ── final CTA ── -->
+<section class="final" aria-labelledby="final-h" style="padding-top:0">
+  <div class="wrap">
+    <div class="final-in mm-grid">
+      <div>
+        <h2 id="final-h">Put your logo on the plate.</h2>
+        <p>Open the tool, drop in a logo and see the card. It's free to try, with nothing to install and no account.</p>
+      </div>
+      <a class="btn btn-primary" href="app.html">Open NFC Studio</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="brand" href="/"><svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg> Veer <span>Tools</span></a>
+        <p style="margin-top:14px;max-width:34ch">Browser tools for makers, from Veer, a digital studio for small businesses. Everything runs on your machine.</p>
+      </div>
+      <div><h4>Tools</h4><ul><li><a href="/nfc-studio/">NFC Studio</a></li><li><a href="/vectorizer/">Vectorizer</a></li><li><a href="/lightbox/">Light Box Studio</a></li></ul></div>
+      <div><h4>Veer</h4><ul><li><a href="https://veersolutions.com">Websites &amp; marketing</a></li><li><a href="https://instagram.com/getveer">Instagram @getveer</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="/#faq">FAQ</a></li><li><a href="/#pricing">Pricing &amp; licenses</a></li></ul></div>
+    </div>
+    <div class="base"><span>© 2026 Veer</span><span>No uploads. No accounts. Your files stay yours.</span></div>
+  </div>
+</footer>
+
+<script src="/assets/checkout.js" defer></script>
+</body>
+</html>
