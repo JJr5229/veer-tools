@@ -4,7 +4,7 @@ A single-file browser tool that turns a logo into a set of watertight STLs for a
 multi-colour NFC business card or keychain, ready to drop straight into Bambu
 Studio.
 
-Open **`nfc-card-studio.html`** in Chrome or Edge. No install, no internet, no
+Open **`app.html`** in Chrome or Edge. No install, no internet, no
 account. Everything runs locally — your logo never leaves the machine.
 
 ---
@@ -315,7 +315,7 @@ with a 22 mm tag) it's left off.
    which checks it with Lemon Squeezy or Gumroad.
 3. If it's good, the function returns a token signed with Veer's private key.
    The page checks the signature with the public key embedded in
-   `index.html`, so Pro can't be switched on by editing browser storage, and it
+   `app.html`, so Pro can't be switched on by editing browser storage, and it
    keeps working offline until the token expires (14 days). While online, the
    page quietly renews it every few days, and drops Pro if the store says the
    license was refunded or revoked.
@@ -330,7 +330,7 @@ with a 22 mm tag) it's left off.
    of `api/license.js` for the full list): `LICENSE_SIGNING_KEY`,
    `LICENSE_PROVIDER`, `LS_STORE_ID` and `LS_PRODUCTS` (or `GUMROAD_PRODUCTS`).
 3. **Paste the checkout links** into `PRO.buyPro` and `PRO.buyCommercial` near
-   the top of the script in `index.html`. Until then, the buy buttons show as
+   the top of the script in `app.html`. Until then, the buy buttons show as
    "opens soon".
 4. Test with a real purchase in the store's test mode, then refund it.
 

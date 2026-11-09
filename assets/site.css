@@ -1,0 +1,127 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   Veer Tools — shared site styles (marketing pages: landing + product pages).
+   The tool apps (…/app.html) stay single-file and inline their own CSS, but
+   use the same tokens. See DESIGN.md before changing anything here.
+   ═══════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* surfaces — warm charcoal, never pure black */
+  --bg:#0f1114; --bg-2:#131519; --panel:#17191d; --panel-2:#1e2126; --line:#2c3037; --line-2:#3a3f47;
+  /* text — warm off-white */
+  --tx:#f2efe9; --tx-2:#a5a39e; --tx-3:#6f6e6a;
+  /* brand — the three colours of the Veer mark */
+  --red:#ef4037; --red-2:#bd222f; --orange:#f69322; --orange-hi:#ffa53d; --cream:#ffd9a1;
+  --grad:linear-gradient(96deg,var(--red) 0%,var(--orange) 62%,var(--cream) 100%);
+  --ok:#41c777; --warn:#f3d089;
+  /* type */
+  --display:"Archivo", "Segoe UI", system-ui, sans-serif;
+  --body:"Figtree", "Segoe UI", system-ui, -apple-system, sans-serif;
+  --mono:"JetBrains Mono", ui-monospace, Consolas, monospace;
+  /* scale */
+  --r-sm:8px; --r:12px; --r-lg:18px;
+  --wrap:1120px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){ html{scroll-behavior:auto} *{transition:none!important;animation:none!important} }
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.65 var(--body);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+img,svg,video,canvas{max-width:100%;display:block}
+a{color:inherit}
+:focus-visible{outline:2px solid var(--orange);outline-offset:3px;border-radius:4px}
+::selection{background:#f6932244}
+
+.wrap{max-width:var(--wrap);margin:0 auto;padding-left:max(20px,env(safe-area-inset-left,0px));padding-right:max(20px,env(safe-area-inset-right,0px))}
+
+/* ---------- type ---------- */
+h1,h2,h3,h4{font-family:var(--display);font-stretch:112%;font-weight:800;letter-spacing:-.02em;line-height:1.06;margin:0;text-wrap:balance}
+h1{font-size:clamp(2.4rem,6vw,4.4rem)}
+h2{font-size:clamp(1.8rem,3.6vw,2.7rem)}
+h3{font-size:1.25rem;letter-spacing:-.01em;line-height:1.2}
+p{margin:0}
+.lede{font-size:clamp(1.05rem,1.6vw,1.22rem);color:var(--tx-2);max-width:60ch;line-height:1.6}
+.grad{background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;padding-bottom:.06em}
+.eyebrow{font:500 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--orange)}
+.mono{font-family:var(--mono);font-size:.88em}
+.muted{color:var(--tx-2)}
+
+/* ---------- header ---------- */
+.site-head{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:#0f1114e6;backdrop-filter:saturate(140%) blur(10px);border-bottom:1px solid var(--line)}
+.site-head .wrap{display:flex;align-items:center;gap:22px;height:64px}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;font-family:var(--display);font-stretch:112%;font-weight:800;font-size:1.06rem;letter-spacing:-.01em}
+.brand svg{width:30px;height:25px}
+.brand span{color:var(--tx-2);font-weight:600}
+.nav{display:flex;gap:4px;margin-left:auto;align-items:center}
+.nav a{text-decoration:none;color:var(--tx-2);font-size:.92rem;font-weight:500;padding:8px 12px;border-radius:var(--r-sm)}
+.nav a:hover,.nav a[aria-current="page"]{color:var(--tx);background:var(--panel)}
+.nav .btn{margin-left:8px}
+@media (max-width:820px){ .nav a.hide-sm{display:none} }
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font:600 .95rem/1 var(--body);text-decoration:none;cursor:pointer;
+  padding:13px 20px;border-radius:10px;border:1px solid var(--line-2);background:var(--panel);color:var(--tx);transition:background .15s,border-color .15s,transform .15s}
+.btn:hover{border-color:var(--orange)}
+.btn-primary{background:var(--orange);border-color:var(--orange);color:#1a0f02}
+.btn-primary:hover{background:var(--orange-hi);border-color:var(--orange-hi);transform:translateY(-1px)}
+.btn-ghost{background:transparent}
+.btn-sm{padding:9px 14px;font-size:.88rem}
+.btn[aria-disabled="true"]{opacity:.5;pointer-events:none}
+
+/* ---------- sections ---------- */
+section{padding-block:clamp(64px,9vw,112px)}
+.section-head{display:flex;flex-direction:column;gap:14px;margin-bottom:clamp(32px,4vw,52px);max-width:720px}
+.rule{border:0;border-top:1px solid var(--line);margin:0}
+
+/* millimetre grid — the build plate, used sparingly behind heroes and product shots */
+.mm-grid{background-color:var(--bg);
+  background-image:
+    linear-gradient(#ffffff0a 1px,transparent 1px),linear-gradient(90deg,#ffffff0a 1px,transparent 1px),
+    linear-gradient(#ffffff05 1px,transparent 1px),linear-gradient(90deg,#ffffff05 1px,transparent 1px);
+  background-size:50px 50px,50px 50px,10px 10px,10px 10px}
+.glow{position:relative;isolation:isolate}
+.glow::before{content:"";position:absolute;inset:-20% -10% auto;height:520px;z-index:-1;pointer-events:none;
+  background:radial-gradient(600px 300px at 18% 0%,#ef403729,transparent 70%),radial-gradient(560px 280px at 82% 0%,#f6932222,transparent 70%)}
+
+/* ---------- cards & panels ---------- */
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:24px;display:flex;flex-direction:column;gap:12px;min-width:0}
+a.card{text-decoration:none;transition:border-color .15s,transform .15s}
+a.card:hover{border-color:var(--orange);transform:translateY(-2px)}
+.shot{border-radius:var(--r-lg);border:1px solid var(--line);overflow:hidden;background:var(--panel);box-shadow:0 30px 80px -30px #000c}
+.shot img{width:100%;height:auto}
+
+/* dimension callout — a technical annotation, like a drawing */
+.dim{display:inline-flex;align-items:center;gap:8px;font:500 .78rem/1 var(--mono);color:var(--tx-2);letter-spacing:.02em}
+.dim::before,.dim::after{content:"";width:18px;height:1px;background:var(--line-2)}
+
+.chip{display:inline-flex;align-items:center;gap:6px;font:500 .78rem/1 var(--mono);color:var(--tx-2);border:1px solid var(--line);border-radius:999px;padding:6px 10px;background:var(--bg-2)}
+.badge-pro{display:inline-block;font:700 .66rem/1 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--orange);border:1px solid #6b4a1d;border-radius:4px;padding:3px 5px;vertical-align:2px}
+
+/* ---------- pricing ---------- */
+.prices{display:grid;gap:16px;grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.price{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);padding:26px;display:flex;flex-direction:column;gap:14px}
+.price.feature{border-color:var(--orange);background:linear-gradient(180deg,#2a1d0e 0%,var(--panel) 55%)}
+.price .tier{font:600 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2)}
+.price.feature .tier{color:var(--orange)}
+.price .amt{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:2.6rem;letter-spacing:-.03em;line-height:1}
+.price .amt small{font:400 .9rem var(--body);color:var(--tx-2);letter-spacing:0;margin-left:6px}
+.price ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;color:var(--tx-2);font-size:.95rem;flex:1}
+.price li{padding-left:22px;position:relative}
+.price li::before{content:"";position:absolute;left:2px;top:.62em;width:9px;height:9px;border-radius:2px;background:var(--line-2)}
+.price.feature li::before{background:var(--orange)}
+
+/* ---------- FAQ ---------- */
+.faq{display:flex;flex-direction:column;border-top:1px solid var(--line)}
+.faq details{border-bottom:1px solid var(--line)}
+.faq summary{cursor:pointer;list-style:none;padding:20px 40px 20px 0;font-weight:600;font-size:1.05rem;position:relative}
+.faq summary::-webkit-details-marker{display:none}
+.faq summary::after{content:"+";position:absolute;right:4px;top:16px;font:400 1.5rem/1 var(--mono);color:var(--orange);transition:transform .2s}
+.faq details[open] summary::after{transform:rotate(45deg)}
+.faq details p{padding:0 0 22px;color:var(--tx-2);max-width:68ch}
+
+/* ---------- footer ---------- */
+.site-foot{border-top:1px solid var(--line);padding-block:48px 28px;color:var(--tx-2);font-size:.92rem}
+.site-foot .cols{display:grid;gap:32px;grid-template-columns:2fr repeat(3,1fr)}
+@media (max-width:760px){ .site-foot .cols{grid-template-columns:1fr 1fr} }
+.site-foot h4{font:600 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);margin-bottom:14px}
+.site-foot ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.site-foot a{text-decoration:none;color:var(--tx-2)} .site-foot a:hover{color:var(--tx)}
+.site-foot .base{margin-top:40px;padding-top:20px;border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;color:var(--tx-3);font-size:.84rem}

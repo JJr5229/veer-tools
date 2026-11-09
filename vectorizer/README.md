@@ -37,4 +37,4 @@ export with zero open or non-manifold edges.
 ## Licensing
 Same scheme as NFC Studio. See `nfc-studio/README.md` → *Free and Pro* and
 the top of `api/license.js`. Put the checkout link in `PRO.buyPro` in the
-script near the bottom of `index.html`.
+script near the bottom of `app.html`.
