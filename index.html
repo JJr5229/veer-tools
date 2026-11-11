@@ -3,167 +3,574 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Veer · Tools</title>
-<meta name="description" content="Production tools by Veer.">
+<title>Veer Tools · Logo, name or photo to print-ready STL files</title>
+<meta name="description" content="Browser tools for 3D-printing makers. Turn a logo into a multi-colour NFC card, a name into a light box, a PNG into an SVG, cookie cutter or plaque. Nothing is uploaded. Free to use; Pro is a one-time purchase.">
+<meta name="theme-color" content="#0f1114">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 79.9 66.6'%3E%3Cg transform='translate(-100.447,-44.954)'%3E%3Cpath transform='matrix(1,0,0,-1,125.672,87.0075)' d='M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0' fill='%23ef4037'/%3E%3Cpath transform='matrix(1,0,0,-1,145.9093,70.930309)' d='M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0' fill='%23bd222f'/%3E%3Cpath transform='matrix(1,0,0,-1,156.546,82.131008)' d='M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z' fill='%23f69322'/%3E%3C/g%3E%3C/svg%3E">
+
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Veer Tools">
+<meta property="og:title" content="Veer Tools: logo, name or photo to print-ready STL files">
+<meta property="og:description" content="NFC cards, light boxes, cookie cutters and plaques for Bambu Studio and the AMS. Runs in your browser, nothing uploaded. Free to use; Pro is a one-time purchase.">
+<meta property="og:image" content="/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A name sign light box reading “The Harlows, Est. 2024”, lit from behind, in Light Box Studio's preview.">
+<meta name="twitter:card" content="summary_large_image">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
 <style>
-:root{
-  --bg:#0f1114; --panel:#17191d; --panel2:#1e2126; --line:#2c3037;
-  --tx:#f2efe9; --tx2:#9b9a96;
-  --red:#ef4037; --red2:#bd222f; --orange:#f69322;
-}
-*{box-sizing:border-box}
-html,body{margin:0;min-height:100%}
-body{
-  background:var(--bg); color:var(--tx);
-  font:16px/1.6 "Segoe UI",system-ui,-apple-system,sans-serif;
-  -webkit-font-smoothing:antialiased;
-}
-.wrap{max-width:940px;margin:0 auto;padding:0 24px}
+/* ── landing page only; tokens come from /assets/site.css ── */
+:root{--tx-mute:#8a8984} /* small muted labels: ≥4.5:1 on --bg, quieter than --tx-2 */
+html{overflow-x:hidden}
+body{overflow-x:clip}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:12px;top:-60px;z-index:50;background:var(--orange);color:#1a0f02;padding:10px 14px;border-radius:8px;font-weight:600;text-decoration:none}
+.skip:focus{top:12px}
+.link{color:var(--tx);text-decoration:none;font-weight:600;border-bottom:1px solid var(--line-2);padding-bottom:2px;transition:border-color .15s,color .15s}
+.link:hover{border-color:var(--orange);color:var(--orange-hi)}
+.arrow::after{content:" →";font-family:var(--mono);font-weight:500}
+section[id]{scroll-margin-top:72px}
 
-/* ---- header ---- */
-header{
-  border-bottom:1px solid var(--line);
-  background:
-    radial-gradient(900px 320px at 12% -40%, rgba(239,64,55,.18), transparent 70%),
-    radial-gradient(700px 300px at 78% -50%, rgba(246,147,34,.14), transparent 70%);
-}
-.bar{display:flex;align-items:center;gap:12px;padding:26px 0 0}
-.bar svg{flex:none}
-.bar b{font-size:19px;letter-spacing:.2px}
-.hero{padding:44px 0 52px}
-h1{
-  margin:0 0 14px; font-size:clamp(30px,5.2vw,46px); line-height:1.12; letter-spacing:-.5px;
-  background:linear-gradient(96deg,var(--red) 0%,var(--orange) 62%,#ffd9a1 100%);
-  -webkit-background-clip:text; background-clip:text; color:transparent;
-  padding-bottom:.08em;
-}
-.hero p{margin:0;color:var(--tx2);max-width:60ch;font-size:17px}
+/* ── hero ── */
+.hero{padding-block:clamp(48px,7vw,96px) clamp(56px,8vw,104px);border-bottom:1px solid var(--line);overflow:hidden}
+.hero .wrap{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:clamp(32px,5vw,72px);align-items:center}
+.hero h1{font-size:clamp(2.2rem,4vw,3.4rem);margin-top:18px}
+.hero .lede{margin-top:22px;max-width:46ch}
+.cta{display:flex;gap:12px;flex-wrap:wrap;margin-top:30px}
+.facts{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 0;padding:0;list-style:none}
+.facts li{font:500 .76rem/1 var(--mono);color:var(--tx-2);border:1px solid var(--line);border-radius:999px;padding:7px 11px;background:#0f1114cc}
+.facts li b{color:var(--tx);font-weight:500}
 
-/* ---- tools ---- */
-main{padding:44px 0 72px}
-.eyebrow{
-  font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--tx2);
-  margin:0 0 16px;font-weight:600;
+.stage{position:relative;padding-bottom:31%;margin-right:-4%}
+.stage figure{margin:0}
+.stage .main{position:relative}
+.stage .main .shot{transform:rotate(.001deg)}
+.stage .card-shot{position:absolute;left:-7%;bottom:0;width:48%;z-index:2}
+.stage .card-shot .shot{border-color:var(--line-2);box-shadow:0 30px 60px -20px #000e,0 0 0 6px #0f1114}
+.stage figcaption{margin-top:12px;display:flex;justify-content:flex-end}
+.stage .card-shot figcaption{justify-content:flex-start}
+.stage .dim{font-size:.72rem;white-space:nowrap}
+.tag-on{position:absolute;top:12px;right:12px;font:600 .66rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--tx);background:#0f1114d9;border:1px solid var(--line-2);border-radius:6px;padding:6px 8px}
+@media (prefers-reduced-motion:no-preference){
+  .stage .main{animation:rise .9s cubic-bezier(.2,.7,.2,1) both}
+  .stage .card-shot{animation:rise .9s .18s cubic-bezier(.2,.7,.2,1) both}
+  @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 }
-.grid{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
-.card{
-  display:flex;flex-direction:column;gap:10px;
-  background:var(--panel); border:1px solid var(--line); border-radius:14px;
-  padding:22px; text-decoration:none; color:inherit;
-  transition:border-color .16s, transform .16s, background .16s;
-}
-a.card:hover{border-color:var(--orange);transform:translateY(-2px);background:var(--panel2)}
-.card h2{margin:0;font-size:17px;letter-spacing:-.1px}
-.card p{margin:0;color:var(--tx2);font-size:14px;line-height:1.55}
-.tags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto;padding-top:6px}
-.tag{
-  font-size:11px;color:var(--tx2);border:1px solid var(--line);
-  border-radius:999px;padding:2px 9px;background:var(--panel2);
-}
-.card .go{color:var(--orange);font-size:13px;font-weight:600}
-.card.soon{opacity:.55}
-.card.soon .go{color:var(--tx2)}
 
-/* ---- footer ---- */
-footer{border-top:1px solid var(--line);padding:26px 0 0;color:var(--tx2);font-size:13px}
-.powered{
-  background:#0b0d10;                /* page bg is #0f1114 — a few points darker */
-  margin-top:26px; padding:9px 0 10px;
-  font-size:.72rem; letter-spacing:.05em; color:#6f6e6a;
-  text-align:center; line-height:1.3;
+/* ── tools ── */
+.tools-head{display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap;margin-bottom:clamp(28px,4vw,44px)}
+.tools-head .section-head{margin:0;flex:1 1 520px;max-width:640px}
+.tool{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;min-width:0}
+.tool .body{padding:clamp(22px,3vw,34px);display:flex;flex-direction:column;gap:14px}
+.tool h3{font-size:clamp(1.5rem,2.4vw,2rem)}
+.tool .promise{font-size:1.08rem;color:var(--tx);max-width:42ch}
+.tool .eyebrow{color:var(--tx-2);line-height:1.5}
+.tool .pic{background:var(--bg-2);border-bottom:1px solid var(--line)}
+.tool .pic img{width:100%;height:auto}
+.out{margin:6px 0 0;display:grid;grid-template-columns:auto 1fr;gap:9px 18px;font-size:.94rem}
+.out dt{font:500 .72rem/1.9 var(--mono);letter-spacing:.1em;text-transform:uppercase;color:var(--tx-mute)}
+.out dd{margin:0;color:var(--tx-2)}
+.out code,.mono-in{font-family:var(--mono);font-size:.86em;color:var(--tx)}
+.tool .actions{display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:auto;padding-top:10px}
+
+.tool.lead{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,7fr)}
+.tool.lead .pic{border-bottom:0;border-left:1px solid var(--line);display:flex;align-items:center;padding:0;order:2}
+.tool.lead .body{justify-content:center}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:16px}
+.pair .tool{display:flex;flex-direction:column}
+.pair .tool .body{flex:1}
+.pair .pic{aspect-ratio:16/10;display:grid;place-items:center;padding:clamp(14px,2.4vw,26px)}
+.pair .pic img{width:auto;max-width:100%;max-height:100%;border-radius:10px;border:1px solid var(--line);box-shadow:0 20px 50px -24px #000}
+
+/* ── how it works ── */
+.how{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--bg-2)}
+.how .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,5vw,72px);align-items:center}
+.steps{list-style:none;margin:30px 0 0;padding:0;counter-reset:s;display:flex;flex-direction:column}
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px 1fr;gap:4px 16px;padding:20px 0;border-top:1px solid var(--line)}
+.steps li:last-child{border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);grid-row:span 2;width:30px;height:30px;border-radius:50%;border:1px solid var(--orange);color:var(--orange);display:grid;place-items:center;font:600 .82rem/1 var(--mono);margin-top:1px}
+.steps h3{font-size:1.08rem}
+.steps p{color:var(--tx-2);font-size:.97rem;max-width:52ch}
+.how figure{margin:0}
+.how figcaption{margin-top:14px;color:var(--tx-mute);font:500 .76rem/1.5 var(--mono)}
+
+/* ── built for selling ── */
+.sell-grid{display:grid;grid-template-columns:repeat(12,minmax(0,1fr));gap:clamp(20px,3vw,32px) clamp(20px,3vw,40px)}
+.sell-grid figure{margin:0}
+.sell-grid figcaption{margin-top:14px}
+.sell-grid h3{font-size:1.15rem;margin-bottom:6px}
+.sell-grid p{color:var(--tx-2);max-width:48ch}
+.s-proof{grid-column:1 / span 7}
+.s-batch{grid-column:8 / span 5;align-self:center;display:flex;flex-direction:column;gap:14px}
+.s-cutter{grid-column:1 / span 5;grid-row:2;align-self:center;display:flex;flex-direction:column;gap:14px}
+.s-cutter-img{grid-column:6 / span 7;grid-row:2}
+.s-license{grid-column:1 / -1;grid-row:3;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:12px 40px;border-top:1px solid var(--line);padding-top:clamp(24px,3vw,36px);margin-top:8px}
+.namelist{margin:0;font:500 .86rem/1.75 var(--mono);color:var(--tx);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r);padding:14px 18px;position:relative}
+.namelist span{color:var(--tx-3)}
+.namelist::before{content:"Batch names · one per line";display:block;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;color:var(--tx-mute);margin-bottom:6px}
+.arrowline{font:500 .82rem/1.6 var(--mono);color:var(--tx-2)}
+.arrowline b{color:var(--orange);font-weight:500}
+
+/* ── pricing ── */
+.pricing{border-top:1px solid var(--line)}
+.ptable{width:100%;border-collapse:separate;border-spacing:0;font-size:.95rem}
+.ptable th,.ptable td{text-align:left;vertical-align:top;padding:22px 20px;border-top:1px solid var(--line)}
+.ptable thead th{border-top:0;padding-top:0;padding-bottom:14px;font:600 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-mute)}
+.ptable thead th.pro-col{color:var(--orange)}
+.ptable tbody th{width:24%;padding-left:0}
+.ptable tbody th a{text-decoration:none;font-family:var(--display);font-stretch:112%;font-weight:800;font-size:1.2rem;letter-spacing:-.01em}
+.ptable tbody th a:hover{color:var(--orange-hi)}
+.ptable tbody th p{font-weight:400;color:var(--tx-mute);font-size:.88rem;margin-top:6px;max-width:26ch}
+.ptable td.pro-col{background:#f693220a;border-left:1px solid #f6932233;border-right:1px solid #f6932233}
+.ptable tbody tr:last-child td.pro-col{border-bottom:1px solid #f6932233}
+.amt{font-family:var(--display);font-stretch:112%;font-weight:800;font-size:1.9rem;letter-spacing:-.03em;line-height:1;display:block}
+.amt small{font:500 .74rem var(--mono);color:var(--tx-mute);letter-spacing:.04em;margin-left:6px;vertical-align:4px}
+.ptable td p{color:var(--tx-2);margin:10px 0 16px;max-width:30ch;font-size:.92rem}
+.ptable td.none{color:var(--tx-mute);font:500 .8rem/1.6 var(--mono)}
+.bundle{margin-top:28px;display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap;border:1px dashed var(--line-2);border-radius:var(--r-lg);padding:22px 24px}
+.bundle h3{font-size:1.15rem}
+.bundle p{color:var(--tx-2);margin-top:4px}
+.fine{margin-top:18px;font:500 .78rem/1.7 var(--mono);color:var(--tx-mute)}
+
+/* ── privacy ── */
+.privacy{background:var(--bg-2);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.privacy .wrap{display:grid;grid-template-columns:minmax(0,5fr) minmax(0,6fr);gap:clamp(32px,5vw,72px);align-items:start}
+.where{display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;background:var(--panel)}
+.where > div{padding:24px}
+.where > div + div{border-left:1px solid var(--line)}
+.where h3{font:600 .72rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-2);margin-bottom:16px}
+.where .here h3{color:var(--ok)}
+.where ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:9px;color:var(--tx-2);font-size:.95rem}
+.where li{padding-left:18px;position:relative}
+.where li::before{content:"";position:absolute;left:0;top:.62em;width:7px;height:7px;border-radius:2px;background:var(--line-2)}
+.where .here li::before{background:var(--ok)}
+.where .note{grid-column:1 / -1;border-left:0;border-top:1px solid var(--line);font-size:.9rem;color:var(--tx-2);padding:16px 24px}
+
+/* ── faq ── */
+.faq-wrap{display:grid;grid-template-columns:minmax(0,4fr) minmax(0,8fr);gap:clamp(28px,5vw,72px)}
+.faq-wrap .section-head{position:sticky;top:96px;align-self:start}
+.faq details p + p{margin-top:-10px}
+.faq a{color:var(--tx)}
+
+/* ── studio ── */
+.studio{padding-block:0 clamp(64px,9vw,112px)}
+.studio-box{display:flex;justify-content:space-between;align-items:center;gap:24px 40px;flex-wrap:wrap;border-top:1px solid var(--line);padding-top:clamp(36px,5vw,56px)}
+.studio-box > div{max-width:640px}
+.studio-box p{color:var(--tx-2);max-width:56ch;margin-top:10px}
+.studio-box h2{font-size:clamp(1.4rem,2.6vw,1.9rem)}
+
+/* ── responsive ── */
+@media (max-width:980px){
+  .hero .wrap,.how .wrap,.privacy .wrap{grid-template-columns:1fr}
+  .stage{max-width:680px;padding-bottom:28%;margin:0 0 0 6%}
+  .tool.lead{grid-template-columns:1fr}
+  .tool.lead .pic{order:0;border-left:0;border-bottom:1px solid var(--line)}
+  .faq-wrap{grid-template-columns:1fr}
+  .faq-wrap .section-head{position:static}
 }
-.powered a{color:#9b9a96;font-weight:600;text-decoration:none}
-.powered a:hover{color:#fff}
-footer a{color:var(--orange);text-decoration:none}
-footer a:hover{text-decoration:underline}
-.note{
-  margin-top:34px;border:1px solid var(--line);border-left:3px solid var(--orange);
-  background:var(--panel);border-radius:0 10px 10px 0;padding:14px 18px;
-  color:var(--tx2);font-size:14px;
+@media (max-width:860px){
+  .pair{grid-template-columns:1fr}
+  .s-proof,.s-batch,.s-cutter,.s-cutter-img,.s-license{grid-column:1 / -1}
+  .s-cutter,.s-cutter-img,.s-license{grid-row:auto}
+  .s-license{grid-template-columns:1fr}
+  /* pricing table → stacked blocks */
+  .ptable thead{display:none}
+  .ptable,.ptable tbody,.ptable tr,.ptable th,.ptable td{display:block;width:auto}
+  .ptable tbody th{width:auto}
+  .ptable tbody th p{max-width:none}
+  .ptable tbody tr{border:1px solid var(--line);border-radius:var(--r-lg);margin-bottom:16px;overflow:hidden;background:var(--panel)}
+  .ptable tbody th{padding:20px 20px 4px;border-top:0}
+  .ptable td{padding:16px 20px;display:grid;grid-template-columns:110px 1fr;gap:4px 14px;align-items:start}
+  .ptable td::before{content:attr(data-tier);font:600 .7rem/2.4 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-mute);grid-row:span 3}
+  .ptable td.pro-col::before{color:var(--orange)}
+  .ptable td.pro-col{border-left:0;border-right:0;border-bottom:0!important}
+  .ptable td p{margin:6px 0 12px}
+  .ptable td .btn{justify-self:start}
+  .ptable td.none{display:none}
 }
-@media (max-width:560px){ .hero{padding:32px 0 38px} main{padding:32px 0 56px} }
+@media (max-width:560px){
+  .stage{margin:0;padding-bottom:0}
+  .stage .card-shot{position:relative;left:auto;width:58%;margin:-5% -2% 0 auto}
+  .stage .main figcaption{display:none}
+  .stage .main figcaption{justify-content:flex-start}
+  .stage .card-shot figcaption{justify-content:flex-end}
+  .where{grid-template-columns:1fr}
+  .where > div + div{border-left:0;border-top:1px solid var(--line)}
+  .out{grid-template-columns:1fr;gap:2px}
+  .out dd{margin-bottom:8px}
+  .ptable td{grid-template-columns:1fr}
+  .ptable td::before{grid-row:auto;line-height:1}
+  .cta .btn{flex:1 1 auto}
+  .tag-on{top:8px;right:8px}
+}
 </style>
 </head>
 <body>
+<a class="skip" href="#main">Skip to content</a>
 
-<header>
+<header class="site-head">
   <div class="wrap">
-    <div class="bar">
-      <svg viewBox="0 0 79.9 66.6" width="30" height="25" aria-label="Veer">
-        <g transform="translate(-100.447,-44.954)">
-        <path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/>
-        <path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/>
-        <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
-        </g>
-      </svg>
-      <b>Veer</b>
-    </div>
-    <div class="hero">
-      <h1>Tools</h1>
-      <p>Production tools, built in-house. Everything runs entirely in your
-         browser — nothing you load is uploaded anywhere.</p>
-    </div>
+    <a class="brand" href="/" aria-label="Veer Tools home">
+      <svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      Veer <span>Tools</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="/nfc-studio/">NFC Studio</a>
+      <a class="hide-sm" href="/vectorizer/">Vectorizer</a>
+      <a class="hide-sm" href="/lightbox/">Light Box Studio</a>
+      <a class="hide-sm" href="/#pricing">Pricing</a>
+      <a class="btn btn-primary btn-sm" href="/#tools">Open a tool</a>
+    </nav>
   </div>
 </header>
 
-<main>
+<main id="main">
+
+<!-- ════════ HERO ════════ -->
+<section class="hero mm-grid glow" aria-labelledby="hero-title">
   <div class="wrap">
-    <p class="eyebrow">Available</p>
-    <div class="grid">
+    <div>
+      <p class="eyebrow">Browser tools for 3D-printing makers</p>
+      <h1 id="hero-title">Turn a logo, a name or a photo into <span class="grad">print&#8209;ready STL&nbsp;files.</span></h1>
+      <p class="lede">NFC business cards, lit name signs, cookie cutters and multi-colour plaques. Each part comes out as its own STL, sized in millimetres, ready for the AMS in Bambu Studio.</p>
+      <div class="cta">
+        <a class="btn btn-primary" href="#tools">Choose a tool</a>
+        <a class="btn btn-ghost" href="#pricing">See pricing</a>
+      </div>
+      <ul class="facts" aria-label="At a glance">
+        <li><b>Runs in your browser</b></li>
+        <li>Nothing uploaded</li>
+        <li>Free to use</li>
+        <li>Pro from <b>$19</b>, once</li>
+      </ul>
+    </div>
 
-      <a class="card" href="./nfc-studio/">
-        <h2>NFC Studio</h2>
-        <p>Turn a logo into print-ready multi-colour STLs for NFC business cards
-           and keychains — colour separation, vector tracing, a sealed tag
-           cavity and a keyring hole. Exports straight into Bambu Studio.</p>
-        <div class="tags">
-          <span class="tag">3D printing</span>
-          <span class="tag">NFC</span>
-          <span class="tag">Bambu Studio</span>
+    <div class="stage">
+      <figure class="main">
+        <div class="shot">
+          <img src="img/lightbox-hero.webp" width="1800" height="841" fetchpriority="high"
+               alt="Light Box Studio's lit preview of a name sign reading “The Harlows, Est. 2024” in an elegant script, glowing warm white inside a dark frame.">
         </div>
-        <span class="go">Open →</span>
-      </a>
-
-      <a class="card" href="./vectorizer/">
-        <h2>Vectorizer</h2>
-        <p>Turn a PNG or JPG logo into a crisp, infinitely scalable SVG.
-           Drag it in, tune colors and detail with live preview, download —
-           tracing runs entirely in your browser.</p>
-        <div class="tags">
-          <span class="tag">SVG</span>
-          <span class="tag">Logos</span>
-          <span class="tag">Vector tracing</span>
+        <span class="tag-on" aria-hidden="true">Light Box Studio</span>
+        <figcaption><span class="dim">180 × 80 × 40 mm · name sign</span></figcaption>
+      </figure>
+      <figure class="card-shot">
+        <div class="shot">
+          <img src="img/nfc-studio-card.webp" width="1400" height="931" loading="eager"
+               alt="NFC Studio's card face view: a three-colour mountain badge logo centred on a credit-card-sized NFC card.">
         </div>
-        <span class="go">Open →</span>
-      </a>
+        <figcaption><span class="dim">85.6 × 54 mm · 4 filaments</span></figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
 
-      <div class="card soon">
-        <h2>More coming</h2>
-        <p>This page grows as tools get built. Each one is a self-contained
-           page — drop in a folder, push, done.</p>
-        <div class="tags"><span class="tag">placeholder</span></div>
-        <span class="go">In progress</span>
+<!-- ════════ TOOLS ════════ -->
+<section id="tools" aria-labelledby="tools-title">
+  <div class="wrap">
+    <div class="tools-head">
+      <div class="section-head">
+        <p class="eyebrow">The tools</p>
+        <h2 id="tools-title">Three tools, each built for one kind of print.</h2>
+      </div>
+      <p class="muted" style="max-width:38ch">Every tool is free to try with nothing to install. Open it, drop in your artwork, and see the result before you pay for anything.</p>
+    </div>
+
+    <article class="tool lead" aria-labelledby="t-nfc">
+      <div class="pic">
+        <img src="img/nfc-studio-app.webp" width="2000" height="1250" loading="lazy"
+             alt="NFC Studio with a three-colour badge logo loaded: artwork and colour controls on the left listing AMS slots 1 to 4, and the card face preview at 85.6 by 54 millimetres on the right.">
+      </div>
+      <div class="body">
+        <p class="eyebrow">For NFC business cards and keychains</p>
+        <h3 id="t-nfc">NFC Studio</h3>
+        <p class="promise">Drop in a logo. Get a multi-colour card with a sealed pocket for the NFC tag and the exact layer to pause on.</p>
+        <dl class="out">
+          <dt>Files</dt><dd><code>1_card.stl</code> plus one STL per logo colour, one origin</dd>
+          <dt>Shapes</dt><dd>Card <span class="mono-in">85.6 × 54</span>, pill, disc, keytags from <span class="mono-in">35 mm</span>, keyring hole</dd>
+          <dt>Colours</dt><dd>Up to 4 filaments on one AMS; company text as real geometry</dd>
+        </dl>
+        <div class="actions">
+          <a class="btn btn-primary" href="/nfc-studio/app.html">Open NFC Studio</a>
+          <a class="link arrow" href="/nfc-studio/">How it works</a>
+        </div>
+      </div>
+    </article>
+
+    <div class="pair">
+      <article class="tool" aria-labelledby="t-vec">
+        <div class="pic">
+          <img src="img/vectorizer-trace.webp" width="1800" height="792" loading="lazy"
+               alt="Vectorizer showing the original PNG badge on the left and the traced three-colour SVG on the right: 107 paths, 17 KB.">
+        </div>
+        <div class="body">
+          <p class="eyebrow">For cutters, stamps, stencils and lasers</p>
+          <h3 id="t-vec">Vectorizer</h3>
+          <p class="promise">PNG or JPG in, clean SVG out. Then make it a cookie cutter, a stamp, a stencil or a plaque.</p>
+          <dl class="out">
+            <dt>Free</dt><dd>Unlimited SVG with background removal</dd>
+            <dt>Pro</dt><dd>SVG at real size in mm with colour layers, DXF R12, batch, and STL for 3D prints</dd>
+          </dl>
+          <div class="actions">
+            <a class="btn btn-primary" href="/vectorizer/app.html">Open Vectorizer</a>
+            <a class="link arrow" href="/vectorizer/">How it works</a>
+          </div>
+        </div>
+      </article>
+
+      <article class="tool" aria-labelledby="t-lb">
+        <div class="pic">
+          <img src="img/lightbox-app.webp" width="2000" height="1250" loading="lazy"
+               alt="Light Box Studio with the name “The Harlows” and “Est. 2024” typed in, the Great Vibes font selected and a lit preview of the 180 by 80 millimetre sign.">
+        </div>
+        <div class="body">
+          <p class="eyebrow">For name signs, gifts and photo lamps</p>
+          <h3 id="t-lb">Light Box Studio</h3>
+          <p class="promise">Type a name, or drop a logo or photo. Get the frame, a glowing front and a back panel that hangs on the wall.</p>
+          <dl class="out">
+            <dt>Parts</dt><dd>Frame, front (colour inlay or lithophane), back with USB cable hole and keyholes</dd>
+            <dt>Sizes</dt><dd><span class="mono-in">180 × 80</span> name sign, square, wide, 6 × 4 in photo, or custom</dd>
+          </dl>
+          <div class="actions">
+            <a class="btn btn-primary" href="/lightbox/app.html">Open Light Box Studio</a>
+            <a class="link arrow" href="/lightbox/">How it works</a>
+          </div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ HOW IT WORKS ════════ -->
+<section class="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-title" style="margin-top:14px">From artwork to the build plate in three steps.</h2>
+      <ol class="steps">
+        <li><h3>Drop in your artwork</h3><p>A PNG, JPG, SVG or WebP logo, a photo, or just a name typed in. The tool separates the colours and traces real vector outlines, not pixel stairs.</p></li>
+        <li><h3>Tune it in the live preview</h3><p>Pick colours per AMS slot, set the size in millimetres, move the art, add text. The 2D and 3D previews update as you go.</p></li>
+        <li><h3>Download and print</h3><p>You get one watertight STL per filament. Drag them all into Bambu Studio or OrcaSlicer, load them as one object with multiple parts, and pick a filament for each.</p></li>
+      </ol>
+    </div>
+    <figure>
+      <div class="shot">
+        <img src="img/nfc-studio-build.webp" width="1800" height="1448" loading="lazy"
+             alt="NFC Studio after Build mesh: a 3D preview of the card, a note that the sealed tag needs a pause at Z 1.40 millimetres after layer 7, and the list of parts with their filament slots.">
+      </div>
+      <figcaption>NFC Studio after “Build mesh”: 4 parts, and the exact layer to pause on so you can drop in the NFC tag.</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ════════ BUILT FOR SELLING ════════ -->
+<section aria-labelledby="sell-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Built for selling</p>
+      <h2 id="sell-title">Made for people who sell what they print.</h2>
+      <p class="lede">Personalised light boxes, NFC cards and cookie cutters are steady sellers on Etsy and at craft fairs. The tools handle the slow parts of an order.</p>
+    </div>
+
+    <div class="sell-grid">
+      <figure class="s-proof">
+        <div class="shot">
+          <img src="img/lightbox-proof.webp" width="1600" height="1200" loading="lazy"
+               alt="The proof image Light Box Studio exports for a customer: a lit name sign reading “Mason &amp; Ruby” in teal script on a warm dark background.">
+        </div>
+        <figcaption><span class="dim">Proof PNG, as exported</span></figcaption>
+      </figure>
+
+      <div class="s-batch">
+        <h3>Proof images for the customer</h3>
+        <p>Send a lit mock-up for approval before you start a four-hour print. One click, one PNG.</p>
+        <h3 style="margin-top:12px">Batch names</h3>
+        <p>Paste the names from your orders, one per line.</p>
+        <pre class="namelist" aria-label="Example batch list">Olivia
+The Harlows
+Mason &amp; Ruby <span>…</span></pre>
+        <p class="arrowline"><b>→</b> one shared frame and back, a front for every name, a proof PNG for each.</p>
       </div>
 
-    </div>
+      <figure class="s-cutter-img">
+        <div class="shot">
+          <img src="img/vectorizer-cutter.webp" width="1800" height="1305" loading="lazy"
+               alt="Vectorizer's Print it in 3D panel in cookie cutter mode: a scalloped heart outline with a 1 mm cutting wall and a 3.5 mm flange, 76.6 by 69.3 by 15 millimetres.">
+        </div>
+      </figure>
 
-    <div class="note">
-      <strong style="color:var(--tx)">Private by design.</strong> These tools do
-      all their work locally in your browser. Logos, images and generated files
-      never leave your machine — there's no upload, no account and no server
-      doing the processing.
+      <div class="s-cutter">
+        <h3>Cookie cutters, stamps and stencils</h3>
+        <p>Turn a customer's drawing into a cutter with a flange that prints flat on the bed. Stencils get bridges added so the middle of an O doesn't fall out.</p>
+        <p class="arrowline"><b>→</b> STL in millimetres, mirrored where needed.</p>
+      </div>
+
+      <div class="s-license">
+        <div>
+          <h3>A Commercial license when it's your business</h3>
+          <p>Pro is for your own prints. If you sell what you make with NFC Studio or Light Box Studio, the Commercial license covers it. One payment, no royalties, no per-sale fees.</p>
+        </div>
+        <div>
+          <h3>Clean backs on paid plans</h3>
+          <p>The free plan debosses a small “MADE WITH VEER” on the back of each part. Pro and Commercial leave it off, so what you ship carries only your brand.</p>
+        </div>
+      </div>
     </div>
   </div>
+</section>
+
+<!-- ════════ PRICING ════════ -->
+<section id="pricing" class="pricing" aria-labelledby="pricing-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Pricing</p>
+      <h2 id="pricing-title">Free to use. Pay once if you need more.</h2>
+      <p class="lede">Each tool works for free with no account. Pro is a one-time purchase per tool that unlocks with a license key. No subscription.</p>
+    </div>
+
+    <table class="ptable">
+      <caption class="sr">Prices per tool: Free, Pro and Commercial</caption>
+      <thead>
+        <tr><th scope="col"><span class="sr">Tool</span></th><th scope="col">Free</th><th scope="col" class="pro-col">Pro</th><th scope="col">Commercial</th></tr>
+      </thead>
+      <tbody>
+        <tr>
+          <th scope="row"><a href="/nfc-studio/">NFC Studio</a><p>Logo to multi-colour NFC cards and keychains</p></th>
+          <td data-tier="Free"><span class="amt">$0</span><p>1–2 logo colours. Small “MADE WITH VEER” on the back.</p><a class="btn btn-sm" href="/nfc-studio/app.html">Open free</a></td>
+          <td data-tier="Pro" class="pro-col"><span class="amt">$29<small>one-time</small></span><p>Up to 4 colours, company info text, no mark.</p><a class="btn btn-primary btn-sm" href="/nfc-studio/app.html" data-checkout="nfc-pro" data-fallback="/nfc-studio/app.html">Get Pro</a></td>
+          <td data-tier="Commercial"><span class="amt">$79<small>one-time</small></span><p>Everything in Pro, plus the right to sell your prints.</p><a class="btn btn-sm" href="/nfc-studio/app.html" data-checkout="nfc-commercial" data-fallback="/nfc-studio/app.html">Get Commercial</a></td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="/vectorizer/">Vectorizer</a><p>PNG/JPG to SVG, DXF and printable STL</p></th>
+          <td data-tier="Free"><span class="amt">$0</span><p>Unlimited PNG/JPG to SVG, background removal. 3D preview.</p><a class="btn btn-sm" href="/vectorizer/app.html">Open free</a></td>
+          <td data-tier="Pro" class="pro-col"><span class="amt">$19<small>one-time</small></span><p>Real-size SVG with colour layers, one SVG per colour, DXF, batch, STL download.</p><a class="btn btn-primary btn-sm" href="/vectorizer/app.html" data-checkout="vectorizer-pro" data-fallback="/vectorizer/app.html">Get Pro</a></td>
+          <td data-tier="Commercial" class="none"><span aria-hidden="true">—</span><span class="sr">No Commercial tier for Vectorizer</span></td>
+        </tr>
+        <tr>
+          <th scope="row"><a href="/lightbox/">Light Box Studio</a><p>Names, logos and photos to light boxes</p></th>
+          <td data-tier="Free"><span class="amt">$0</span><p>Text names in 9 fonts. Small mark on the back panel.</p><a class="btn btn-sm" href="/lightbox/app.html">Open free</a></td>
+          <td data-tier="Pro" class="pro-col"><span class="amt">$29<small>one-time</small></span><p>Logos, photo lithophanes, batch names, no mark.</p><a class="btn btn-primary btn-sm" href="/lightbox/app.html" data-checkout="lightbox-pro" data-fallback="/lightbox/app.html">Get Pro</a></td>
+          <td data-tier="Commercial"><span class="amt">$79<small>one-time</small></span><p>Everything in Pro, plus the right to sell what you print.</p><a class="btn btn-sm" href="/lightbox/app.html" data-checkout="lightbox-commercial" data-fallback="/lightbox/app.html">Get Commercial</a></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="bundle">
+      <div>
+        <h3>Veer Pro bundle: coming soon</h3>
+        <p>Every tool, plus the ones we build next, under one license.</p>
+      </div>
+      <a class="btn btn-sm" data-checkout="veer-pro" aria-disabled="true">Coming soon</a>
+    </div>
+    <p class="fine">Prices in USD. Pro and Commercial are per tool and unlock in the browser you enter the key in.</p>
+  </div>
+</section>
+
+<!-- ════════ PRIVACY ════════ -->
+<section class="privacy" aria-labelledby="privacy-title">
+  <div class="wrap">
+    <div class="section-head" style="margin:0">
+      <p class="eyebrow">No uploads</p>
+      <h2 id="privacy-title">Your artwork never leaves your computer.</h2>
+      <p class="lede">A customer's logo or a family photo is not ours to keep. So the tools don't send it anywhere: the tracing, the colour separation and the 3D mesh are all computed in your browser.</p>
+    </div>
+    <div class="where">
+      <div class="here">
+        <h3>On your machine</h3>
+        <ul>
+          <li>Your images, names and text</li>
+          <li>Colour separation and tracing</li>
+          <li>3D meshes and STL / SVG / DXF files</li>
+          <li>Proof images</li>
+        </ul>
+      </div>
+      <div>
+        <h3>Sent to us</h3>
+        <ul>
+          <li>Your license key, when you unlock Pro and when it re-checks</li>
+          <li>Nothing else</li>
+        </ul>
+      </div>
+      <p class="note">No account, no sign-in, no cloud storage. Close the tab and your work is gone from everywhere but your Downloads folder.</p>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ FAQ ════════ -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="wrap faq-wrap">
+    <div class="section-head">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title">Questions makers ask.</h2>
+    </div>
+    <div class="faq">
+      <details open>
+        <summary>Does it work with my printer and slicer?</summary>
+        <p>The files are standard STL in millimetres, so any slicer opens them. The multi-colour tools give you one STL per filament. In Bambu Studio or OrcaSlicer, select them all, drag them onto the plate together and answer yes to “load as a single object with multiple parts”, then pick a filament for each part. The tools are made with Bambu printers and the AMS in mind, but any multi-material setup works the same way.</p>
+      </details>
+      <details>
+        <summary>What's the difference between Pro and Commercial?</summary>
+        <p>The features are the same. Pro is for your own prints: your business cards, gifts, things for friends. Commercial adds the right to sell what you print, for example light boxes or NFC cards on Etsy or at markets.</p>
+      </details>
+      <details>
+        <summary>Is it a subscription?</summary>
+        <p>No. Pro and Commercial are one-time purchases per tool. You get a license key, enter it once in the tool, and it stays unlocked.</p>
+      </details>
+      <details>
+        <summary>Does it work offline?</summary>
+        <p>Yes. All the work happens in your browser, so once a tool has loaded it doesn't need the internet. A Pro unlock is stored in your browser and keeps working offline; it re-checks the key now and then when you're back online.</p>
+      </details>
+      <details>
+        <summary>Do I need an account?</summary>
+        <p>No. There's nothing to sign up for. Open a tool and start.</p>
+      </details>
+      <details>
+        <summary>Which browser should I use?</summary>
+        <p>A recent Chrome or Edge on a laptop or desktop works best. The 3D preview uses WebGL, which every current desktop browser supports.</p>
+      </details>
+      <details>
+        <summary>Can I get a refund?</summary>
+        <p>Contact us within 14 days if a tool doesn't work for you. You can reach us on Instagram at <a href="https://instagram.com/getveer">@getveer</a> or through <a href="https://veersolutions.com">veersolutions.com</a>.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ════════ STUDIO ════════ -->
+<section class="studio" aria-labelledby="studio-title">
+  <div class="wrap">
+    <div class="studio-box">
+      <div>
+        <p class="eyebrow">From the studio</p>
+        <h2 id="studio-title" style="margin-top:12px">Veer also builds websites and marketing for small businesses.</h2>
+        <p>The same people who make these tools design sites, run campaigns and make ads for shops and makers. If your print business needs a proper home online, talk to us.</p>
+      </div>
+      <a class="btn" href="https://veersolutions.com">Visit veersolutions.com</a>
+    </div>
+  </div>
+</section>
+
 </main>
 
-<footer>
+<footer class="site-foot">
   <div class="wrap">
-    Veer · <a href="https://veersolutions.com">veersolutions.com</a>
-  </div>
-  <div class="powered">
-    <div class="wrap">Powered by <a href="https://veersolutions.com" rel="noopener">Veer</a></div>
+    <div class="cols">
+      <div>
+        <a class="brand" href="/"><svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg> Veer <span>Tools</span></a>
+        <p style="margin-top:14px;max-width:34ch">Browser tools for makers, from Veer, a digital studio for small businesses. Everything runs on your machine.</p>
+      </div>
+      <div><h4>Tools</h4><ul><li><a href="/nfc-studio/">NFC Studio</a></li><li><a href="/vectorizer/">Vectorizer</a></li><li><a href="/lightbox/">Light Box Studio</a></li></ul></div>
+      <div><h4>Veer</h4><ul><li><a href="https://veersolutions.com">Websites &amp; marketing</a></li><li><a href="https://instagram.com/getveer">Instagram @getveer</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="/#faq">FAQ</a></li><li><a href="/#pricing">Pricing &amp; licenses</a></li></ul></div>
+    </div>
+    <div class="base"><span>© 2026 Veer</span><span>No uploads. No accounts. Your files stay yours.</span></div>
   </div>
 </footer>
 
+<script src="/assets/checkout.js" defer></script>
 </body>
 </html>

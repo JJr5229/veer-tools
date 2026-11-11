@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Light Box Studio · 3D-printable name lights, lithophanes and logo signs · Veer Tools</title>
+<meta name="description" content="Turn a name, a logo or a pet photo into a 3D-printable light box: frame, white diffuser front and back panel with cable hole and keyholes. Batch your Etsy orders and send each customer a lit proof. Runs in your browser.">
+<meta name="theme-color" content="#0f1114">
+<meta property="og:type" content="product">
+<meta property="og:site_name" content="Veer Tools">
+<meta property="og:title" content="Light Box Studio: names, logos and photos that glow">
+<meta property="og:description" content="A name, a logo or a pet photo in. STL files for a frame, a white diffuser front and a back panel out, plus a lit proof to send your customer.">
+<meta property="og:image" content="/lightbox/img/og.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="A 3D-printed light box reading “Olivia” in script, lit warm white">
+<meta name="twitter:card" content="summary_large_image">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+/* ── Light Box Studio product page. Tokens come from /assets/site.css. ── */
+.skip{position:absolute;left:12px;top:-60px;z-index:50;background:var(--orange);color:#1a0f02;padding:10px 14px;border-radius:8px;font-weight:600;text-decoration:none}
+.skip:focus{top:12px}
+main section[id]{scroll-margin-top:80px}
+.split{display:grid;gap:clamp(28px,5vw,64px);align-items:center}
+@media (min-width:960px){ .split{grid-template-columns:minmax(0,5fr) minmax(0,7fr)} .split.flip{grid-template-columns:minmax(0,7fr) minmax(0,5fr)} }
+figure{margin:0}
+figcaption{font:500 .78rem/1.5 var(--mono);color:var(--tx-2);margin-top:12px;letter-spacing:.01em}
+figcaption b{color:var(--tx);font-weight:500}
+.shot img{aspect-ratio:auto}
+
+/* hero */
+.hero,.cta{overflow:clip}
+/* site.css's ".nav a" colour outranks ".btn-primary", which leaves the header button's label orange on orange */
+.site-head .nav a.btn-primary{color:#1a0f02}
+.hero{padding-block:clamp(40px,7vw,88px) clamp(56px,8vw,104px);border-bottom:1px solid var(--line)}
+.hero .copy{display:flex;flex-direction:column;gap:22px}
+.hero h1{font-size:clamp(2.4rem,9vw,3.3rem)}
+.hero h1 .ln{display:block}
+/* each line is ~9.3× the font size wide; at ≥960px the column is ~(100vw − 110px)/2, so 4.6vw keeps both lines on one row */
+@media (min-width:960px){ .hero .split{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} .hero h1{font-size:min(4.6vw,3.3rem)} .hero h1 .ln{white-space:nowrap} }
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:6px}
+.hero .small{font:500 .8rem/1.6 var(--mono);color:var(--tx-2)}
+.hero .small span{color:var(--tx)}
+.hero-shot .shot{position:relative}
+.hero-shot .shot{background:#1f1a15}
+/* technical dimension lines drawn over the proof image (box spans 6.9–93.1% × 24.4–75.4%) */
+.dl{position:absolute;font:500 .72rem/1 var(--mono);color:#e9dcc6;pointer-events:none}
+.dl-w{left:6.9%;right:6.9%;top:82%;height:1px;background:#e9dcc699}
+.dl-w::before,.dl-w::after{content:"";position:absolute;top:-5px;width:1px;height:11px;background:#e9dcc6}
+.dl-w::before{left:0} .dl-w::after{right:0}
+.dl-w span{position:absolute;left:50%;top:-.5em;transform:translateX(-50%);background:#2a241d;padding:0 8px}
+.dl-h{right:2.6%;top:24.4%;bottom:24.6%;width:1px;background:#e9dcc699}
+.dl-h::before,.dl-h::after{content:"";position:absolute;left:-5px;width:11px;height:1px;background:#e9dcc6}
+.dl-h::before{top:0} .dl-h::after{bottom:0}
+.dl-h span{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) rotate(-90deg);background:#27211b;padding:0 6px;white-space:nowrap}
+@media (max-width:520px){ .dl{font-size:.62rem} }
+
+/* examples */
+.examples{display:grid;gap:18px}
+@media (min-width:880px){ .examples{grid-template-columns:minmax(0,7fr) minmax(0,5fr);grid-template-rows:auto auto} .examples .big{grid-row:span 2} }
+.examples figure{background:var(--panel);border:1px solid var(--line);border-radius:var(--r-lg);overflow:hidden;display:flex;flex-direction:column}
+.examples figure img{width:100%;height:auto}
+.examples .big img{flex:1;min-height:0;object-fit:contain;background:linear-gradient(180deg,#2a241d,#14110e)}
+.examples figure:not(.big) img{aspect-ratio:2/1;object-fit:cover}
+.examples figcaption{margin:0;padding:16px 18px 18px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.examples figcaption strong{font:600 1rem/1.3 var(--body);color:var(--tx);letter-spacing:0}
+
+/* lights on / off */
+.pairs{display:grid;gap:28px}
+.pair{display:grid;gap:12px;grid-template-columns:1fr 1fr}
+@media (max-width:640px){ .pair{grid-template-columns:1fr} }
+.pair figure{position:relative}
+.pair img{border-radius:var(--r);border:1px solid var(--line);width:100%;height:auto}
+.pair figcaption{margin-top:8px}
+.tag-state{position:absolute;top:12px;left:12px;font:600 .68rem/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;padding:6px 8px;border-radius:5px;background:#0f1114d9;border:1px solid var(--line-2);color:var(--tx-2)}
+.tag-state.on{color:var(--orange);border-color:#6b4a1d}
+.pair-note{color:var(--tx-2);max-width:62ch;margin-top:4px}
+
+/* etsy workflow */
+.steps{list-style:none;margin:0 0 clamp(28px,4vw,44px);padding:0;display:grid;gap:0;counter-reset:s;border-top:1px solid var(--line)}
+@media (min-width:860px){ .steps{grid-template-columns:repeat(4,minmax(0,1fr));border-bottom:1px solid var(--line)} .steps li{border-bottom:0!important;padding-right:22px!important} .steps li + li{border-left:1px solid var(--line);padding-left:22px} }
+.steps li{counter-increment:s;display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 14px;padding:18px 0;border-bottom:1px solid var(--line)}
+.steps li::before{content:counter(s);grid-row:span 2;font:600 .8rem/1 var(--mono);color:var(--orange);width:30px;height:30px;border:1px solid #6b4a1d;border-radius:50%;display:grid;place-items:center;margin-top:-2px}
+.steps b{font-weight:600}
+.steps p{color:var(--tx-2);font-size:.95rem}
+.proofs{display:grid;gap:12px;grid-template-columns:repeat(4,minmax(0,1fr));margin-top:20px}
+@media (max-width:720px){ .proofs{grid-template-columns:repeat(2,minmax(0,1fr))} }
+.proofs img{border-radius:10px;border:1px solid var(--line);width:100%;height:auto}
+.proofs figcaption{font-size:.7rem;margin-top:6px;overflow-wrap:anywhere}
+.tree{font:400 .8rem/1.75 var(--mono);color:var(--tx-2);background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r);padding:16px 18px;margin:20px 0 0;overflow-x:auto;white-space:pre}
+.tree b{color:var(--tx);font-weight:500}
+.tree i{font-style:normal;color:var(--orange)}
+
+/* how it works: the tool's four panels */
+.panels{display:grid;gap:0;border-top:1px solid var(--line)}
+@media (min-width:720px){ .panels{grid-template-columns:1fr 1fr} .panels > div:nth-child(odd){padding-right:28px;border-right:1px solid var(--line)} .panels > div:nth-child(even){padding-left:28px} }
+.panels > div{padding:20px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:6px}
+.panels h3{font-size:1.05rem}
+.panels h3 .mono{color:var(--orange);font-weight:500;margin-right:6px;font-size:.8rem}
+.panels p{color:var(--tx-2);font-size:.95rem}
+
+/* what you print */
+.print-cols{display:grid;gap:clamp(28px,5vw,64px);margin-top:clamp(32px,4vw,48px);align-items:start}
+@media (min-width:960px){ .print-cols{grid-template-columns:minmax(0,1fr) minmax(0,1fr)} }
+.parts{display:grid;gap:0;border-top:1px solid var(--line)}
+.parts > div{display:grid;grid-template-columns:minmax(0,150px) minmax(0,1fr);gap:16px;padding:18px 0;border-bottom:1px solid var(--line)}
+@media (max-width:520px){ .parts > div{grid-template-columns:1fr;gap:6px} }
+.parts h3{font-size:1.05rem}
+.parts h3 small{display:block;font:500 .72rem/1.4 var(--mono);color:var(--tx-3);letter-spacing:.02em;margin-top:4px}
+.parts p{color:var(--tx-2);font-size:.95rem}
+.parts .spec{font:500 .78rem/1.6 var(--mono);color:var(--tx);display:block;margin-top:6px}
+.sizes{width:100%;border-collapse:collapse;font-size:.92rem}
+.sizes caption{text-align:left;font:500 .74rem/1 var(--mono);letter-spacing:.14em;text-transform:uppercase;color:var(--tx-3);padding-bottom:12px}
+.sizes th,.sizes td{text-align:left;padding:10px 12px 10px 0;border-bottom:1px solid var(--line);vertical-align:top}
+.sizes th{font-weight:600;color:var(--tx);white-space:nowrap}
+.sizes td{color:var(--tx-2)}
+.sizes td.mm{font-family:var(--mono);font-size:.84rem;color:var(--tx);white-space:nowrap}
+.sizes thead th{font:500 .72rem/1 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--tx-3)}
+
+/* lighting */
+.light-grid{display:grid;gap:clamp(28px,5vw,56px);align-items:start}
+@media (min-width:900px){ .light-grid{grid-template-columns:minmax(0,6fr) minmax(0,5fr)} }
+.light-grid > *{min-width:0}
+.section-svg{background:var(--bg-2);border:1px solid var(--line);border-radius:var(--r-lg);padding:clamp(14px,3vw,28px)}
+.section-svg .scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.section-svg svg{width:100%;height:auto;min-width:520px}
+.section-svg text{font-family:var(--mono);font-size:13px;fill:var(--tx-2)}
+.checklist{list-style:none;margin:0;padding:0;border-top:1px solid var(--line)}
+.checklist li{padding:16px 0;border-bottom:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.checklist .k{font:500 .74rem/1.3 var(--mono);color:var(--orange);letter-spacing:.06em;text-transform:uppercase}
+.checklist p{color:var(--tx-2);font-size:.95rem}
+.checklist b{color:var(--tx);font-weight:600}
+
+/* pricing */
+.price .who{font-size:.92rem;color:var(--tx-2);margin-top:-4px}
+.price .btn{width:100%}
+.price .fine{font:400 .74rem/1.5 var(--mono);color:var(--tx-3)}
+.price-note{margin-top:22px;color:var(--tx-2);font-size:.95rem;max-width:72ch}
+.price-note b{color:var(--tx);font-weight:600}
+
+/* FAQ + CTA */
+.faq-wrap{display:grid;gap:clamp(24px,4vw,56px)}
+@media (min-width:900px){ .faq-wrap{grid-template-columns:minmax(0,4fr) minmax(0,8fr)} }
+.faq details p + p{margin-top:-8px}
+.faq code{font:500 .85em var(--mono);color:var(--tx)}
+.cta{border-top:1px solid var(--line)}
+.cta .wrap{display:grid;gap:28px;align-items:center}
+@media (min-width:900px){ .cta .wrap{grid-template-columns:minmax(0,6fr) minmax(0,5fr)} }
+.cta h2{font-size:clamp(2rem,4.4vw,3.2rem)}
+.cta .ctas{display:flex;gap:12px;flex-wrap:wrap;margin-top:22px}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Veer Tools home">
+      <svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      Veer <span>Tools</span>
+    </a>
+    <nav class="nav" aria-label="Main">
+      <a class="hide-sm" href="/nfc-studio/">NFC Studio</a>
+      <a class="hide-sm" href="/vectorizer/">Vectorizer</a>
+      <a class="hide-sm" href="/lightbox/" aria-current="page">Light Box Studio</a>
+      <a class="hide-sm" href="/#pricing">Pricing</a>
+      <a class="btn btn-primary btn-sm" href="/#tools">Open a tool</a>
+    </nav>
+  </div>
+</header>
+
+<main id="main">
+
+<!-- ───────────── hero ───────────── -->
+<section class="hero mm-grid glow" aria-labelledby="hero-title">
+  <div class="wrap split">
+    <div class="copy">
+      <p class="eyebrow">Light Box Studio · for 3D printers</p>
+      <h1 id="hero-title"><span class="ln">Names that <span class="grad">glow.</span></span> <span class="ln">Printed by you.</span></h1>
+      <p class="lede">Type a name, drop in a logo or a pet photo. Light Box Studio gives you the STL files for a frame, a white diffuser front and a back panel, plus a lit proof image to send your customer before you print.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="app.html">Open Light Box Studio</a>
+        <a class="btn btn-ghost" href="#pricing">Pro and Commercial</a>
+      </div>
+      <p class="small">Free for names · <span>Pro $29</span> · <span>Commercial $79</span>, one-time<br>Runs in your browser. Nothing is uploaded.</p>
+    </div>
+    <figure class="hero-shot">
+      <div class="shot">
+        <img src="img/proof-olivia.webp" width="1600" height="1200" fetchpriority="high"
+             alt="Proof image from Light Box Studio: a dark rectangular light box with “Olivia” in black Pacifico script on a warm-white glowing front.">
+        <span class="dl dl-w" aria-hidden="true"><span>180 mm</span></span>
+        <span class="dl dl-h" aria-hidden="true"><span>80 mm</span></span>
+      </div>
+      <figcaption>Proof image as exported · <b>Name sign 180 × 80 × 40 mm</b> · Pacifico · black PLA name in a white PLA front</figcaption>
+    </figure>
+  </div>
+</section>
+
+<!-- ───────────── examples ───────────── -->
+<section id="examples" aria-labelledby="ex-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">What it makes</p>
+      <h2 id="ex-title">Night lights, pet lithophanes and shop signs from one tool</h2>
+      <p class="lede">The three gifts people ask for every December. Each picture below is the proof image the tool exports, untouched.</p>
+    </div>
+    <div class="examples">
+      <figure class="big">
+        <img src="img/proof-pet.webp" width="1600" height="1200" loading="lazy"
+             alt="Proof of a photo lithophane light box: a dog's head and shoulders in soft light against out-of-focus background lights, with the name “Biscuit” in script, glowing warm white.">
+        <figcaption><strong>Pet photo lithophane</strong>Photo 6 × 4 in · 162 × 112 × 40 mm · one white PLA front, thin where the photo is bright and thick where it is dark. The name prints dark over the photo.</figcaption>
+      </figure>
+      <figure>
+        <img src="img/proof-family.webp" width="1600" height="1200" loading="lazy"
+             alt="Proof of a wide light box reading “The Johnsons” with “Est. 2024” underneath, in a serif font, glowing warm white.">
+        <figcaption><strong>Two-line family sign</strong>Wide · 220 × 90 × 40 mm · Playfair · free plan</figcaption>
+      </figure>
+      <figure>
+        <img src="img/proof-logo.webp" width="1600" height="1200" loading="lazy"
+             alt="Proof of a business sign light box: a logo with an orange sun, black mountains and a blue river beside the words “Ridge Coffee Roasters”.">
+        <figcaption><strong>Logo sign</strong>Wide · 220 × 90 × 40 mm · logo split into 3 filaments, set flush into the white front</figcaption>
+      </figure>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ───────────── lights on / off ───────────── -->
+<section id="lit" aria-labelledby="lit-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Lit preview</p>
+      <h2 id="lit-title">See it lit before you print a layer</h2>
+      <p class="lede">The preview shows how light actually passes through the front. White glows, colours glow tinted, black blocks light. Flip the lights off to see how it looks on a shelf in the daytime.</p>
+    </div>
+    <div class="pairs">
+      <div class="pair">
+        <figure>
+          <img src="img/stage-olivia-off.webp" width="1500" height="976" loading="lazy" alt="Lights off: the Olivia name sign as an off-white front with a crisp black script name.">
+          <span class="tag-state">Lights off</span>
+          <figcaption>Black name, white front: reads crisply in daylight</figcaption>
+        </figure>
+        <figure>
+          <img src="img/stage-olivia-on.webp" width="1500" height="976" loading="lazy" alt="Lights on: the same sign glowing warm white around the black name.">
+          <span class="tag-state on">Lights on</span>
+          <figcaption>Lit from inside: the name becomes a silhouette</figcaption>
+        </figure>
+      </div>
+      <div class="pair">
+        <figure>
+          <img src="img/stage-pet-off.webp" width="1500" height="976" loading="lazy" alt="Lights off: the dog lithophane is a pale, almost blank white panel with a faint relief.">
+          <span class="tag-state">Lights off</span>
+          <figcaption>A lithophane is a pale relief until it's lit</figcaption>
+        </figure>
+        <figure>
+          <img src="img/stage-pet-on.webp" width="1500" height="976" loading="lazy" alt="Lights on: the same lithophane shows the full photo of the dog in warm tones.">
+          <span class="tag-state on">Lights on</span>
+          <figcaption>Then the whole photo appears</figcaption>
+        </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── Etsy workflow ───────────── -->
+<section id="etsy" class="mm-grid" aria-labelledby="etsy-title" style="border-block:1px solid var(--line)">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">For Etsy sellers <span class="badge-pro">Pro</span></p>
+      <h2 id="etsy-title">Today's orders, one paste, one zip</h2>
+      <p class="lede">Personalised name lights are a copy-and-paste job. Set up the design once, then let batch mode make a front and a proof for every name.</p>
+    </div>
+    <ol class="steps" aria-label="Batch workflow">
+        <li><b>Set up one design</b><p>Font, box size, depth and fit. Every name uses these settings.</p></li>
+        <li><b>Paste the names from your orders</b><p>One per line in <em>Batch names</em>. Up to 200 at a time.</p></li>
+        <li><b>Download one zip</b><p>A shared frame and back panel, plus a front and a <span class="mono">proof.png</span> for every name.</p></li>
+        <li><b>Send proofs, then print</b><p>Message each buyer their proof. Print the ones they approve.</p></li>
+      </ol>
+      <figure>
+        <div class="shot"><img src="img/app-batch.webp" width="2560" height="1600" loading="lazy"
+          alt="Light Box Studio with the Batch names panel open, listing Olivia, Mason, Ava Grace, Theo, Harper and Noah, and the lit preview of Olivia in Pacifico."></div>
+        <figcaption>The Batch names panel with six orders pasted in. The preview shows the first; every name gets the same font, size and fit.</figcaption>
+      </figure>
+
+    <div class="proofs" role="list" aria-label="Proof images from one batch">
+      <figure role="listitem"><img src="img/proof-batch-mason.webp" width="800" height="600" loading="lazy" alt="Batch proof: “Mason” in script, lit."><figcaption>names/<wbr>002_Mason/<wbr>proof.png</figcaption></figure>
+      <figure role="listitem"><img src="img/proof-batch-ava-grace.webp" width="800" height="600" loading="lazy" alt="Batch proof: “Ava Grace” in script, lit."><figcaption>names/<wbr>003_Ava_Grace/<wbr>proof.png</figcaption></figure>
+      <figure role="listitem"><img src="img/proof-batch-theo.webp" width="800" height="600" loading="lazy" alt="Batch proof: “Theo” in script, lit."><figcaption>names/<wbr>004_Theo/<wbr>proof.png</figcaption></figure>
+      <figure role="listitem"><img src="img/proof-batch-harper.webp" width="800" height="600" loading="lazy" alt="Batch proof: “Harper” in script, lit."><figcaption>names/<wbr>005_Harper/<wbr>proof.png</figcaption></figure>
+    </div>
+
+<pre class="tree" aria-label="Contents of the batch zip"><b>batch_6_lightbox.zip</b>
+├─ 1_box/frame.stl              <i>shared by every name</i>
+├─ names/
+│  ├─ 001_Olivia/  2_front.stl  3_colour1.stl  proof.png
+│  ├─ 002_Mason/   2_front.stl  3_colour1.stl  proof.png
+│  └─ …            one folder per name
+├─ 2_back/back.stl              <i>shared by every name</i>
+└─ README.txt                   print settings and import steps</pre>
+  </div>
+</section>
+
+<!-- ───────────── how it works ───────────── -->
+<section id="how" aria-labelledby="how-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">How it works</p>
+      <h2 id="how-title">Four panels, top to bottom</h2>
+      <p class="lede">Open the tool and work down the left side. The preview updates as you type.</p>
+    </div>
+    <figure style="margin-bottom:clamp(28px,4vw,44px)">
+      <div class="shot"><img src="img/app-logo.webp" width="2560" height="1600" loading="lazy"
+        alt="Light Box Studio showing a logo sign: an uploaded mountain-and-sun logo split into three filament colours next to the text “Ridge Coffee Roasters”, in the lit preview."></div>
+      <figcaption>A logo sign in the tool: the uploaded image is split into filament colours, each one shown as a swatch you can change</figcaption>
+    </figure>
+    <div class="panels">
+      <div><h3><span class="mono">1</span>Front</h3><p>Pick <b>Name &amp; graphics</b> (text and artwork set flush into a thin white front) or <b>Photo lithophane</b>. Type up to two lines in 9 fonts, from Pacifico and Great Vibes to Bebas Neue and Playfair. Add a logo or photo and choose 1 to 3 image colours.</p></div>
+      <div><h3><span class="mono">2</span>Box</h3><p>Choose a size preset or type your own. Set depth, wall, corner radius, front thickness, and the frame and front colours.</p></div>
+      <div><h3><span class="mono">3</span>Back panel &amp; light</h3><p>Turn on the cable hole and keyhole slots, and pick how tightly the back fits: snug, standard or loose.</p></div>
+      <div><h3><span class="mono">4</span>Batch names</h3><p>Paste a list of names to make one front and one proof per name, sharing a single frame and back.</p></div>
+    </div>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ───────────── what you print ───────────── -->
+<section id="parts" aria-labelledby="parts-title">
+  <div class="wrap">
+        <div class="section-head">
+          <p class="eyebrow">What you print</p>
+          <h2 id="parts-title">A frame, a front and a back</h2>
+          <p class="lede">Two prints. The frame and front load as one multi-part object; the back panel prints on its own.</p>
+        </div>
+      <figure>
+        <div class="shot"><img src="img/app-3d.webp" width="2560" height="1600" loading="lazy"
+          alt="Light Box Studio 3D preview of the Olivia box, with a part list underneath: frame, front diffuser and text, each assigned to an AMS slot with height and triangle count."></div>
+        <figcaption>3D preview with the part list: file, filament slot, height and triangle count for each part</figcaption>
+      </figure>
+    <div class="print-cols">
+        <div class="parts">
+          <div><h3>Frame<small>1_box/1_frame.stl</small></h3>
+            <p>The box walls, in any opaque filament. It prints front-down together with the front, so the face comes off a smooth plate clean.<span class="spec">2.4 mm walls · 40 mm deep · 5 mm corners</span></p></div>
+          <div><h3>Front<small>1_box/2_front.stl + colours</small></h3>
+            <p>The diffuser, in white PLA. For names and logos, each colour is its own STL set flush into the face, ready for an AMS. For photos, one lithophane of varying thickness.<span class="spec">1.2 mm face · 0.6 mm colour depth · lithophane 0.8–3 mm</span></p></div>
+          <div><h3>Back panel<small>2_back/back.stl</small></h3>
+            <p>A flat plate with a locating rim that presses into the frame. It has a slot for a USB cable and two keyhole slots for hanging it on a wall.<span class="spec">2.4 mm plate · 4 mm rim · fit 0.2 / 0.3 / 0.45 mm</span></p></div>
+        </div>
+      <table class="sizes">
+      <caption>Size presets (outside dimensions, default 40 mm deep)</caption>
+      <thead><tr><th scope="col">Preset</th><th scope="col">W × H</th><th scope="col">Good for</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Name sign</th><td class="mm">180 × 80 mm</td><td>One name, a nursery or bedroom night light</td></tr>
+        <tr><th scope="row">Square</th><td class="mm">120 × 120 mm</td><td>A logo on its own, a monogram</td></tr>
+        <tr><th scope="row">Wide</th><td class="mm">220 × 90 mm</td><td>Family names with a second line, logo plus shop name</td></tr>
+        <tr><th scope="row">Photo 6 × 4 in</th><td class="mm">162 × 112 mm</td><td>Landscape lithophanes</td></tr>
+        <tr><th scope="row">Photo portrait</th><td class="mm">112 × 162 mm</td><td>Portrait lithophanes, pets sitting up</td></tr>
+        <tr><th scope="row">Custom</th><td class="mm">from 40 mm</td><td>Whatever fits the order</td></tr>
+      </tbody>
+    </table>
+    </div>
+
+  </div>
+</section>
+
+<!-- ───────────── lighting ───────────── -->
+<section id="lighting" style="border-top:1px solid var(--line);background:var(--bg-2)" aria-labelledby="light-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Lighting</p>
+      <h2 id="light-title">What goes inside</h2>
+      <p class="lede">The box is built around a cheap USB LED strip. Here is a cross-section of the name sign.</p>
+    </div>
+    <div class="light-grid">
+      <figure class="section-svg">
+        <div class="scroll" tabindex="0" role="region" aria-label="Cross-section diagram, scrolls sideways on small screens">
+        <svg viewBox="0 0 640 390" role="img" aria-labelledby="sx-t sx-d">
+          <title id="sx-t">Cross-section of the light box</title>
+          <desc id="sx-d">Side section: the white front on the left, frame walls top and bottom, an LED strip on the inside of each wall, and the back panel on the right with its rim pressed into the frame and a USB cable leaving through the hole. The depth is 40 mm.</desc>
+          <defs>
+            <linearGradient id="glowT" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffd9a1" stop-opacity=".5"/><stop offset="1" stop-color="#ffd9a1" stop-opacity="0"/></linearGradient>
+            <linearGradient id="glowB" x1="0" y1="1" x2="0" y2="0"><stop offset="0" stop-color="#ffd9a1" stop-opacity=".5"/><stop offset="1" stop-color="#ffd9a1" stop-opacity="0"/></linearGradient>
+          </defs>
+          <rect x="236" y="60" width="148" height="130" fill="url(#glowT)"/>
+          <rect x="236" y="190" width="148" height="130" fill="url(#glowB)"/>
+          <rect x="230" y="50" width="170" height="10" fill="#3a3f47"/>
+          <rect x="230" y="320" width="170" height="10" fill="#3a3f47"/>
+          <rect x="230" y="60" width="6" height="260" fill="#f2efe9"/>
+          <rect x="230" y="150" width="3" height="80" fill="#1b1b1f"/>
+          <rect x="290" y="60" width="44" height="4" fill="#f69322"/>
+          <rect x="290" y="316" width="44" height="4" fill="#f69322"/>
+          <rect x="400" y="50" width="10" height="280" fill="#4a5058"/>
+          <rect x="384" y="61" width="16" height="6" fill="#4a5058"/>
+          <rect x="384" y="313" width="16" height="6" fill="#4a5058"/>
+          <rect x="400" y="292" width="10" height="14" fill="#131519"/>
+          <path d="M312 316 C312 300 350 299 390 299 L470 299 C500 299 510 312 510 340" fill="none" stroke="#a5a39e" stroke-width="2.5"/>
+          <g stroke="#6f6e6a" stroke-width="1"><line x1="230" y1="364" x2="410" y2="364"/><line x1="230" y1="356" x2="230" y2="372"/><line x1="410" y1="356" x2="410" y2="372"/></g>
+          <rect x="285" y="356" width="70" height="16" fill="#131519"/>
+          <text x="320" y="368" text-anchor="middle" style="fill:#f2efe9">40 mm</text>
+          <g stroke="#6f6e6a" stroke-width="1" fill="none">
+            <path d="M233 110 H182"/><path d="M232 190 H182"/><path d="M312 60 V30 H340"/><path d="M392 67 L440 100 H460"/><path d="M410 190 H460"/><path d="M510 340 H520"/>
+          </g>
+          <text x="176" y="106" text-anchor="end">white front</text><text x="176" y="122" text-anchor="end">1.2 mm</text>
+          <text x="176" y="186" text-anchor="end">black name</text><text x="176" y="202" text-anchor="end">blocks light</text>
+          <text x="346" y="34">5 V LED strip on the walls</text>
+          <text x="466" y="104">locating rim</text>
+          <text x="466" y="194">back panel</text>
+          <text x="524" y="336">USB out</text><text x="524" y="352">13 × 8 mm hole</text>
+        </svg>
+        </div>
+        <figcaption>Section of the 180 × 80 × 40 mm name sign. Not to scale.</figcaption>
+      </figure>
+      <ul class="checklist">
+        <li><span class="k">The light</span><p>A <b>5 V USB LED strip</b>, <b>warm white</b>, about <b>50 cm</b> long, stuck around the inside walls. It runs from a USB phone charger. A battery puck light stuck to the back panel works too.</p></li>
+        <li><span class="k">Depth</span><p>Keep the box <b>at least 30 mm deep</b>. Closer than that and you see the individual LEDs as hot spots on the front. The presets start at 40 mm.</p></li>
+        <li><span class="k">The cable</span><p>Run it out through the hole in the back panel before you press the panel in. The tool can leave the hole out if you use a puck light.</p></li>
+        <li><span class="k">Hanging</span><p>Two keyhole slots in the back panel, with an 8 mm opening for the screw head, hang it flat on a wall. Or just stand it on a shelf.</p></li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── pricing ───────────── -->
+<section id="pricing" aria-labelledby="price-title">
+  <div class="wrap">
+    <div class="section-head">
+      <p class="eyebrow">Pricing</p>
+      <h2 id="price-title">Pay once. Make as many as you like.</h2>
+      <p class="lede">Names are free. Logos, photos and batch are Pro. If you sell what you print, you need Commercial.</p>
+    </div>
+    <div class="prices">
+      <div class="price">
+        <span class="tier">Free</span>
+        <div class="amt">$0</div>
+        <p class="who">For a night light for your own kids.</p>
+        <ul>
+          <li>Names in 9 fonts, one or two lines</li>
+          <li>Any box size, frame, front and back panel</li>
+          <li>Lit preview, 3D preview, proof image</li>
+          <li>Small “MADE WITH VEER” debossed on the back panel</li>
+          <li>Personal use</li>
+        </ul>
+        <a class="btn" href="app.html">Open the tool</a>
+      </div>
+      <div class="price">
+        <span class="tier">Pro</span>
+        <div class="amt">$29<small>one-time</small></div>
+        <p class="who">For gifts with logos and photos.</p>
+        <ul>
+          <li>Everything in Free</li>
+          <li>Logos and images, in up to 3 colours</li>
+          <li>Photo lithophanes</li>
+          <li>Batch names with a proof for each</li>
+          <li>No mark on the back panel</li>
+          <li>Personal use</li>
+        </ul>
+        <a class="btn" data-checkout="lightbox-pro" data-fallback="app.html" href="app.html">Get Pro</a>
+      </div>
+      <div class="price feature">
+        <span class="tier">Commercial · for sellers</span>
+        <div class="amt">$79<small>one-time</small></div>
+        <p class="who">For Etsy shops, craft fairs and custom orders.</p>
+        <ul>
+          <li>Everything in Pro</li>
+          <li>The right to sell the light boxes you print</li>
+          <li>Batch workflow for daily order runs</li>
+        </ul>
+        <a class="btn btn-primary" data-checkout="lightbox-commercial" data-fallback="app.html" href="app.html">Get Commercial</a>
+        <p class="fine">License key by email. Works offline after you unlock it.</p>
+      </div>
+    </div>
+    <p class="price-note"><b>Try before you buy.</b> Logos, lithophanes and batch names all preview for free in the lit and 3D views. Pro is only needed to download the files.</p>
+  </div>
+</section>
+
+<hr class="rule">
+
+<!-- ───────────── FAQ ───────────── -->
+<section id="faq" aria-labelledby="faq-title">
+  <div class="wrap faq-wrap">
+    <div class="section-head" style="margin-bottom:0">
+      <p class="eyebrow">FAQ</p>
+      <h2 id="faq-title">Before your first print</h2>
+    </div>
+    <div class="faq">
+      <details>
+        <summary>Which filament should I use for the front?</summary>
+        <p>White PLA. It is the diffuser, so it should let light through evenly. For names and logos, black text blocks light and reads as a crisp silhouette; any other colour glows tinted. The frame and back can be any opaque colour. An AMS holds 4 filaments, and the tool warns you if a design needs more.</p>
+      </details>
+      <details>
+        <summary>What layer height for a lithophane?</summary>
+        <p>0.12–0.16 mm layers in white PLA at 100% infill look best. Name and logo fronts are fine at 0.2 mm. The README in every download repeats the settings.</p>
+      </details>
+      <details>
+        <summary>How does the back attach?</summary>
+        <p>The back panel has a 4 mm locating rim that presses into the back of the frame. No screws or glue. Pick snug (0.2 mm), standard (0.3 mm) or loose (0.45 mm) to suit your printer. If it comes out too tight or too loose, change the fit and re-export.</p>
+      </details>
+      <details>
+        <summary>Can I sell the light boxes I print?</summary>
+        <p>Yes, with Commercial ($79, one-time). Free and Pro are for personal use and gifts.</p>
+      </details>
+      <details>
+        <summary>Do my customers need to use the tool?</summary>
+        <p>No. You make the file and send them the proof image to approve. They never see Light Box Studio. In batch mode every name gets its own <code>proof.png</code>, ready to attach to an Etsy message.</p>
+      </details>
+      <details>
+        <summary>Which printer and slicer does it work with?</summary>
+        <p>The files are standard STL. The README gives the steps for Bambu Studio and OrcaSlicer: drag every file in <code>1_box</code> onto the plate together and load them as one object with multiple parts. Name and logo fronts are multi-colour, so they need a multi-material setup such as a Bambu AMS.</p>
+      </details>
+      <details>
+        <summary>Are my photos uploaded anywhere?</summary>
+        <p>No. Light Box Studio runs entirely in your browser. Customer photos and names stay on your computer.</p>
+      </details>
+    </div>
+  </div>
+</section>
+
+<!-- ───────────── final CTA ───────────── -->
+<section class="cta mm-grid glow" aria-labelledby="cta-title">
+  <div class="wrap">
+    <div>
+      <p class="eyebrow">Light Box Studio</p>
+      <h2 id="cta-title" style="margin-top:14px">Type a name and turn the lights on.</h2>
+      <p class="lede" style="margin-top:16px">It's free for names and needs no account. Upgrade when the first logo or photo order comes in.</p>
+      <div class="ctas">
+        <a class="btn btn-primary" href="app.html">Open Light Box Studio</a>
+        <a class="btn btn-ghost" href="#pricing">Compare plans</a>
+      </div>
+    </div>
+    <figure>
+      <div class="shot"><img src="img/app-lit.webp" width="2560" height="1600" loading="lazy"
+        alt="Light Box Studio with the Front panel open, font tiles showing Olivia in nine fonts, and a lit preview of the Olivia name sign."></div>
+    </figure>
+  </div>
+</section>
+
+</main>
+
+<footer class="site-foot">
+  <div class="wrap">
+    <div class="cols">
+      <div>
+        <a class="brand" href="/"><svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg> Veer <span>Tools</span></a>
+        <p style="margin-top:14px;max-width:34ch">Browser tools for makers, from Veer, a digital studio for small businesses. Everything runs on your machine.</p>
+      </div>
+      <div><h4>Tools</h4><ul><li><a href="/nfc-studio/">NFC Studio</a></li><li><a href="/vectorizer/">Vectorizer</a></li><li><a href="/lightbox/">Light Box Studio</a></li></ul></div>
+      <div><h4>Veer</h4><ul><li><a href="https://veersolutions.com">Websites &amp; marketing</a></li><li><a href="https://instagram.com/getveer">Instagram @getveer</a></li></ul></div>
+      <div><h4>Help</h4><ul><li><a href="/#faq">FAQ</a></li><li><a href="/#pricing">Pricing &amp; licenses</a></li></ul></div>
+    </div>
+    <div class="base"><span>© 2026 Veer</span><span>No uploads. No accounts. Your files stay yours.</span></div>
+  </div>
+</footer>
+
+<script src="/assets/checkout.js" defer></script>
+</body>
+</html>
