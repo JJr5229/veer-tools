@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-labelledby="t">
+  <title id="t">Veer Tools</title>
+  <desc>The three-colour Veer chevron V on a charcoal tile.</desc>
+  <!-- Veer Tools icon family: 1024 tile, 225 corner radius (22%), charcoal #17191d, 96-unit strokes -->
+  <rect width="1024" height="1024" rx="225" fill="#17191d"/>
+  <!-- the Veer mark (viewBox 79.9 x 66.6), scaled 8.2x and centred -->
+  <g transform="translate(184.4 249) scale(8.2) translate(-100.447 -44.954)">
+    <path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/>
+    <path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/>
+    <path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/>
+  </g>
+</svg>

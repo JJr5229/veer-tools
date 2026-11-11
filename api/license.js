@@ -16,7 +16,15 @@
    LICENSE_SIGNING_KEY   required. EC P-256 private key, PKCS#8 PEM, or that
                          PEM base64-encoded on one line. Generate the pair with
                          `node scripts/gen-license-keypair.js`.
-   LICENSE_PROVIDER      "lemonsqueezy" (default) or "gumroad".
+   LICENSE_PROVIDER      "stripe", "lemonsqueezy" (default) or "gumroad".
+
+   Stripe (see api/_stripe.js and api/claim.js)
+   STRIPE_SECRET_KEY     restricted key: Checkout Sessions read, PaymentIntents
+                         read+write, Charges read, Products/Prices read.
+   LICENSE_ACTIVATION_LIMIT  browsers per key (default 3).
+   Products need metadata tool = nfc-studio | vectorizer | lightbox | veer-pro
+   and tier = pro | commercial. Payment Links redirect to
+   /license/?session_id={CHECKOUT_SESSION_ID}.
 
    Lemon Squeezy
    LS_STORE_ID           your store id (number) — keys from other stores fail.
@@ -193,8 +201,8 @@ module.exports = async function handler(req, res) {
     let r = testKey(key);
     if (!r) {
       const provider = (process.env.LICENSE_PROVIDER || "lemonsqueezy").toLowerCase();
-      r = provider === "gumroad"
-        ? await gumroad(action, key, instance, product)
+      r = provider === "stripe" ? await require("./_stripe.js").check(action, key, instance, product)
+        : provider === "gumroad" ? await gumroad(action, key, instance, product)
         : await lemonSqueezy(action, key, instance, product);
     }
     if (action === "deactivate") { res.status(200).json({ ok: true }); return; }

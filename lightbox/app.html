@@ -1824,6 +1824,15 @@ $("proActivate").onclick=doActivate;
 $("proKey").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); doActivate(); } });
 $("proRemove").onclick=()=>{ const st=licStored(); if(st) licCall("deactivate",st.key,st.instance); licStore(null); licApply(null); proMsg("Removed from this browser. Your key still works anywhere else.","ok"); refresh(); };
 
+/* Arriving from the purchase page as app.html#license=KEY: unlock straight
+   away. The key stays in the fragment, so it never reaches a server log. */
+function licFromHash(){
+  var m=/(?:^#|&)license=([^&]+)/.exec(location.hash||""); if(!m) return;
+  var k=decodeURIComponent(m[1]);
+  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+  if(isPro()) return;
+  openPro(); document.getElementById("proKey").value=k; doActivate();
+}
 /* persistence */
 function save(){
   const o={mode:S.mode,textCol:S.textCol}; LIVE.forEach(id=>{ const e=$(id); if(e) o[id]=e.type==="checkbox"?e.checked:e.value; });
@@ -1836,7 +1845,7 @@ function save(){
   $("build").textContent=BUILD; syncLabels(); proUI();
   setMode(S.mode);
   document.fonts.ready.then(()=>Promise.all([...$("font").options].map(o=>document.fonts.load(`${FONT_WEIGHT[o.value]||400} 64px "${o.value}"`).catch(()=>{})))).then(refresh,refresh);
-  licInit();
+  licInit().then(licFromHash);
 })();
 window.__veerLightBox={readSettings,buildFront,buildBack,lithoMap,rasterInlay,S,isPro};
 

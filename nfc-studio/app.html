@@ -2694,7 +2694,16 @@ $("proRemove").onclick=async()=>{
   licStore(null); licApply(null); proMsg("Removed from this browser. Your key still works anywhere else.","ok");
   refresh();
 };
-licInit().then(()=>proUI());
+/* Arriving from the purchase page as app.html#license=KEY: unlock straight
+   away. The key stays in the fragment, so it never reaches a server log. */
+function licFromHash(){
+  var m=/(?:^#|&)license=([^&]+)/.exec(location.hash||""); if(!m) return;
+  var k=decodeURIComponent(m[1]);
+  try{ history.replaceState(null,"",location.pathname+location.search); }catch(e){}
+  if(isPro()) return;
+  openPro(); document.getElementById("proKey").value=k; doActivate();
+}
+licInit().then(()=>{ proUI(); licFromHash(); });
 </script>
 </body>
 </html>

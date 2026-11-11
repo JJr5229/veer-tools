@@ -1,24 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024"><title>Vectorizer</title><defs>
-  <pattern id="mm" width="16" height="16" patternUnits="userSpaceOnUse"><path d="M16 0H0V16" fill="none" stroke="#ffffff" stroke-opacity=".035" stroke-width="1"/></pattern>
-  <pattern id="cm" width="80" height="80" patternUnits="userSpaceOnUse"><path d="M80 0H0V80" fill="none" stroke="#ffffff" stroke-opacity=".06" stroke-width="1.5"/></pattern>
-  <radialGradient id="vig" cx="50%" cy="45%" r="70%"><stop offset="0" stop-color="#1b1d22"/><stop offset="1" stop-color="#0c0d10"/></radialGradient>
-  <linearGradient id="brand" x1="0" y1="0" x2="1" y2="0.35"><stop offset="0" stop-color="#ef4037"/><stop offset=".62" stop-color="#f69322"/><stop offset="1" stop-color="#ffd9a1"/></linearGradient>
-  
-</defs>
-<rect width="1024" height="1024" fill="url(#vig)"/>
-<rect width="1024" height="1024" fill="url(#mm)"/>
-<rect width="1024" height="1024" fill="url(#cm)"/><rect x="118" y="640" width="64" height="64" fill="#2c3037" stroke="#3a3f47" stroke-width="2"/><rect x="182" y="580" width="64" height="64" fill="#2c3037" stroke="#3a3f47" stroke-width="2"/><rect x="246" y="520" width="64" height="64" fill="#2c3037" stroke="#3a3f47" stroke-width="2"/><rect x="310" y="456" width="64" height="64" fill="#2c3037" stroke="#3a3f47" stroke-width="2"/><rect x="374" y="392" width="64" height="64" fill="#2c3037" stroke="#3a3f47" stroke-width="2"/>
-<path d="M150 700 L150 640 L214 640 L214 580 L278 580 L278 516 L342 516 L342 452 L406 452 L406 404" fill="none" stroke="#6f6e6a" stroke-width="6" stroke-linejoin="miter"/>
-<path d="M406 404 C 520 300, 600 250, 700 300 S 860 470, 880 360" fill="none" stroke="url(#brand)" stroke-width="22" stroke-linecap="round"/>
-<g stroke="#f2efe9" stroke-width="4" opacity=".9">
-  <line x1="700" y1="300" x2="600" y2="250"/><line x1="700" y1="300" x2="800" y2="350"/>
-</g>
-<g fill="#0f1114" stroke="#f2efe9" stroke-width="6">
-  <rect x="388" y="386" width="36" height="36"/>
-  <rect x="682" y="282" width="36" height="36"/>
-  <rect x="862" y="342" width="36" height="36"/>
-</g>
-<g fill="#f2efe9"><circle cx="600" cy="250" r="11"/><circle cx="800" cy="350" r="11"/></g>
-<g font-family="JetBrains Mono, monospace" font-size="26" fill="#6f6e6a" letter-spacing="2">
-  <text x="140" y="790">PNG</text><text x="820" y="440">SVG</text>
-</g><g transform="translate(64,60) scale(0.62)"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></g></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-labelledby="t">
+  <title id="t">Vectorizer</title>
+  <desc>A bold orange bezier curve between two cream square anchor nodes.</desc>
+  <!-- Veer Tools icon family: 1024 tile, 225 corner radius (22%), charcoal #17191d, 96-unit strokes -->
+  <rect width="1024" height="1024" rx="225" fill="#17191d"/>
+  <!-- the bezier path -->
+  <path d="M296 728C296 472 472 296 728 296" fill="none" stroke="#f69322" stroke-width="96"/>
+  <!-- square anchor nodes, pen-tool style -->
+  <rect x="184" y="616" width="224" height="224" rx="32" fill="#ffd9a1"/>
+  <rect x="616" y="184" width="224" height="224" rx="32" fill="#ffd9a1"/>
+</svg>
