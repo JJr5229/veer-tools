@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Your license key · Veer Tools</title>
+<meta name="robots" content="noindex">
+<meta name="description" content="Your Veer Tools license key.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,600..900&family=Figtree:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/site.css">
+<style>
+main{min-height:calc(100vh - 64px)}
+.claim{padding-block:clamp(56px,10vw,120px)}
+.panel{max-width:640px;margin:0 auto;display:flex;flex-direction:column;gap:22px}
+.keybox{background:var(--panel);border:1px solid var(--line-2);border-radius:var(--r-lg);padding:22px;display:flex;flex-direction:column;gap:14px}
+.key{font:600 clamp(.95rem,2.6vw,1.2rem)/1.5 var(--mono);letter-spacing:.02em;word-break:break-all;color:var(--tx);
+  background:var(--bg-2);border:1px dashed var(--line-2);border-radius:var(--r);padding:16px 18px;user-select:all}
+.row{display:flex;flex-wrap:wrap;gap:10px}
+.steps{margin:0;padding-left:20px;color:var(--tx-2);display:flex;flex-direction:column;gap:6px}
+.steps b{color:var(--tx)}
+.state{color:var(--tx-2)}
+.err{color:#ff8a80}
+.small{font-size:.9rem;color:var(--tx-2)}
+[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<header class="site-head">
+  <div class="wrap">
+    <a class="brand" href="/" aria-label="Veer Tools home">
+      <svg viewBox="0 0 79.9 66.6" aria-hidden="true"><g transform="translate(-100.447,-44.954)"><path transform="matrix(1,0,0,-1,125.672,87.0075)" d="M0 0-25.225 42.053H-4.347L12.208 14.454C6.144 11.892 1.523 6.522 0 0" fill="#ef4037"/><path transform="matrix(1,0,0,-1,145.9093,70.930309)" d="M0 0H1.884V3.96L10.637-1.095 16.258-4.341 34.443 25.976H13.564L-2.078-.103C-1.395-.035-.701 0 0 0" fill="#bd222f"/><path transform="matrix(1,0,0,-1,156.546,82.131008)" d="M0 0-8.753-5.054V-1.033H-10.637C-12.896-1.033-15.034-1.928-16.658-3.551-18.283-5.177-19.178-7.314-19.178-9.574V-16.618H-23.83L-16.146-29.428 2.305 1.331Z" fill="#f69322"/></g></svg>
+      Veer <span>Tools</span>
+    </a>
+  </div>
+</header>
+<main class="mm-grid glow">
+  <section class="claim"><div class="wrap"><div class="panel">
+    <span class="eyebrow" id="eyebrow">Your purchase</span>
+    <h1 id="title" style="font-size:clamp(2rem,5vw,3.2rem)">Getting your license key…</h1>
+    <p class="lede state" id="state">One moment while we confirm your payment with Stripe.</p>
+
+    <div class="keybox" id="box" hidden>
+      <span class="eyebrow">License key</span>
+      <div class="key" id="key"></div>
+      <div class="row">
+        <a class="btn btn-primary" id="open" href="#">Open and unlock</a>
+        <button class="btn" type="button" id="copy">Copy key</button>
+      </div>
+      <p class="small" id="mail"></p>
+    </div>
+
+    <ol class="steps" id="how" hidden>
+      <li><b>Open and unlock</b> fills the key in for you. Or open the tool, click <b>Free · Upgrade</b> and paste it.</li>
+      <li>You need to be online the first time. After that it works offline.</li>
+      <li>Use the key in up to 3 browsers. To move it, click your plan in the old browser and choose <b>Remove from this browser</b>.</li>
+      <li><b>Bookmark this page</b>: it shows your key again any time.</li>
+    </ol>
+    <p class="small">Problem with your purchase? Contact us within 14 days and we'll refund you: @getveer on Instagram.</p>
+  </div></div></section>
+</main>
+<script>
+(function(){
+  var $ = function(id){ return document.getElementById(id); };
+  var sid = new URLSearchParams(location.search).get("session_id");
+  function fail(msg){ $("title").textContent = "We couldn't show your key yet"; $("state").textContent = msg; $("state").classList.add("err"); }
+  if(!sid){ fail("This page needs the link from your receipt. Open it from the email Stripe sent you, or the page you were sent to after paying."); return; }
+  var tries = 0;
+  (function go(){
+    fetch("/api/claim?session_id=" + encodeURIComponent(sid)).then(function(r){ return r.json(); }).then(function(j){
+      if(!j.ok){
+        if(/isn't complete yet/.test(j.error||"") && tries++ < 6){ setTimeout(go, 2500); return; }
+        fail(j.error || "Something went wrong."); return;
+      }
+      var tier = j.tier === "commercial" ? "Commercial" : "Pro";
+      $("eyebrow").textContent = "Thank you";
+      $("title").textContent = j.name + " " + tier + " is yours";
+      $("state").textContent = j.tier === "commercial"
+        ? "Everything unlocked, including the right to sell what you print."
+        : "Everything in Pro is unlocked for your own use.";
+      $("key").textContent = j.key;
+      $("open").href = j.path + "#license=" + encodeURIComponent(j.key);
+      $("open").textContent = j.tool === "veer-pro" ? "Open Veer Tools" : "Open " + j.name + " and unlock";
+      if(j.email) $("mail").textContent = "Purchased by " + j.email + ".";
+      $("box").hidden = false; $("how").hidden = false;
+    }).catch(function(){ fail("We couldn't reach the server. Check your connection and refresh; your purchase is safe."); });
+  })();
+  $("copy").addEventListener("click", function(){
+    var t = $("key").textContent, b = $("copy");
+    try{ navigator.clipboard.writeText(t).then(function(){ b.textContent = "Copied"; setTimeout(function(){ b.textContent = "Copy key"; }, 1500); },
+      function(){ getSelection().selectAllChildren($("key")); b.textContent = "Selected: press Ctrl/Cmd+C"; }); }
+    catch(e){ getSelection().selectAllChildren($("key")); }
+  });
+})();
+</script>
+</body>
+</html>

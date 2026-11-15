@@ -9,16 +9,18 @@
 "use strict";
 const http = require("http"), fs = require("fs"), path = require("path");
 const root = path.join(__dirname, "..");
-const handler = require(path.join(root, "api/license.js"));
+const handlers = { "/api/license": require(path.join(root, "api/license.js")), "/api/claim": require(path.join(root, "api/claim.js")) };
 const TYPES = { ".html":"text/html; charset=utf-8", ".css":"text/css", ".js":"text/javascript", ".json":"application/json",
   ".png":"image/png", ".jpg":"image/jpeg", ".jpeg":"image/jpeg", ".webp":"image/webp", ".svg":"image/svg+xml", ".ico":"image/x-icon" };
 http.createServer((req, res) => {
-  if (req.url.startsWith("/api/license")) {
+  const route = Object.keys(handlers).find(r => req.url === r || req.url.startsWith(r + "?") || req.url.startsWith(r + "/"));
+  if (route) {
+    req.query = Object.fromEntries(new URL(req.url, "http://x").searchParams);
     let b = ""; req.on("data", c => b += c); req.on("end", () => {
       try { req.body = JSON.parse(b); } catch { req.body = {}; }
       res.status = c => { res.statusCode = c; return res; };
       res.json = o => { res.setHeader("Content-Type", "application/json"); res.end(JSON.stringify(o)); };
-      handler(req, res);
+      handlers[route](req, res);
     });
     return;
   }

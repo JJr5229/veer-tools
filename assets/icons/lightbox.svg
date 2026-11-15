@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024" role="img" aria-labelledby="t">
+  <title id="t">Light Box Studio</title>
+  <desc>An orange light box frame around a glowing cream panel with a bold script stroke.</desc>
+  <!-- Veer Tools icon family: 1024 tile, 225 corner radius (22%), charcoal #17191d, 96-unit strokes -->
+  <rect width="1024" height="1024" rx="225" fill="#17191d"/>
+  <!-- frame and lit diffuser -->
+  <rect x="216" y="200" width="592" height="624" rx="104" fill="#ffd9a1" stroke="#f69322" stroke-width="96"/>
+  <!-- a name, written as one bold script stroke -->
+  <path d="M344 616C400 616 420 440 472 440C524 440 488 616 552 616C616 616 616 488 680 488" fill="none" stroke="#17191d" stroke-width="88" stroke-linecap="round" stroke-linejoin="round"/>
+</svg>

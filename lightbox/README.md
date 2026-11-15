@@ -11,6 +11,30 @@ in the browser.
 - **Photo lithophane:** any photo becomes a variable-thickness front (thin =
   bright, thick = dark), with optional text printed dark over it.
 
+## Shapes
+- **Rectangle:** the classic box, with size presets.
+- **Follow the name:** the box takes the outline of the name (and logo, if
+  any), grown by a border you choose. Frame, glowing front, back panel and
+  its rim all follow that outline.
+- **Letter shapes:** each letter is its own hollow glowing piece, like
+  channel letters. Best at 300 mm+ wide in a bold or connected font; the tool
+  warns when the name splits into separate pieces or the letters are too
+  narrow inside for an LED strip.
+
+## Back panel
+- **Keyhole slots** for wall hanging (screw head up to 8 mm). On shaped boxes
+  they're placed automatically: a level pair as high and as far apart as the
+  shape allows, or one centred keyhole when it's narrow.
+- **Power hole:** USB plug pass-through (17 × 9 mm), USB-C panel socket
+  cut-out (9.4 × 3.8 mm), DC barrel jack panel mount (Ø 8 mm) or large-nut
+  DC jack (Ø 12 mm). Optional **switch hole** (Ø 6.5 mm) beside it.
+- Every hole is checked against the inside of the rim; the tool warns when a
+  shape has no room for one.
+
+In the shaped modes, Width sets the overall width and the height follows from
+the artwork. Photo lithophanes stay rectangular. Shaped boxes are Pro
+(preview free). In batch mode each name gets its own frame, front and back.
+
 ## Box
 Size presets (name sign, square, wide, 6×4 photo landscape/portrait) or custom.
 Depth, wall, corner radius, front thickness and colour depth are adjustable.
@@ -29,6 +53,7 @@ or loose fit), a USB cable hole and keyhole slots for wall hanging.
 | Logos / images | preview | ✓ | ✓ |
 | Photo lithophane | preview | ✓ | ✓ |
 | Batch names | preview | ✓ | ✓ |
+| Name-shaped and letter-shaped boxes | preview | ✓ | ✓ |
 | Back panel | small `MADE WITH VEER` deboss | clean | clean |
 | Selling prints | — | — | ✓ |
 

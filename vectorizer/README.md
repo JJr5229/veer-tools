@@ -15,6 +15,18 @@ Everything runs in the browser and nothing is uploaded.
 - DXF R12 for laser cutters: closed polylines, one layer per colour
 - Batch convert: many images to sized SVG + DXF in one zip
 
+**Stacked shapes** (a checkbox above the exports). Normally each colour is
+cut out where other colours sit on it, like puzzle pieces. Stacked fills
+each colour in underneath the colours above it, the way designers build
+logos and layered vinyl works: a circle behind text comes out whole, and a
+circle or rectangle partly covered at its edge is restored exactly. Every
+piece can then be moved or recoloured in Illustrator without leaving a gap.
+
+**Colour detection.** Before tracing, Vectorizer finds the logo's real
+colours itself (histogram + farthest-colour seeding + k-means on the opaque
+pixels), so small distinct colours aren't merged into their neighbours.
+"Colors" is a maximum: soft anti-aliased edges don't become extra layers.
+
 **Print it in 3D.** Preview is free; STL download is Pro.
 
 | Mode | What you get | Notes |
