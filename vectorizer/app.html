@@ -504,6 +504,10 @@ a.buy.off{opacity:.45;pointer-events:none}
             <span class="num"><input type="number" id="mmW" value="100" min="1" max="5000" step="1"><span class="unit">mm</span></span>
             <span id="mmH"></span>
           </div>
+          <label class="check" style="margin:2px 0 12px">
+            <input type="checkbox" id="stacked">
+            Stacked shapes <span style="color:var(--tx-3)">(each colour fills in under the colours above it, like a hand-built logo or layered vinyl)</span>
+          </label>
           <div class="ex-grid">
             <button class="btn primary" id="exSized">Sized SVG, layers grouped<small>one file · groups per colour</small></button>
             <button class="btn" id="exLayers">One SVG per colour (.zip)<small>a file per mat or pass</small></button>
@@ -1885,7 +1889,7 @@ if(typeof define === 'function' && define.amd){
    ships: MINOR for a new capability, PATCH for a fix. The date is the ship
    date, so a glance at the badge tells you whether the page you're looking
    at is the current one or a stale cache. */
-var BUILD = 'v1.3.1 · 2026-11-09';
+var BUILD = 'v1.4.0 · 2026-11-15';
 
 var MAXDIM = 1600;
 
@@ -2055,19 +2059,70 @@ function syncOutputs(){
   ui.speckleOut.textContent = ui.speckle.value;
 }
 
+/* Pick the logo's real colours before tracing. The tracer's own sampling
+   picks evenly spaced pixels, so on a transparent PNG most samples are
+   transparent and small but distinct colours (white text, a blue badge) get
+   merged into their neighbours. Instead: histogram the opaque pixels (5 bits
+   per channel), then choose centres that are both common and far from the
+   ones already chosen (count × distance²), refine with a few k-means passes,
+   and add one transparent entry if the image has transparency. "Colors"
+   then means visible colours. Deterministic, and cached per image. */
+var palCache = {imgd:null, n:0, pal:null};
+function smartPalette(imgd, n){
+  if(palCache.imgd === imgd && palCache.n === n) return palCache.pal;
+  var d = imgd.data, N = imgd.width*imgd.height, step = Math.max(1, Math.floor(N/120000));
+  var bins = new Map(), clear = 0, seen = 0;
+  for(var i=0;i<N;i+=step){
+    var o = i*4; seen++;
+    if(d[o+3] < 128){ clear++; continue; }
+    var key = ((d[o]>>3)<<10)|((d[o+1]>>3)<<5)|(d[o+2]>>3), b = bins.get(key);
+    if(!b){ b = {c:0, r:0, g:0, b:0}; bins.set(key, b); }
+    b.c++; b.r += d[o]; b.g += d[o+1]; b.b += d[o+2];
+  }
+  var B = []; bins.forEach(function(b){ B.push({c:b.c, r:b.r/b.c, g:b.g/b.c, b:b.b/b.c}); });
+  var C = [], total = 0; B.forEach(function(p){ total += p.c; });
+  /* anti-aliased edges scatter thinly over many bins; only a colour that
+     fills at least 0.2% of the logo in one bin can become its own layer, so
+     "Colors" is a maximum and soft edges don't add sliver layers */
+  var cand = B.filter(function(p){ return p.c >= total*0.002; });
+  if(!cand.length) cand = B.slice(0,1);
+  if(B.length){
+    B.sort(function(a,b){ return b.c - a.c; }); C.push({r:B[0].r, g:B[0].g, b:B[0].b});
+    while(C.length < Math.min(n, cand.length)){
+      var best = null, bs = -1;
+      cand.forEach(function(p){ var m = Infinity;
+        C.forEach(function(c){ var dr=p.r-c.r, dg=p.g-c.g, db=p.b-c.b; m = Math.min(m, dr*dr+dg*dg+db*db); });
+        var sc = p.c*m; if(sc > bs){ bs = sc; best = p; } });
+      C.push({r:best.r, g:best.g, b:best.b});
+    }
+    for(var it=0; it<6; it++){
+      var acc = C.map(function(){ return {c:0, r:0, g:0, b:0}; });
+      B.forEach(function(p){ var bi=0, bd=Infinity;
+        C.forEach(function(c, j){ var dr=p.r-c.r, dg=p.g-c.g, db=p.b-c.b, dd=dr*dr+dg*dg+db*db; if(dd<bd){bd=dd; bi=j;} });
+        var a = acc[bi]; a.c += p.c; a.r += p.r*p.c; a.g += p.g*p.c; a.b += p.b*p.c; });
+      C = C.map(function(c, j){ var a = acc[j]; return a.c ? {r:a.r/a.c, g:a.g/a.c, b:a.b/a.c} : c; });
+    }
+  }
+  var pal = C.map(function(c){ return {r:Math.round(c.r), g:Math.round(c.g), b:Math.round(c.b), a:255}; });
+  if(clear > seen*0.003 || !pal.length) pal.push({r:0, g:0, b:0, a:0});
+  palCache = {imgd:imgd, n:n, pal:pal};
+  return pal;
+}
 function buildOpts(){
   var d = +ui.detail.value;
   var tres = (11 - d) * 0.2;
   var ncolors = +ui.colors.value;
+  var img = activeImgd(), pal = img ? smartPalette(img, ncolors) : null;
   return {
+    pal: pal || undefined,
     ltres:tres, qtres:tres,
     pathomit:+ui.speckle.value,
     rightangleenhance:ui.rightangle.checked,
     /* deterministic sampling keeps alpha in the palette; the generated
        greyscale palette used for 2-colour work would force it back opaque */
     colorsampling:((ncolors === 2 && activeImgd() === state.rawImgd) ? 0 : 2),
-    numberofcolors:ncolors,
-    mincolorratio:0, colorquantcycles:3,
+    numberofcolors:pal ? pal.length : ncolors,
+    mincolorratio:0, colorquantcycles:pal ? 1 : 3,
     strokewidth:1,
     blurradius:+ui.smooth.value, blurdelta:20,
     scale:1, roundcoords:1, viewbox:true, desc:false,
@@ -2436,6 +2491,109 @@ function toHex(rgb){
   var c = (/rgba?\(([^)]*)\)/.exec(rgb) || [,'0,0,0'])[1].split(',').map(function(v){ return Math.max(0,Math.min(255,Math.round(+v))); });
   return '#' + c.slice(0,3).map(function(v){ return ('0' + v.toString(16)).slice(-2); }).join('');
 }
+/* ───────── stacked shapes ─────────
+   The tracer produces cut-out shapes: where white text sits on a red circle,
+   the circle has text-shaped holes. "Stacked" fills each colour in underneath
+   the colours above it, the way a designer builds a logo: bottom layers are
+   whole shapes, and every piece can be moved or recoloured without leaving a
+   gap. Order is bottom → top by area. A hole in a layer is filled only where
+   upper layers cover it (real see-through holes stay holes), and each layer
+   tucks 1.5 px under its neighbours above so no hairline gaps show. Each
+   stacked layer is re-traced with the same settings, so curves stay clean. */
+function stackTrace(t){
+  var P3 = window.__veerPrint3d;
+  if(!P3 || t.layers.length < 2) return t;
+  var k = Math.min(2, 2400 / Math.max(t.w, t.h));
+  var W = Math.max(1, Math.round(t.w*k)), H = Math.max(1, Math.round(t.h*k)), N = W*H;
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  var g = cv.getContext('2d', {willReadFrequently:true});
+  var masks = t.layers.map(function(L){
+    g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,W,H); g.setTransform(k,0,0,k,0,0); g.fillStyle = '#000';
+    L.paths.forEach(function(d){ try{ g.fill(new Path2D(d), 'evenodd'); }catch(e){} });
+    var px = g.getImageData(0,0,W,H).data, m = new Uint8Array(N), a = 0;
+    for(var i=0;i<N;i++) if(px[i*4+3] > 127){ m[i] = 1; a++; }
+    return {L:L, m:m, a:a};
+  }).sort(function(x,y){ return y.a - x.a; });
+  var opts = Object.assign({}, V.buildOpts(), {numberofcolors:2, colorsampling:0, blurradius:0, mincolorratio:0, layering:0,
+    scale:1/k, viewbox:true, pal:[{r:0,g:0,b:0,a:255},{r:255,g:255,b:255,a:255}]});
+  var out = [];
+  masks.forEach(function(M, i){
+    if(i === masks.length-1){ out.push(M.L); return; }            // top layer is unchanged
+    var upper = new Uint8Array(N);
+    for(var j=i+1;j<masks.length;j++){ var mj = masks[j].m; for(var q=0;q<N;q++) if(mj[q]) upper[q] = 1; }
+    /* fill under upper colours where this shape plausibly continues: within
+       the convex outline of each of its pieces (completes a circle cut by a
+       badge on its edge, fills letter counters), plus a 1.5 px tuck. Only
+       area hidden by upper colours is ever added. */
+    var hull = hullMask(M.m, W, H, P3, P3.dilate(upper, W, H, 3*k)), grown = P3.dilate(M.m, W, H, 1.5*k), st = new Uint8Array(N);
+    for(var q2=0;q2<N;q2++) st[q2] = (M.m[q2] || (upper[q2] && (hull[q2] || grown[q2]))) ? 1 : 0;
+    var id = new ImageData(W, H), d = id.data;
+    for(var q3=0;q3<N;q3++){ var v = st[q3] ? 0 : 255; d[q3*4]=v; d[q3*4+1]=v; d[q3*4+2]=v; d[q3*4+3]=255; }
+    var svg = ImageTracer.imagedataToSVG(id, opts), re = /<path\b([^>]*)\/>/g, mm, paths = [];
+    while((mm = re.exec(svg))){
+      var a = mm[1], f = (/fill="([^"]*)"/.exec(a) || [])[1], dd = (/\sd="([^"]*)"/.exec(a) || [])[1];
+      if(dd && f && /rgb\(0,0,0\)/.test(f.replace(/\s/g,''))) paths.push(dd.trim());
+    }
+    out.push({fill:M.L.fill, hex:M.L.hex, paths:paths.length ? paths : M.L.paths, stacked:true});
+  });
+  return {w:t.w, h:t.h, layers:out, stacked:true};
+}
+/* convex hull of every connected piece of a mask, rasterised back to a mask */
+/* …and if a piece's visible edge (the part not cut by upper colours) is a
+   circle or an axis-aligned rectangle, the whole circle / rectangle, so a
+   badge cut by a sticker on its rim comes back perfectly round */
+function hullMask(m, W, H, P3, upper){
+  var C = P3.components(m, W, H, 1), pts = C.comps.map(function(){ return []; }), edge = C.comps.map(function(){ return []; });
+  var free = function(j){ return !m[j] && !(upper && upper[j]); };
+  for(var y=0;y<H;y++) for(var x=0;x<W;x++){
+    var i = y*W+x, l = C.lab[i]; if(l < 0) continue;
+    if(x===0||y===0||x===W-1||y===H-1||!m[i-1]||!m[i+1]||!m[i-W]||!m[i+W]){
+      pts[l].push([x,y]);
+      if(x>0&&y>0&&x<W-1&&y<H-1&&(free(i-1)||free(i+1)||free(i-W)||free(i+W))) edge[l].push([x,y]);
+    }
+  }
+  var cv = document.createElement('canvas'); cv.width = W; cv.height = H;
+  var g = cv.getContext('2d', {willReadFrequently:true}); g.fillStyle = '#000';
+  var cross = function(o,a,b){ return (a[0]-o[0])*(b[1]-o[1]) - (a[1]-o[1])*(b[0]-o[0]); };
+  pts.forEach(function(P){
+    if(P.length < 3) return;
+    P.sort(function(a,b){ return a[0]-b[0] || a[1]-b[1]; });
+    var lo = [], up = [];
+    P.forEach(function(p){ while(lo.length>=2 && cross(lo[lo.length-2],lo[lo.length-1],p)<=0) lo.pop(); lo.push(p); });
+    for(var j=P.length-1;j>=0;j--){ var p = P[j]; while(up.length>=2 && cross(up[up.length-2],up[up.length-1],p)<=0) up.pop(); up.push(p); }
+    var h = lo.slice(0,-1).concat(up.slice(0,-1));
+    g.beginPath(); h.forEach(function(p,j){ j ? g.lineTo(p[0]+0.5,p[1]+0.5) : g.moveTo(p[0]+0.5,p[1]+0.5); }); g.closePath(); g.fill();
+  });
+  edge.forEach(function(E){
+    if(E.length < 24) return;
+    // circle: algebraic least-squares fit, accepted if the visible edge hugs it and spans > 180°
+    var n = E.length, sx=0,sy=0,sxx=0,syy=0,sxy=0,sxz=0,syz=0,sz=0;
+    E.forEach(function(p){ var x=p[0], y=p[1], z=x*x+y*y; sx+=x; sy+=y; sxx+=x*x; syy+=y*y; sxy+=x*y; sxz+=x*z; syz+=y*z; sz+=z; });
+    var A=[[sxx,sxy,sx],[sxy,syy,sy],[sx,sy,n]], b=[-sxz,-syz,-sz];
+    var det=function(M){ return M[0][0]*(M[1][1]*M[2][2]-M[1][2]*M[2][1])-M[0][1]*(M[1][0]*M[2][2]-M[1][2]*M[2][0])+M[0][2]*(M[1][0]*M[2][1]-M[1][1]*M[2][0]); };
+    var D0=det(A);
+    if(Math.abs(D0) > 1e-9){
+      var sol=[0,1,2].map(function(c){ var M=A.map(function(r,ri){ return r.map(function(v,ci){ return ci===c?b[ri]:v; }); }); return det(M)/D0; });
+      var cx=-sol[0]/2, cy=-sol[1]/2, r=Math.sqrt(Math.max(0,cx*cx+cy*cy-sol[2]));
+      if(r > 6){
+        var rms=0, ang=new Array(36).fill(0);
+        E.forEach(function(p){ var dd=Math.hypot(p[0]-cx,p[1]-cy)-r; rms+=dd*dd; ang[Math.floor((Math.atan2(p[1]-cy,p[0]-cx)+Math.PI)/(2*Math.PI)*36)%36]=1; });
+        rms=Math.sqrt(rms/n);
+        if(rms < Math.max(1.5, 0.012*r) && ang.reduce(function(a,v){return a+v;},0) >= 19){
+          g.beginPath(); g.arc(cx+0.5, cy+0.5, r, 0, Math.PI*2); g.fill(); return; }
+      }
+    }
+    // axis-aligned rectangle: nearly every visible edge pixel lies on its bounding box
+    var x0=Infinity,x1=-Infinity,y0=Infinity,y1=-Infinity;
+    E.forEach(function(p){ x0=Math.min(x0,p[0]); x1=Math.max(x1,p[0]); y0=Math.min(y0,p[1]); y1=Math.max(y1,p[1]); });
+    var on=0; E.forEach(function(p){ if(Math.min(Math.abs(p[0]-x0),Math.abs(p[0]-x1),Math.abs(p[1]-y0),Math.abs(p[1]-y1))<=1.5) on++; });
+    if(on/n > 0.97 && x1-x0 > 6 && y1-y0 > 6) g.fillRect(x0, y0, x1-x0+1, y1-y0+1);
+  });
+  var px = g.getImageData(0,0,W,H).data, out = new Uint8Array(W*H);
+  for(var q=0;q<W*H;q++) if(px[q*4+3] > 127) out[q] = 1;
+  return out;
+}
+function makerTrace(svg){ var t = parseTrace(svg); return $('stacked').checked ? stackTrace(t) : t; }
 function mmSize(t){
   var mw = Math.max(1, +$('mmW').value || 100);
   return {w:mw, h:+(mw * t.h / t.w).toFixed(2), s:mw / t.w};
@@ -2573,7 +2731,7 @@ var base = function(n){ return String(n || 'image').replace(/\.[^.]+$/, '').repl
 function current(){
   var st = V.getState();
   if(!st.svg){ makerMsg('Load an image first.', 'err'); return null; }
-  var t = parseTrace(st.svg);
+  var t = makerTrace(st.svg);
   if(!t.layers.length){ makerMsg('The trace is empty. Try keeping the background or adding colours.', 'err'); return null; }
   return {st:st, t:t};
 }
@@ -2612,7 +2770,7 @@ $('batchFile').addEventListener('change', async function(){
     await new Promise(function(r){ setTimeout(r, 20); });   // let the message paint
     try{
       var svg = await traceFile(list[i]);
-      var t = parseTrace(svg), bn = base(list[i].name);
+      var t = makerTrace(svg), bn = base(list[i].name);
       if(!t.layers.length){ failed++; continue; }
       files.push({name: 'vectorized/' + bn + '.svg', data: sizedSvg(t, t.layers, bn)});
       files.push({name: 'vectorized/' + bn + '.dxf', data: makeDxf(t).text});
@@ -2692,7 +2850,7 @@ function licFromHash(){
   openPro(); document.getElementById("proKey").value=k; doActivate();
 }
 licInit().then(licFromHash);
-window.__veerVectorizerPro = { parseTrace:parseTrace, makeDxf:makeDxf, sizedSvg:sizedSvg, isPro:isPro,
+window.__veerVectorizerPro = { parseTrace:parseTrace, stackTrace:stackTrace, makeDxf:makeDxf, sizedSvg:sizedSvg, isPro:isPro,
   openPro:openPro, zipStore:zipStore, save:save, base:base };
 })();
 
@@ -3771,7 +3929,8 @@ var proTag = function(){ $('p3Tag').hidden = P.isPro(); };
 new MutationObserver(proTag).observe($('planTxt'), {childList:true, characterData:true, subtree:true});
 proTag();
 
-window.__veerPrint3d = { plan:plan, build:build, opts:opts, stlBinary:stlBinary, last:function(){ return last; } };
+window.__veerPrint3d = { plan:plan, build:build, opts:opts, stlBinary:stlBinary, last:function(){ return last; },
+  dilate:dilate, fillHoles:fillHoles, components:components };
 })();
 
 </script>
