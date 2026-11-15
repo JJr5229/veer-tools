@@ -21,6 +21,16 @@ in the browser.
   warns when the name splits into separate pieces or the letters are too
   narrow inside for an LED strip.
 
+## Back panel
+- **Keyhole slots** for wall hanging (screw head up to 8 mm). On shaped boxes
+  they're placed automatically: a level pair as high and as far apart as the
+  shape allows, or one centred keyhole when it's narrow.
+- **Power hole:** USB plug pass-through (17 × 9 mm), USB-C panel socket
+  cut-out (9.4 × 3.8 mm), DC barrel jack panel mount (Ø 8 mm) or large-nut
+  DC jack (Ø 12 mm). Optional **switch hole** (Ø 6.5 mm) beside it.
+- Every hole is checked against the inside of the rim; the tool warns when a
+  shape has no room for one.
+
 In the shaped modes, Width sets the overall width and the height follows from
 the artwork. Photo lithophanes stay rectangular. Shaped boxes are Pro
 (preview free). In batch mode each name gets its own frame, front and back.

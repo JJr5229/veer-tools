@@ -418,7 +418,15 @@ a.buy.off{opacity:.45;pointer-events:none}
     <details class="sec"><summary><span class="n">3</span><span class="t">Back panel &amp; light</span></summary><div class="body">
       <div class="chk"><input type="checkbox" id="backOn" checked><label for="backOn">Make a back panel</label></div>
       <div class="chk"><input type="checkbox" id="keyholes" checked><label for="keyholes">Keyhole slots for wall hanging</label></div>
-      <div class="chk"><input type="checkbox" id="cable" checked><label for="cable">Cable hole for USB LED strip</label></div>
+      <div class="chk"><input type="checkbox" id="cable" checked><label for="cable">Power hole</label></div>
+      <div class="row" id="powerRow"><label for="powerKind">Power</label>
+        <select id="powerKind">
+          <option value="usb" selected>USB plug pass-through · 17 × 9 mm</option>
+          <option value="usbc">USB-C panel socket · 9.4 × 3.8 mm</option>
+          <option value="dc8">DC barrel jack, panel mount · Ø 8 mm</option>
+          <option value="dc12">DC jack, large nut · Ø 12 mm</option>
+        </select></div>
+      <div class="chk"><input type="checkbox" id="switchOn"><label for="switchOn">Switch hole · Ø 6.5 mm (mini toggle or rocker)</label></div>
       <div class="row"><label for="fit">Back panel fit</label><select id="fit"><option value="0.2">Snug · 0.2 mm</option><option value="0.3" selected>Standard · 0.3 mm</option><option value="0.45">Loose · 0.45 mm</option></select></div>
       <div class="note"><b>Lighting:</b> a 5 V USB LED strip (warm white, about 50 cm) stuck around the inside walls lights evenly. A battery puck light on the back panel works too. At least 30 mm of depth avoids hot spots.</div>
     </div></details>
@@ -506,7 +514,7 @@ a.buy.off{opacity:.45;pointer-events:none}
    are mirrored into print space at the end; the back panel is authored in
    print space directly (its outside face is on the plate).
    ═══════════════════════════════════════════════════════════════════════════ */
-const BUILD = "v1.1.0 · 2026-11-15";
+const BUILD = "v1.2.0 · 2026-11-15";
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v<a?a:v>b?b:v;
 
@@ -1214,6 +1222,7 @@ function readSettings(){
     frameCol:$("frameCol").value, faceCol:$("faceCol").value,
     backOn:$("backOn").checked, keyholes:$("keyholes").checked, cable:$("cable").checked, fit:parseFloat($("fit").value)||0.3,
     batch:$("batch").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,200),
+    powerKind:$("powerKind").value, switchOn:$("switchOn").checked,
     shape:$("shape").value, border:Math.max(3,g("border")), grow:Math.max(0.5,g("grow"))
   };
   if(st.mode==="litho"||!["outline","letters"].includes(st.shape)) st.shape="rect";
@@ -1454,6 +1463,12 @@ function buildFront(st, line1, line2){
   mirrorX(parts);   // the front prints face-down: mirror so it reads right
   return parts;
 }
+/* power entry: the hole shape and the clearance radius it needs */
+const POWER={ usb:{r:9.7, loop:(x,y)=>rectLoop(x,y,17,9,3.5), label:"USB plug pass-through (17 × 9 mm)"},
+  usbc:{r:5.1, loop:(x,y)=>rectLoop(x,y,9.4,3.8,1.6), label:"USB-C panel socket cut-out (9.4 × 3.8 mm)"},
+  dc8:{r:4.1, loop:(x,y)=>circleLoop(x,y,4.1,48), label:"DC barrel jack, panel mount (Ø 8 mm)"},
+  dc12:{r:6.1, loop:(x,y)=>circleLoop(x,y,6.1,56), label:"DC jack with large nut (Ø 12 mm)"} };
+const SWITCH_R=3.25;
 /* keyhole: Ø8 head clearance with a 4.4 mm slot rising 8 mm (CCW) */
 function keyholeLoop(cx,cy){
   const R=4, a=2.2, L=8, yi=Math.sqrt(R*R-a*a), pts=[];
@@ -1470,7 +1485,12 @@ function buildBack(st){
   const rw=st.iw-2*c, rhh=st.ih-2*c, rr=Math.max(0.5,st.ri-c);
   const rimO=roundRectLoop(rw,rhh,rr), rimI=roundRectLoop(rw-2*rimT,rhh-2*rimT,Math.max(0.3,rr-rimT));
   const inHW=rw/2-rimT, inHH=rhh/2-rimT, holes=[];
-  if(st.cable && inHH>12) holes.push(rectLoop(0,-inHH+6.5,13,8,3.5));
+  const pw=POWER[st.powerKind]||POWER.usb;
+  if(st.cable && inHH>pw.r+3 && inHW>pw.r+3){
+    const py=-inHH+pw.r+3;
+    holes.push(pw.loop(0,py));
+    if(st.switchOn && inHW>pw.r+SWITCH_R+12) holes.push(circleLoop(pw.r+SWITCH_R+8,py,SWITCH_R,40));
+  }else if(st.switchOn && inHH>8) holes.push(circleLoop(0,-inHH+SWITCH_R+3,SWITCH_R,40));
   if(st.keyholes && inHH>18){
     const xs = st.iw>90 ? [-st.iw/4, st.iw/4] : [0];
     xs.forEach(x=>holes.push(keyholeLoop(x, inHH-17)));
@@ -1720,17 +1740,7 @@ function slotMaskM(M,slot){
 /* back panel for a shaped box, in print space (rim side up = seen from the front) */
 function buildBackShaped(st){
   const M=st.model, Lp=M.getLoops(), bt=2.4, rh=4, holes=[];
-  // cable hole at the roomiest spot inside the rim, preferring the lower half
-  if(st.cable){
-    const inv=new Uint8Array(M.N); for(let i=0;i<M.N;i++) inv[i]=M.rimI[i]?0:1;
-    const D=edt(inv,M.gw,M.gh); let bi=-1,bd=0,ai=-1,ad=0; const cy=(M.gh-1)/2;
-    for(let i=0;i<M.N;i++){ const v=D[i]; if(v>ad){ad=v;ai=i;} if(v>bd && Math.floor(i/M.gw)<cy){bd=v;bi=i;} }
-    const pick=(Math.sqrt(bd)/M.res>=7.6)?bi:ai, r=Math.sqrt(pick===bi?bd:ad)/M.res;
-    if(pick>=0 && r>=4.5){
-      const x=M.ox+(pick%M.gw)/M.res, y=M.oy+Math.floor(pick/M.gw)/M.res;
-      holes.push(r>=8.2 ? rectLoop(x,y,13,8,3.5) : circleLoop(x,y,3.5,40));
-    }
-  }
+  holes.push(...planHolesShaped(st,M).holes);
   let wm=null;
   if(!isPro()) wm=backMarkShaped(st,M,holes);
   const t=[], hr=holes.map(revLoop), wr=wm?wm.map(revLoop):[];
@@ -1741,6 +1751,55 @@ function buildBackShaped(st){
   addWalls(t,[...Lp.rimO,...Lp.rimI.map(revLoop)],bt,bt+rh);
   addCaps(t,[...Lp.rimO,...Lp.rimI.map(revLoop)],bt+rh,true);
   return [{name:"back",label:"Back panel",tris:t,color:st.frameCol,z:[0,bt+rh]}];
+}
+/* Where things go on a shaped back panel. Everything is checked against the
+   inside of the rim (distance field), with 1.5 mm to spare.
+   power + switch: roomiest spots in the lower half; keyholes: a level pair as
+   high and as far apart as the shape allows, or one centred keyhole. */
+function planHolesShaped(st,M){
+  const hk=[st.cable,st.powerKind,st.switchOn,st.keyholes].join("|");
+  if(M.holePlan&&M.holePlan.key===hk) return M.holePlan;
+  const warn=[];
+  const inv=new Uint8Array(M.N); for(let i=0;i<M.N;i++) inv[i]=M.rimI[i]?0:1;
+  const D=edt(inv,M.gw,M.gh), res=M.res;
+  const room=(x,y)=>{ const gx=Math.round((x-M.ox)*res), gy=Math.round((y-M.oy)*res);
+    if(gx<0||gy<0||gx>=M.gw||gy>=M.gh) return 0; return Math.sqrt(D[gy*M.gw+gx])/res; };
+  const holes=[], used=[];
+  const step=1.5, cyMid=0;
+  const xs=[], ys=[];
+  for(let x=M.ox;x<=-M.ox;x+=step) xs.push(x);
+  for(let y=M.oy;y<=-M.oy;y+=step) ys.push(y);
+  const far=(x,y,r)=>used.every(u=>Math.hypot(u.x-x,u.y-y)>u.r+r+4);
+  if(st.cable){
+    const pw=POWER[st.powerKind]||POWER.usb; let best=null;
+    for(const y of ys) for(const x of xs){ const r=room(x,y); if(r<pw.r+1.5) continue;
+      const score=(y<cyMid?1000:0)-y*2-Math.abs(x)*0.5+r*0.2;   // low and central
+      if(!best||score>best.s) best={x,y,s:score}; }
+    if(best){ holes.push(pw.loop(best.x,best.y)); used.push({x:best.x,y:best.y,r:pw.r});
+      if(st.switchOn){ let sb=null;
+        for(const y of ys) for(const x of xs){ if(room(x,y)<SWITCH_R+1.5||!far(x,y,SWITCH_R)) continue;
+          const dd=Math.hypot(x-best.x,y-best.y); if(!sb||dd<sb.d) sb={x,y,d:dd}; }
+        if(sb){ holes.push(circleLoop(sb.x,sb.y,SWITCH_R,40)); used.push({x:sb.x,y:sb.y,r:SWITCH_R}); } } }
+    else warn.push("There's no room inside this shape for the "+pw.label+". Choose a smaller power option or a bigger size.");
+  }
+  if(st.keyholes){
+    // keyhole spans y-4 … y+13.6 and x±4 around its head
+    const fits=(x,y)=>room(x,y)>=5.5 && room(x,y+4.5)>=4.5 && room(x,y+9)>=4 && far(x,y+4,9);
+    let pair=null, single=null;
+    for(let yi=ys.length-1;yi>=0&&!pair;yi--){ const y=ys[yi];
+      const ok=xs.filter(x=>fits(x,y));
+      if(!ok.length) continue;
+      if(!single) single={x:ok.reduce((a,b)=>Math.abs(b)<Math.abs(a)?b:a),y};
+      const span=ok[ok.length-1]-ok[0];
+      if(span>=Math.max(40,0.35*st.W)){ pair=[{x:ok[0]+3,y},{x:ok[ok.length-1]-3,y}];
+        if(!fits(pair[0].x,y)) pair[0].x=ok[0]; if(!fits(pair[1].x,y)) pair[1].x=ok[ok.length-1]; }
+    }
+    const ks=pair||(single?[single]:[]);
+    ks.forEach(k=>{ holes.push(keyholeLoop(k.x,k.y)); used.push({x:k.x,y:k.y+4,r:9}); });
+    if(!ks.length) warn.push("No room for keyhole slots inside this shape. Hang it with adhesive strips, or add border or size.");
+  }
+  M.holePlan={key:hk,holes,warn};
+  return M.holePlan;
 }
 function backMarkShaped(st,M,holes){
   const c=document.createElement("canvas"); c.width=M.gw; c.height=M.gh;
@@ -1983,7 +2042,8 @@ function refresh(){
       drawLit();
       if(st.shape!=="rect"){
         $("H").value=Math.round(st.H);
-        if(st.model.warn.length) $("frontWarn").innerHTML+=st.model.warn.map(w=>`<div class="warnbox">${w}</div>`).join("");
+        const ws=[...st.model.warn,...(st.backOn?planHolesShaped(st,st.model).warn:[])];
+        if(ws.length) $("frontWarn").innerHTML+=ws.map(w=>`<div class="warnbox">${w}</div>`).join("");
       }
       const needs=isPro()?[]:proNeeds(st);
       $("overlay").textContent=`${st.W} × ${st.H} × ${st.D} mm · ${st.shape==="rect"?`opening ${st.iw.toFixed(0)} × ${st.ih.toFixed(0)} mm`:st.shape==="outline"?"shaped to the name":"letter shapes"} · ${st.mode==="litho"?"lithophane":"multi-colour front"} · ${(performance.now()-t0).toFixed(0)} ms`;
@@ -2030,7 +2090,11 @@ function readme(st, names){
     "  Print flat, rim up. The rim presses into the back of the frame.",
     "  Too tight or too loose? Change 'Back panel fit' and re-export.","");
   L.push("LIGHT","  Stick a 5 V USB LED strip (warm white) around the inside walls, or use a battery puck",
-    "  light on the back panel. Run the USB cable out through the hole in the back panel.");
+    "  light on the back panel.");
+  if(st.cable) L.push("  Power: "+(POWER[st.powerKind]||POWER.usb).label+" in the back panel."+
+    (st.powerKind==="usbc"?" Glue the socket in from the inside.":st.powerKind.startsWith("dc")?" Fit the jack from the inside and tighten its nut.":""));
+  if(st.switchOn) L.push("  Switch: Ø 6.5 mm hole for a mini toggle or round rocker switch.");
+  if(st.keyholes) L.push("  Hang: keyhole slots on the back fit a screw with a head up to 8 mm.");
   return L.join("\r\n")+"\r\n";
 }
 async function doDownload(){
@@ -2121,7 +2185,7 @@ $("imgClear").onclick=e=>{ e.stopPropagation(); S.img=null; S.src=null; S.palett
 ["dragleave","drop"].forEach(ev=>window.addEventListener(ev,e=>{ e.preventDefault(); $("drop").classList.remove("over"); }));
 window.addEventListener("drop",e=>{ if(e.dataTransfer&&e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
 const LIVE=["l1","l2","font","tSize","tL2","tBold","tX","tY","iScale","iX","iY","k","rmBg","bgTol","lZoom","lBright","lContrast","lMin","lMax",
-  "W","H","D","wall","rad","faceT","colD","frameCol","faceCol","backOn","keyholes","cable","fit","batch","preset","shape","border","grow"];
+  "W","H","D","wall","rad","faceT","colD","frameCol","faceCol","backOn","keyholes","cable","fit","batch","preset","shape","border","grow","powerKind","switchOn"];
 LIVE.forEach(id=>{ const el=$(id); if(!el) return;
   el.addEventListener("input",()=>{ syncLabels(); $("stat").classList.remove("ok"); refresh(); });
   el.addEventListener("change",()=>{ syncLabels(); refresh(); }); });
