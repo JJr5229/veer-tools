@@ -385,7 +385,16 @@ a.buy.off{opacity:.45;pointer-events:none}
     </div></details>
 
     <details class="sec" open><summary><span class="n">2</span><span class="t">Box</span></summary><div class="body">
-      <div class="row"><label for="preset">Size</label>
+      <div class="row"><label for="shape">Shape</label>
+        <select id="shape">
+          <option value="rect">Rectangle</option>
+          <option value="outline">Follow the name</option>
+          <option value="letters">Letter shapes</option>
+        </select></div>
+      <div class="row" id="borderRow" hidden><label for="border">Border around the name</label><span class="u"><input type="number" id="border" value="8" step="1" min="3"><i>mm</i></span></div>
+      <div class="row" id="growRow" hidden><label for="grow">Letter thickness added</label><span class="u"><input type="number" id="grow" value="1" step="0.5" min="0.5"><i>mm</i></span></div>
+      <div class="note" id="shapeNote" hidden></div>
+      <div class="row" id="presetRow"><label for="preset">Size</label>
         <select id="preset">
           <option value="name">Name sign · 180 × 80</option>
           <option value="square">Square · 120 × 120</option>
@@ -497,7 +506,7 @@ a.buy.off{opacity:.45;pointer-events:none}
    are mirrored into print space at the end; the back panel is authored in
    print space directly (its outside face is on the plate).
    ═══════════════════════════════════════════════════════════════════════════ */
-const BUILD = "v1.0.1 · 2026-11-09";
+const BUILD = "v1.1.0 · 2026-11-15";
 const $ = id => document.getElementById(id);
 const clamp = (v,a,b) => v<a?a:v>b?b:v;
 
@@ -1157,6 +1166,7 @@ function proNeeds(st){
   if(st.mode==="litho") n.push("photo lithophane");
   else if(S.img) n.push("an image");
   if(st.batch.length) n.push("batch names");
+  if(st.shape!=="rect") n.push(st.shape==="outline"?"a name-shaped box":"letter-shaped boxes");
   return n;
 }
 function proUI(){
@@ -1203,8 +1213,10 @@ function readSettings(){
     rad:Math.max(0,g("rad")), faceT:Math.max(0.6,g("faceT")), colD:Math.max(0.2,g("colD")),
     frameCol:$("frameCol").value, faceCol:$("faceCol").value,
     backOn:$("backOn").checked, keyholes:$("keyholes").checked, cable:$("cable").checked, fit:parseFloat($("fit").value)||0.3,
-    batch:$("batch").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,200)
+    batch:$("batch").value.split(/\r?\n/).map(s=>s.trim()).filter(Boolean).slice(0,200),
+    shape:$("shape").value, border:Math.max(3,g("border")), grow:Math.max(0.5,g("grow"))
   };
+  if(st.mode==="litho"||!["outline","letters"].includes(st.shape)) st.shape="rect";
   if(st.lMax<=st.lMin+0.4) st.lMax=st.lMin+0.4;
   st.colD=Math.min(st.colD, st.faceT-0.4);
   st.rad=Math.min(st.rad, Math.min(st.W,st.H)/2-0.5);
@@ -1413,6 +1425,7 @@ function openingLoop(st){
 }
 /* frame + front (+ colour parts), mirrored into print space */
 function buildFront(st, line1, line2){
+  if(st.shape!=="rect"){ withShape(st,line1,line2); return buildFrontShaped(st,line1,line2); }
   const parts=[];
   const outer=jitterLoops([roundRectLoop(st.W,st.H,st.rad)])[0];
   const inner=st.mode==="litho" ? openingLoop(st) : jitterLoops([openingLoop(st)])[0];
@@ -1451,6 +1464,7 @@ function keyholeLoop(cx,cy){
 }
 /* back panel, in print space: outside face on the plate, locating rim up */
 function buildBack(st){
+  if(st.shape!=="rect"){ if(!st.model) withShape(st,st.l1,st.l2); return buildBackShaped(st); }
   const bt=2.4, rh=4, rimT=1.6, c=st.fit;
   const outer=roundRectLoop(st.W,st.H,st.rad);
   const rw=st.iw-2*c, rhh=st.ih-2*c, rr=Math.max(0.5,st.ri-c);
@@ -1501,6 +1515,297 @@ function backMark(st, hw, hh, holes){
 
 /* ───────────────────────── lit preview ───────────────────────── */
 const GLOW=[255,238,206];
+/* ───────────────────────── shaped boxes ─────────────────────────
+   "Follow the name": the box outline is the artwork's silhouette grown by a
+   border, so the light box takes the shape of the name (or logo).
+   "Letter shapes": every letter becomes its own hollow glowing piece.
+   Everything is done on a millimetre raster with exact Euclidean offsets,
+   then traced back into smooth loops: S is the outside of the frame, I the
+   glowing opening (S shrunk by the wall), and the back panel's rim is S shrunk
+   by wall + fit. In these modes Width sets the overall width and the height
+   follows from the artwork. */
+function dt1(f, n, d, v, z){
+  var k = 0; v[0] = 0; z[0] = -Infinity; z[1] = Infinity;
+  for(var q=1;q<n;q++){
+    var s = ((f[q]+q*q) - (f[v[k]]+v[k]*v[k])) / (2*q - 2*v[k]);
+    while(s <= z[k]){ k--; s = ((f[q]+q*q) - (f[v[k]]+v[k]*v[k])) / (2*q - 2*v[k]); }
+    k++; v[k] = q; z[k] = s; z[k+1] = Infinity;
+  }
+  k = 0;
+  for(var p=0;p<n;p++){ while(z[k+1] < p) k++; d[p] = (p-v[k])*(p-v[k]) + f[v[k]]; }
+}
+/* squared distance (px²) from every pixel to the nearest set pixel */
+function edt(mask, w, h){
+  var INF = 1e20, N = Math.max(w,h);
+  var f = new Float64Array(N), d = new Float64Array(N), v = new Int32Array(N), z = new Float64Array(N+1);
+  var out = new Float32Array(w*h), x, y;
+  for(var i=0;i<w*h;i++) out[i] = mask[i] ? 0 : INF;
+  for(x=0;x<w;x++){ for(y=0;y<h;y++) f[y] = out[y*w+x]; dt1(f,h,d,v,z); for(y=0;y<h;y++) out[y*w+x] = d[y]; }
+  for(y=0;y<h;y++){ var r = y*w; for(x=0;x<w;x++) f[x] = out[r+x]; dt1(f,w,d,v,z); for(x=0;x<w;x++) out[r+x] = d[x]; }
+  return out;
+}
+function dilate(mask, w, h, rpx){
+  if(rpx <= 0) return mask.slice();
+  var D = edt(mask, w, h), r2 = rpx*rpx, out = new Uint8Array(w*h);
+  for(var i=0;i<w*h;i++) out[i] = D[i] <= r2 ? 1 : 0;
+  return out;
+}
+function orMasks(list, n){ var out = new Uint8Array(n); list.forEach(function(m){ for(var i=0;i<n;i++) if(m[i]) out[i] = 1; }); return out; }
+function countSet(m){ var c = 0; for(var i=0;i<m.length;i++) c += m[i]; return c; }
+
+/* 4-connected components of pixels equal to `val` */
+function components(mask, w, h, val){
+  var lab = new Int32Array(w*h).fill(-1), comps = [], stack = new Int32Array(w*h);
+  for(var s=0;s<w*h;s++){
+    if(lab[s] !== -1 || (mask[s] ? 1 : 0) !== val) continue;
+    var id = comps.length, sp = 0, c = {size:0, border:false, x0:1e9, x1:-1, y0:1e9, y1:-1,
+      top:-1, bot:-1, left:-1, right:-1};
+    stack[sp++] = s; lab[s] = id;
+    while(sp){
+      var p = stack[--sp], x = p % w, y = (p - x)/w;
+      c.size++;
+      if(x===0 || y===0 || x===w-1 || y===h-1) c.border = true;
+      if(y > c.y1){ c.y1 = y; c.top = p; }  if(y < c.y0){ c.y0 = y; c.bot = p; }
+      if(x > c.x1){ c.x1 = x; c.right = p; } if(x < c.x0){ c.x0 = x; c.left = p; }
+      var nb = [x>0?p-1:-1, x<w-1?p+1:-1, y>0?p-w:-1, y<h-1?p+w:-1];
+      for(var k=0;k<4;k++){ var q = nb[k]; if(q >= 0 && lab[q] === -1 && (mask[q] ? 1 : 0) === val){ lab[q] = id; stack[sp++] = q; } }
+    }
+    comps.push(c);
+  }
+  return {lab:lab, comps:comps};
+}
+function removeSpecks(mask, w, h, minPx){
+  var C = components(mask, w, h, 1), out = mask.slice();
+  for(var i=0;i<w*h;i++) if(C.lab[i] >= 0 && C.comps[C.lab[i]].size < minPx) out[i] = 0;
+  return out;
+}
+/* pinholes inside the art (anti-aliased seams between two traced colours)
+   would become pits in a stamp and hundreds of "islands" in a stencil */
+function fillSmallHoles(mask, w, h, maxPx){
+  var C = components(mask, w, h, 0), out = mask.slice();
+  for(var i=0;i<w*h;i++) if(C.lab[i] >= 0){ var c = C.comps[C.lab[i]]; if(!c.border && c.size < maxPx) out[i] = 1; }
+  return out;
+}
+function fillHoles(mask, w, h){
+  var C = components(mask, w, h, 0), out = mask.slice();
+  for(var i=0;i<w*h;i++) if(C.lab[i] >= 0 && !C.comps[C.lab[i]].border) out[i] = 1;
+  return out;
+}
+
+function erode(mask,w,h,rpx){ const inv=new Uint8Array(w*h); for(let i=0;i<w*h;i++) inv[i]=mask[i]?0:1; const d=dilate(inv,w,h,rpx); const out=new Uint8Array(w*h); for(let i=0;i<w*h;i++) out[i]=d[i]?0:1; return out; }
+function fontPx(st,mm,res){ return mm*res; }
+const shapeCache=new Map();
+function shapeModel(st, line1, line2){
+  const key=JSON.stringify([st.shape,st.W,st.wall,st.border,st.grow,st.fit,st.font,st.tL2,st.tBold,st.tX,st.tY,st.iScale,st.iX,st.iY,
+    S.imgName, S.src&&S.src.key, S.palette.map(p=>p.hex).join(), S.textCol, line1, line2]);
+  if(shapeCache.has(key)) return shapeCache.get(key);
+  const outline=st.shape==="outline";
+  const grow=outline?st.border:st.grow;
+  const tw=Math.max(20, st.W-2*st.wall-2*grow);           // width the artwork gets
+  const w8=FONT_WEIGHT[st.font]||400, fam=`"${st.font}", "Segoe UI", sans-serif`;
+  const mc=document.createElement("canvas").getContext("2d");
+  const l1=(line1||"").trim(), l2=(line2||"").trim();
+  /* measure the text at a 100 px reference size, then scale so the widest
+     line spans the art width */
+  const lines=[];
+  [[l1,1],[l2,l1?st.tL2:1]].forEach(([t,rel])=>{ if(!t) return;
+    mc.font=`${w8} 100px ${fam}`; const m=mc.measureText(t);
+    lines.push({t,rel,w:m.width/100,asc:(m.actualBoundingBoxAscent||72)/100,desc:(m.actualBoundingBoxDescent||20)/100}); });
+  let fmm=0;                                               // line-1 font size in mm
+  if(lines.length) fmm=Math.min(...lines.map(L=>(tw-st.tBold)/(L.w*L.rel)));
+  if(!isFinite(fmm)||fmm<=0) fmm=0;
+  const textH = lines.length ? lines.reduce((a,L)=>a+(L.asc+L.desc)*fmm*L.rel,0)+(lines.length>1?fmm*0.12:0)+st.tBold : 0;
+  let imgW=0, imgH=0;
+  if(S.img&&S.src){ imgW=tw*(lines.length?st.iScale:1); imgH=imgW*S.img.naturalHeight/S.img.naturalWidth; }
+  const gap=(imgH&&textH)?4:0;
+  const artH=Math.max(10, imgH+gap+textH);
+  const H=artH+2*st.wall+2*grow;
+  const pad=4, res=Math.min(8, 1500/(Math.max(st.W,H)+2*pad));
+  const gw=Math.round((st.W+2*pad)*res)+1, gh=Math.round((H+2*pad)*res)+1, N=gw*gh;
+  const ox=-(st.W/2+pad), oy=-(H/2+pad);
+  const px=(x,y)=>[(x-ox)*res,(gh-1)-(y-oy)*res];
+  const c=document.createElement("canvas"); c.width=gw; c.height=gh;
+  const g=c.getContext("2d",{willReadFrequently:true});
+  const labels=new Uint8Array(N), slots=[];
+  const top=artH/2;
+  if(imgW){
+    const [x0,y0]=px(st.iX-imgW/2, st.iY+top);
+    g.imageSmoothingQuality="high"; g.drawImage(S.img,x0,y0,imgW*res,imgH*res);
+    const d=g.getImageData(0,0,gw,gh).data, P=S.palette.map(p=>p.src);
+    for(let i=0;i<N;i++){
+      const r=d[i*4],gg=d[i*4+1],b=d[i*4+2],a=d[i*4+3];
+      if(!S.src.keep(r,gg,b,a)) continue;
+      let bi=0,bd=Infinity;
+      for(let k=0;k<P.length;k++){ const dr=r-P[k][0],dg=gg-P[k][1],db=b-P[k][2],dd=dr*dr+dg*dg+db*db; if(dd<bd){bd=dd;bi=k;} }
+      labels[i]=bi+1;
+    }
+    S.palette.forEach((p,i)=>slots.push({hex:p.hex,label:"Image colour "+(i+1)}));
+  }
+  if(lines.length){
+    g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,gw,gh); g.fillStyle="#fff"; g.strokeStyle="#fff";
+    g.textAlign="center"; g.textBaseline="alphabetic"; g.lineJoin="round"; g.lineWidth=st.tBold*res;
+    let y=top-imgH-gap-st.tBold/2;                        // mm, top of the text block
+    lines.forEach((L,i)=>{
+      const f=fmm*L.rel; y-=L.asc*f;
+      const [cx,cy]=px(st.tX, y+st.tY);
+      g.font=`${w8} ${fontPx(st,f,res)}px ${fam}`;
+      if(st.tBold>0) g.strokeText(L.t,cx,cy); g.fillText(L.t,cx,cy);
+      y-=L.desc*f+(i===0?fmm*0.12:0);
+    });
+    const td=g.getImageData(0,0,gw,gh).data, ts=slots.length+1;
+    for(let i=0;i<N;i++) if(td[i*4+3]>128) labels[i]=ts;
+    slots.push({hex:S.textCol,label:"Text"});
+  }
+  // art mask, y-up
+  let art=new Uint8Array(N);
+  for(let y=0;y<gh;y++){ const s=y*gw, d=(gh-1-y)*gw; for(let x=0;x<gw;x++) if(labels[s+x]) art[d+x]=1; }
+  const minPx=Math.max(4,Math.round(1.0*res*res));
+  art=removeSpecks(art,gw,gh,minPx);
+  let Sm, warn=[];
+  if(outline){
+    Sm=fillHoles(dilate(fillHoles(art,gw,gh),gw,gh,(st.wall+grow)*res),gw,gh);
+  }else{
+    Sm=fillSmallHoles(dilate(art,gw,gh,(st.wall+grow)*res),gw,gh,Math.round(12*res*res));
+  }
+  const Im=erode(Sm,gw,gh,st.wall*res);
+  const rimO=erode(Sm,gw,gh,(st.wall+st.fit)*res), rimI=erode(Sm,gw,gh,(st.wall+st.fit+1.6)*res);
+  if(!outline){
+    const pieces=components(Im,gw,gh,1).comps.filter(c=>c.size>minPx).length;
+    if(pieces>1) warn.push(`${pieces} separate pieces: each needs its own light, and they're hung separately. A connected script font, more letter thickness or "Follow the name" makes one piece.`);
+    // narrowest channel: LED strips need about 10 mm inside
+    const inv=new Uint8Array(N); for(let i=0;i<N;i++) inv[i]=Im[i]?0:1;
+    const D=edt(inv,gw,gh); let best=0; for(let i=0;i<N;i++) if(D[i]>best) best=D[i];
+    if(Math.sqrt(best)/res*2<10) warn.push(`The letters are only about ${(Math.sqrt(best)/res*2).toFixed(0)} mm wide inside. That's tight for an LED strip; add letter thickness or use 2 mm fairy-light wire.`);
+  }
+  const L=m=>jitterLoops(maskToLoops(m,gw,gh,ox,oy,res,1,0.03,0.5));
+  const M={shape:st.shape,res,gw,gh,ox,oy,N,labels,slots:outline?slots:[],art,Sm,Im,rimO,rimI,H:+H.toFixed(1),W:st.W,warn,
+    loops:null, getLoops(){ return this.loops||(this.loops={S:L(Sm),I:L(Im),rimO:L(rimO),rimI:L(rimI)}); }};
+  if(shapeCache.size>12) shapeCache.clear();
+  shapeCache.set(key,M);
+  return M;
+}
+/* attach the model and the height it implies */
+function withShape(st, line1, line2){
+  if(st.shape==="rect") return st;
+  st.model=shapeModel(st,line1,line2); st.H=st.model.H;
+  return st;
+}
+function buildFrontShaped(st, line1, line2){
+  const M=st.model||shapeModel(st,line1,line2), Lp=M.getLoops(), parts=[];
+  const fr=[]; extrude(fr,[...Lp.S,...Lp.I.map(revLoop)],0,st.D);
+  parts.push({name:"frame",label:"Frame",tris:fr,color:st.frameCol,z:[0,st.D]});
+  const F=st.faceT, h=st.colD;
+  if(M.shape==="outline" && M.slots.length){
+    const lab=m=>jitterLoops(maskToLoops(m,M.gw,M.gh,M.ox,M.oy,M.res,1,0.03,0.08));
+    const U=lab(slotMaskM(M,0)), holes=U.map(revLoop), t=[];
+    addCaps(t,[...Lp.I,...holes],0,false); addWalls(t,holes,0,h); addCaps(t,U,h,false);
+    addWalls(t,Lp.I,0,F); addCaps(t,Lp.I,F,true);
+    parts.push({name:"front",label:"Front (diffuser)",tris:t,color:st.faceCol,z:[0,F]});
+    M.slots.forEach((s,i)=>{ const Ls=lab(slotMaskM(M,i+1)); if(!Ls.length) return;
+      const tt=[]; extrude(tt,Ls,0,h); parts.push({name:"colour"+(i+1),label:s.label,tris:tt,color:s.hex,z:[0,h]}); });
+  }else{
+    const t=[]; extrude(t,Lp.I,0,F);
+    parts.push({name:"front",label:"Front (diffuser)",tris:t,color:st.faceCol,z:[0,F]});
+  }
+  mirrorX(parts);
+  return parts;
+}
+function slotMaskM(M,slot){
+  const m=new Uint8Array(M.N);
+  for(let y=0;y<M.gh;y++){ const s=y*M.gw,d=(M.gh-1-y)*M.gw; for(let x=0;x<M.gw;x++){ const v=M.labels[s+x]; if(slot?v===slot:v) m[d+x]=1; } }
+  // keep inlays clear of the frame
+  const inner=erode(M.Im,M.gw,M.gh,1.5*M.res); for(let i=0;i<M.N;i++) if(!inner[i]) m[i]=0;
+  return m;
+}
+/* back panel for a shaped box, in print space (rim side up = seen from the front) */
+function buildBackShaped(st){
+  const M=st.model, Lp=M.getLoops(), bt=2.4, rh=4, holes=[];
+  // cable hole at the roomiest spot inside the rim, preferring the lower half
+  if(st.cable){
+    const inv=new Uint8Array(M.N); for(let i=0;i<M.N;i++) inv[i]=M.rimI[i]?0:1;
+    const D=edt(inv,M.gw,M.gh); let bi=-1,bd=0,ai=-1,ad=0; const cy=(M.gh-1)/2;
+    for(let i=0;i<M.N;i++){ const v=D[i]; if(v>ad){ad=v;ai=i;} if(v>bd && Math.floor(i/M.gw)<cy){bd=v;bi=i;} }
+    const pick=(Math.sqrt(bd)/M.res>=7.6)?bi:ai, r=Math.sqrt(pick===bi?bd:ad)/M.res;
+    if(pick>=0 && r>=4.5){
+      const x=M.ox+(pick%M.gw)/M.res, y=M.oy+Math.floor(pick/M.gw)/M.res;
+      holes.push(r>=8.2 ? rectLoop(x,y,13,8,3.5) : circleLoop(x,y,3.5,40));
+    }
+  }
+  let wm=null;
+  if(!isPro()) wm=backMarkShaped(st,M,holes);
+  const t=[], hr=holes.map(revLoop), wr=wm?wm.map(revLoop):[];
+  addCaps(t,[...Lp.S,...hr,...wr],0,false);
+  addWalls(t,Lp.S,0,bt); addWalls(t,hr,0,bt);
+  if(wm){ addWalls(t,wr,0,0.4); addCaps(t,wm,0.4,false); }
+  addCaps(t,[...Lp.S,...Lp.rimO.map(revLoop),...Lp.rimI,...hr],bt,true);
+  addWalls(t,[...Lp.rimO,...Lp.rimI.map(revLoop)],bt,bt+rh);
+  addCaps(t,[...Lp.rimO,...Lp.rimI.map(revLoop)],bt+rh,true);
+  return [{name:"back",label:"Back panel",tris:t,color:st.frameCol,z:[0,bt+rh]}];
+}
+function backMarkShaped(st,M,holes){
+  const c=document.createElement("canvas"); c.width=M.gw; c.height=M.gh;
+  const g=c.getContext("2d",{willReadFrequently:true});
+  const ok=erode(M.rimI,M.gw,M.gh,2*M.res);
+  const bb=holes.map(L=>{ let a=1e9,b=-1e9,cc=1e9,dd=-1e9; for(const p of L){a=Math.min(a,p.x);b=Math.max(b,p.x);cc=Math.min(cc,p.y);dd=Math.max(dd,p.y);} return [a-1.5,b+1.5,cc-1.5,dd+1.5]; });
+  for(const cap of [3.2,2.6,2.0]){
+    g.setTransform(1,0,0,1,0,0); g.clearRect(0,0,M.gw,M.gh);
+    g.setTransform(-1,0,0,1,2*((0-M.ox)*M.res),0);        // mirror about x = 0 (read from behind)
+    g.font=`800 ${cap*M.res/0.716}px "Segoe UI","Helvetica Neue",Arial,sans-serif`;
+    try{ g.letterSpacing=(0.5*M.res)+"px"; }catch(e){}
+    g.textAlign="center"; g.textBaseline="middle"; g.fillStyle="#fff"; g.strokeStyle="#fff"; g.lineJoin="round"; g.lineWidth=0.25*M.res;
+    const cx=(0-M.ox)*M.res, cy=(M.gh-1)-(0-M.oy)*M.res;
+    g.strokeText("MADE WITH VEER",cx,cy); g.fillText("MADE WITH VEER",cx,cy);
+    const d=g.getImageData(0,0,M.gw,M.gh).data, m=new Uint8Array(M.N); let bad=false;
+    for(let y=0;y<M.gh&&!bad;y++) for(let x=0;x<M.gw;x++){
+      if(d[(y*M.gw+x)*4+3]<=128) continue;
+      const iu=((M.gh-1)-y)*M.gw+x, mx=M.ox+x/M.res, my=M.oy+((M.gh-1)-y)/M.res;
+      if(!ok[iu]||bb.some(b=>mx>b[0]&&mx<b[1]&&my>b[2]&&my<b[3])){ bad=true; break; }
+      m[iu]=1;
+    }
+    if(bad) continue;
+    const L=maskToLoops(m,M.gw,M.gh,M.ox,M.oy,M.res,1,0.03,0.01);
+    if(L.length) return jitterLoops(L);
+  }
+  return null;
+}
+/* the shaped box as a picture: frame where S−I, the glowing front inside */
+function shapedView(st, lit){
+  const M=st.model, img=new ImageData(M.gw,M.gh), d=img.data;
+  const face=hex2rgb(st.faceCol), fr=hex2rgb(st.frameCol), frLit=fr.map(v=>v*0.8);
+  const faceLit=GLOW.map((g,i)=>g*(0.55+0.45*face[i]/255));
+  const cols=M.slots.map(s=>hex2rgb(s.hex));
+  const colLit=cols.map(c=>{ const l=luma(c); return c.map((v,i)=>clamp(v*(0.25+1.1*l)+GLOW[i]*0.12*l,0,255)); });
+  const inl=M.slots.length?erode(M.Im,M.gw,M.gh,1.5*M.res):null;
+  for(let y=0;y<M.gh;y++) for(let x=0;x<M.gw;x++){
+    const iu=((M.gh-1)-y)*M.gw+x, o=(y*M.gw+x)*4;
+    if(!M.Sm[iu]){ d[o+3]=0; continue; }
+    let c;
+    if(!M.Im[iu]) c=lit?frLit:fr;
+    else { const s=M.labels[y*M.gw+x]; c=(s&&inl&&inl[iu]) ? (lit?colLit[s-1]:cols[s-1]) : (lit?faceLit:face); }
+    d[o]=c[0]; d[o+1]=c[1]; d[o+2]=c[2]; d[o+3]=255;
+  }
+  const c=document.createElement("canvas"); c.width=M.gw; c.height=M.gh; c.getContext("2d").putImageData(img,0,0);
+  return c;
+}
+function paintShaped(ctx, Wc, Hc, st, lit, view){
+  const M=st.model, pad=Math.max(28,Math.min(Wc,Hc)*0.09);
+  const fullW=M.gw/M.res, fullH=M.gh/M.res;
+  const sc=Math.min((Wc-2*pad)/st.W,(Hc-2*pad)/M.H);
+  const dw=fullW*sc, dh=fullH*sc, x0=(Wc-dw)/2, y0=(Hc-dh)/2;
+  if(lit){
+    const gr=ctx.createRadialGradient(Wc/2,Hc/2,Math.min(st.W,M.H)*sc*0.3,Wc/2,Hc/2,Math.max(st.W,M.H)*sc*0.95);
+    gr.addColorStop(0,"rgba(255,214,150,0.22)"); gr.addColorStop(1,"rgba(255,214,150,0)");
+    ctx.fillStyle=gr; ctx.fillRect(0,0,Wc,Hc);
+  }
+  ctx.save(); ctx.imageSmoothingEnabled=true; ctx.imageSmoothingQuality="high";
+  ctx.shadowColor="rgba(0,0,0,0.55)"; ctx.shadowBlur=30; ctx.shadowOffsetY=14;
+  ctx.drawImage(view,x0,y0,dw,dh); ctx.restore();
+  if(lit){
+    ctx.save(); ctx.globalCompositeOperation="screen"; ctx.globalAlpha=0.35; ctx.filter=`blur(${Math.max(4,st.W*sc/60)}px)`;
+    ctx.drawImage(view,x0,y0,dw,dh); ctx.restore();
+  }
+  return {sc,x0,y0,bw:st.W*sc,bh:M.H*sc};
+}
 function paintBox(ctx, Wc, Hc, st, lit, view){
   const pad=Math.max(28, Math.min(Wc,Hc)*0.09);
   const sc=Math.min((Wc-2*pad)/st.W, (Hc-2*pad)/st.H);
@@ -1535,6 +1840,7 @@ function paintBox(ctx, Wc, Hc, st, lit, view){
 }
 /* the front as an image: what you see looking at the box */
 function frontViews(st, line1, line2){
+  if(st.shape!=="rect"){ withShape(st,line1,line2); return {lit:shapedView(st,true), unlit:shapedView(st,false)}; }
   if(st.mode==="litho"){ const M=lithoMap(st,line1,line2); return {lit:frontView(st,true,line1,line2,M), unlit:frontView(st,false,line1,line2,M)}; }
   const R=rasterInlay(st,line1,line2);
   return {lit:frontView(st,true,line1,line2,R), unlit:frontView(st,false,line1,line2,R)};
@@ -1569,14 +1875,15 @@ function drawLit(){
   cv.width=Wc*dpr; cv.height=Hc*dpr;
   const ctx=cv.getContext("2d"); ctx.setTransform(dpr,0,0,dpr,0,0); ctx.clearRect(0,0,Wc,Hc);
   if(!viewCache) return;
-  paintBox(ctx,Wc,Hc,viewCache.st,$("lightsOn").checked,$("lightsOn").checked?viewCache.lit:viewCache.unlit);
+  (viewCache.st.shape!=="rect"?paintShaped:paintBox)(ctx,Wc,Hc,viewCache.st,$("lightsOn").checked,$("lightsOn").checked?viewCache.lit:viewCache.unlit);
 }
 function proofPNG(st, line1, line2){
   const W=1600, H=1200, c=document.createElement("canvas"); c.width=W; c.height=H;
   const ctx=c.getContext("2d");
   const bg=ctx.createLinearGradient(0,0,0,H); bg.addColorStop(0,"#2a241d"); bg.addColorStop(1,"#14110e");
   ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
-  paintBox(ctx,W,H,st,true,frontView(st,true,line1,line2));
+  if(st.shape!=="rect"){ withShape(st,line1,line2); paintShaped(ctx,W,H,st,true,shapedView(st,true)); }
+  else paintBox(ctx,W,H,st,true,frontView(st,true,line1,line2));
   return new Promise(res=>c.toBlob(b=>b.arrayBuffer().then(a=>res(new Uint8Array(a))),"image/png"));
 }
 
@@ -1674,8 +1981,12 @@ function refresh(){
       const t0=performance.now();
       viewCache={st, ...frontViews(st,st.l1,st.l2)};
       drawLit();
+      if(st.shape!=="rect"){
+        $("H").value=Math.round(st.H);
+        if(st.model.warn.length) $("frontWarn").innerHTML+=st.model.warn.map(w=>`<div class="warnbox">${w}</div>`).join("");
+      }
       const needs=isPro()?[]:proNeeds(st);
-      $("overlay").textContent=`${st.W} × ${st.H} × ${st.D} mm · opening ${st.iw.toFixed(0)} × ${st.ih.toFixed(0)} mm · ${st.mode==="litho"?"lithophane":"multi-colour front"} · ${(performance.now()-t0).toFixed(0)} ms`;
+      $("overlay").textContent=`${st.W} × ${st.H} × ${st.D} mm · ${st.shape==="rect"?`opening ${st.iw.toFixed(0)} × ${st.ih.toFixed(0)} mm`:st.shape==="outline"?"shaped to the name":"letter shapes"} · ${st.mode==="litho"?"lithophane":"multi-colour front"} · ${(performance.now()-t0).toFixed(0)} ms`;
       if(needs.length) setStatus(`Previewing Pro features (${needs.join(", ")}). Download needs Pro.`);
       else if(!$("stat").classList.contains("ok")) setStatus(st.batch.length?`${st.batch.length} names ready for batch export.`:"Ready.");
       S.parts=[]; $("partlist").style.display="none";
@@ -1711,7 +2022,9 @@ function readme(st, names){
     st.mode==="litho"
       ? "  Lithophane: print the front in WHITE PLA, 100% infill, 0.12-0.16 mm layers look best."
       : "  The front is the diffuser: white PLA. Black text blocks light; other colours glow tinted.","");
-  if(names.length) L.push("BATCH: the frame is shared. For each name, load 1_box/frame.stl together with the",
+  if(names.length && st.shape!=="rect") L.push("BATCH: each name has its own folder with its own frame, front and back,",
+    "because a shaped box takes the shape of the name.","");
+  else if(names.length) L.push("BATCH: the frame is shared. For each name, load 1_box/frame.stl together with the",
     "files in names/<name>/ as one object.","");
   if(st.backOn) L.push("PRINT 2: THE BACK PANEL  (folder 2_back)",
     "  Print flat, rim up. The rim presses into the back of the frame.",
@@ -1728,7 +2041,16 @@ async function doDownload(){
   await new Promise(r=>setTimeout(r,20));
   try{
     const files=[], bn=slug(st.batch.length?"batch_"+st.batch.length:st.l1||S.imgName.replace(/\.[^.]+$/,""));
-    if(st.batch.length){
+    if(st.batch.length && st.shape!=="rect"){
+      for(let i=0;i<st.batch.length;i++){
+        const name=st.batch[i]; setStatus(`Building ${i+1} of ${st.batch.length}: ${name}…`);
+        await new Promise(r=>setTimeout(r,0));
+        const dir=`${bn}/${String(i+1).padStart(3,"0")}_${slug(name)}`;
+        buildFront(st,name,st.l2).forEach((p,k)=>files.push({name:`${dir}/1_box/${k+1}_${p.name}.stl`,data:stlBinary(p.tris,p.label+" "+name)}));
+        if(st.backOn){ const b=buildBack(st)[0]; files.push({name:`${dir}/2_back/back.stl`,data:stlBinary(b.tris,"Back panel "+name)}); }
+        files.push({name:`${dir}/proof.png`,data:await proofPNG(st,name,st.l2)});
+      }
+    }else if(st.batch.length){
       const frame=buildFront(st,st.batch[0],st.l2)[0];
       files.push({name:`${bn}/1_box/frame.stl`,data:stlBinary(frame.tris,"Frame")});
       for(let i=0;i<st.batch.length;i++){
@@ -1743,13 +2065,26 @@ async function doDownload(){
       parts.forEach((p,i)=>files.push({name:`${bn}/1_box/${i+1}_${p.name}.stl`,data:stlBinary(p.tris,p.label)}));
       files.push({name:`${bn}/proof.png`,data:await proofPNG(st,st.l1,st.l2)});
     }
-    if(st.backOn){ const b=buildBack(st)[0]; files.push({name:`${bn}/2_back/back.stl`,data:stlBinary(b.tris,"Back panel")}); }
+    if(st.backOn && !(st.batch.length && st.shape!=="rect")){ if(st.shape!=="rect") withShape(st,st.l1,st.l2); const b=buildBack(st)[0]; files.push({name:`${bn}/2_back/back.stl`,data:stlBinary(b.tris,"Back panel")}); }
     files.push({name:`${bn}/README.txt`,data:readme(st,st.batch)});
     download(zipStore(files),bn+"_lightbox.zip","application/zip");
     setStatus(st.batch.length?`Saved ${st.batch.length} light boxes with proofs.`:"Saved. Import everything in 1_box together; print the back separately.","ok");
   }catch(e){ console.error(e); setStatus("Export failed: "+e.message,"err"); }
 }
 
+/* shape controls: presets and height only apply to rectangles */
+function syncShapeUI(){
+  const litho=S.mode==="litho", v=litho?"rect":$("shape").value, shaped=v!=="rect";
+  $("shape").disabled=litho;
+  $("borderRow").hidden=v!=="outline"; $("growRow").hidden=v!=="letters";
+  $("presetRow").hidden=shaped; $("H").disabled=shaped; $("rad").closest(".row").hidden=shaped;
+  const n=$("shapeNote"); n.hidden=!shaped&&!litho;
+  n.textContent = litho ? "Photo lithophanes are rectangular."
+    : v==="outline" ? "The box follows the outline of the name (and logo), plus the border. Width sets the overall width; the height follows from the name."
+    : v==="letters" ? "Each letter becomes its own glowing shape. Letter signs look best big (300 mm+ wide) in a bold or connected font, so there's room inside for the light."
+    : "";
+}
+$("shape").addEventListener("change",syncShapeUI);
 /* mode + inputs */
 function setMode(m){
   S.mode=m;
@@ -1761,6 +2096,7 @@ function setMode(m){
     : "Text and artwork are set flush into a thin white front. White glows, colours glow tinted, black blocks light.";
   if(m==="litho"&&$("preset").value==="name"){ $("preset").value="photo"; applyPreset(); }
   $("imgCtrls").hidden=!S.img;
+  syncShapeUI();
   refresh();
 }
 document.querySelectorAll("#modeSeg button").forEach(b=>b.onclick=()=>setMode(b.dataset.m));
@@ -1785,7 +2121,7 @@ $("imgClear").onclick=e=>{ e.stopPropagation(); S.img=null; S.src=null; S.palett
 ["dragleave","drop"].forEach(ev=>window.addEventListener(ev,e=>{ e.preventDefault(); $("drop").classList.remove("over"); }));
 window.addEventListener("drop",e=>{ if(e.dataTransfer&&e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
 const LIVE=["l1","l2","font","tSize","tL2","tBold","tX","tY","iScale","iX","iY","k","rmBg","bgTol","lZoom","lBright","lContrast","lMin","lMax",
-  "W","H","D","wall","rad","faceT","colD","frameCol","faceCol","backOn","keyholes","cable","fit","batch","preset"];
+  "W","H","D","wall","rad","faceT","colD","frameCol","faceCol","backOn","keyholes","cable","fit","batch","preset","shape","border","grow"];
 LIVE.forEach(id=>{ const el=$(id); if(!el) return;
   el.addEventListener("input",()=>{ syncLabels(); $("stat").classList.remove("ok"); refresh(); });
   el.addEventListener("change",()=>{ syncLabels(); refresh(); }); });
